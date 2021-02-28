@@ -1,7 +1,6 @@
 package com.personal.board.service;
 
 import com.personal.board.dto.request.SignUpRequest;
-import com.personal.board.dto.response.UserResponse;
 import com.personal.board.dto.response.UserResponseWithCreatedAt;
 import com.personal.board.dto.response.UserResponseWithModifiedAt;
 import com.personal.board.entity.User;
@@ -22,7 +21,7 @@ public class UserService {
   private final UserRepository userRepository;
 
   public UserResponseWithCreatedAt signUp(SignUpRequest signUpRequest) {
-    if (userRepository.findUserByEmailOrNickname(signUpRequest.getEmail(), signUpRequest.getNickname()) != null) {
+    if (userRepository.findUserByEmailOrNickname(signUpRequest.getEmail(), signUpRequest.getNickname()).isPresent()) {
       throw new DuplicatedException("Email or nickname is duplicated.");
     }
 
