@@ -10,7 +10,7 @@ public class UserResponseWithCreatedAt extends UserResponse {
 
   public UserResponseWithCreatedAt(User user) {
     super(user);
-    this.createdAt = getCreatedAt();
+    this.createdAt = user.getCreatedAt();
   }
 
   private final LocalDateTime createdAt;
