@@ -1,0 +1,18 @@
+package com.personal.board.dto.response;
+
+import com.personal.board.entity.User;
+import lombok.Getter;
+
+import java.time.LocalDateTime;
+
+@Getter
+public class UserResponseWithCreatedAt extends UserResponse {
+
+  public UserResponseWithCreatedAt(User user) {
+    super(user);
+    this.createdAt = getCreatedAt();
+  }
+
+  private final LocalDateTime createdAt;
+
+}
