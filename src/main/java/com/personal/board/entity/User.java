@@ -50,4 +50,24 @@ public class User extends BaseEntity {
   @Column(columnDefinition = "text", nullable = false)
   private String password;
 
+  public void changeEmail(final String email) {
+    this.email = email;
+  }
+
+  public void changeNickname(final String nickname) {
+    this.nickname = nickname;
+  }
+
+  public void changeName(final String name) {
+    this.name = name;
+  }
+
+  public void changeAge(final int age) {
+    this.age = age;
+  }
+
+  public void changePassword(final String password) {
+    this.password = password;
+  }
+
 }
