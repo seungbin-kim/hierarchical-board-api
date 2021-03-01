@@ -2,8 +2,7 @@ package com.personal.board.exception;
 
 public class DuplicatedException extends RuntimeException {
 
-  public DuplicatedException(String message) {
-    super(message);
+  public DuplicatedException() {
+    super("Email or nickname is duplicated.");
   }
-
 }
