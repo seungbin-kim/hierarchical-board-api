@@ -1,8 +1,10 @@
 package com.personal.board.controller;
 
+import com.personal.board.dto.request.UserUpdateRequest;
 import com.personal.board.dto.response.ResultResponse;
 import com.personal.board.dto.request.SignUpRequest;
 import com.personal.board.dto.response.UserResponseWithCreatedAt;
+import com.personal.board.dto.response.UserResponseWithDate;
 import com.personal.board.dto.response.UserResponseWithModifiedAt;
 import com.personal.board.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,7 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping("/users")
-  public ResponseEntity<UserResponseWithCreatedAt> signUp(@RequestBody @Valid SignUpRequest signUpRequest) {
+  public ResponseEntity<UserResponseWithCreatedAt> signUp(@RequestBody @Valid final SignUpRequest signUpRequest) {
     UserResponseWithCreatedAt userResponse = userService.signUp(signUpRequest);
 
     return ResponseEntity
@@ -33,9 +35,16 @@ public class UserController {
   }
 
   @GetMapping("/users")
-  public ResponseEntity<ResultResponse<List<UserResponseWithModifiedAt>>> getAllUsers() {
+  public ResponseEntity<ResultResponse<List<UserResponseWithDate>>> getAllUsers() {
     return ResponseEntity
-        .ok(new ResultResponse<>(userService.returnAllUsers()));
+        .ok(new ResultResponse<>(userService.getAllUsers()));
+  }
+
+  @PatchMapping("/users/{id}")
+  public ResponseEntity<UserResponseWithModifiedAt> updateUser(
+      @RequestBody @Valid final UserUpdateRequest request, @PathVariable final Long id) {
+    return ResponseEntity
+        .ok(userService.updateUser(request, id));
   }
 
 }
