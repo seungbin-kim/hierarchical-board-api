@@ -1,6 +1,6 @@
 package com.personal.board.dto.response;
 
-import com.personal.board.advice.ErrorType;
+import com.personal.board.enumeration.ErrorType;
 import lombok.Getter;
 
 @Getter
