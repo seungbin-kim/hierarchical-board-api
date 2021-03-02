@@ -1,9 +1,9 @@
 package com.personal.board.exception;
 
-public class PasswordIncorrectException extends RuntimeException {
+public class PasswordIncorrectException extends BadArgumentException {
 
   public PasswordIncorrectException() {
-    super("Password is incorrect.");
+    super("password is incorrect.");
   }
 
 }
