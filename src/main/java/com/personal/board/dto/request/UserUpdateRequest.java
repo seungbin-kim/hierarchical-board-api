@@ -10,16 +10,16 @@ import javax.validation.constraints.NotBlank;
 @Setter
 public class UserUpdateRequest {
 
-  @Email(message = "Not in email format.")
+  @Email(message = "not in email format.")
   private String email;
 
   private String nickname;
 
   private String name;
 
-  private int age;
+  private Integer age;
 
-  @NotBlank(message = "Password is required.")
+  @NotBlank(message = "password is required.")
   private String password;
 
   private String newPassword;
