@@ -54,4 +54,19 @@ public class UserController {
     }
   }
 
+  @GetMapping("/users/{id}")
+  public ResponseEntity<UserResponseWithDate> findUser(@PathVariable final Long id) {
+    return ResponseEntity
+        .ok(userService.findUser(id));
+  }
+
+  @DeleteMapping("/users/{id}")
+  public ResponseEntity deleteUser(@PathVariable final Long id) {
+    userService.deleteUser(id);
+
+    return ResponseEntity
+        .noContent()
+        .build();
+  }
+
 }
