@@ -14,7 +14,7 @@ public class UserRepository {
   @PersistenceContext
   private EntityManager em;
 
-  public User saveUser(final User user) {
+  public User save(final User user) {
     em.persist(user);
     return user;
   }
