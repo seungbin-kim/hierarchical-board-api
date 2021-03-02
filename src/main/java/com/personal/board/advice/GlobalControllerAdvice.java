@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.personal.board.dto.response.ErrorResponse;
 import com.personal.board.enumeration.ErrorType;
 import com.personal.board.exception.BadArgumentException;
+import com.personal.board.exception.NotFoundException;
 import com.personal.board.exception.ReflectIllegalAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,13 @@ import java.util.Objects;
 @RestControllerAdvice(basePackages = "com.personal.board.controller")
 public class GlobalControllerAdvice {
 
+  @ExceptionHandler(NotFoundException.class)
+  public ResponseEntity<ErrorResponse> notFoundExceptionHandler(NotFoundException exception) {
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(makeErrorResponse(ErrorType.NOT_FOUND, exception.getMessage()));
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> methodValidExceptionHandler(MethodArgumentNotValidException exception) {
     String defaultMessage =
@@ -26,7 +34,7 @@ public class GlobalControllerAdvice {
 
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
-        .body(new ErrorResponse(ErrorType.BAD_ARGUMENT, defaultMessage));
+        .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, defaultMessage));
   }
 
   @ExceptionHandler(BadArgumentException.class)
@@ -40,11 +48,11 @@ public class GlobalControllerAdvice {
   public ResponseEntity<ErrorResponse> InvalidFormatExceptionHandler() {
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
-        .body(new ErrorResponse(ErrorType.BAD_ARGUMENT, "incorrect data type."));
+        .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, "incorrect data type."));
   }
 
   @ExceptionHandler(ReflectIllegalAccessException.class)
-  public ResponseEntity<ErrorResponse> updateExceptionHandler(ReflectIllegalAccessException exception) {
+  public ResponseEntity<ErrorResponse> ReflectIllegalAccessExceptionHandler(ReflectIllegalAccessException exception) {
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(new ErrorResponse(ErrorType.SERVER_ERROR, exception.getMessage()));
