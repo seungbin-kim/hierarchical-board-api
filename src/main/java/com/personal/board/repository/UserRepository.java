@@ -14,9 +14,13 @@ public class UserRepository {
   @PersistenceContext
   private EntityManager em;
 
-  public User save(final User user) {
+  public User saveUser(final User user) {
     em.persist(user);
     return user;
+  }
+
+  public void deleteUser(final User user) {
+    em.remove(user);
   }
 
   public Optional<User> findUserById(final Long id) {
