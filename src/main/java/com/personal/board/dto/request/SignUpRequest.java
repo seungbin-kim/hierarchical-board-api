@@ -5,24 +5,26 @@ import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
 public class SignUpRequest {
 
-  @Email(message = "Not in email format.")
-  @NotBlank(message = "Email is required")
+  @Email(message = "not in email format.")
+  @NotBlank(message = "email is required")
   private String email;
 
-  @NotBlank(message = "Nickname is required.")
+  @NotBlank(message = "nickname is required.")
   private String nickname;
 
-  @NotBlank(message = "Name is required.")
+  @NotBlank(message = "name is required.")
   private String name;
 
-  private int age;
+  @NotNull(message = "age is required.")
+  private Integer age;
 
-  @NotBlank(message = "Password is required.")
+  @NotBlank(message = "password is required.")
   private String password;
 
 }
