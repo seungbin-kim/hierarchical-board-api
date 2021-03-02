@@ -6,6 +6,7 @@ import com.personal.board.dto.request.SignUpRequest;
 import com.personal.board.dto.response.UserResponseWithCreatedAt;
 import com.personal.board.dto.response.UserResponseWithDate;
 import com.personal.board.dto.response.UserResponseWithModifiedAt;
+import com.personal.board.exception.ReflectIllegalAccessException;
 import com.personal.board.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,7 @@ public class UserController {
 
   @GetMapping("/users")
   public ResponseEntity<ResultResponse<List<UserResponseWithDate>>> getAllUsers() {
+
     return ResponseEntity
         .ok(new ResultResponse<>(userService.getAllUsers()));
   }
@@ -43,8 +45,13 @@ public class UserController {
   @PatchMapping("/users/{id}")
   public ResponseEntity<UserResponseWithModifiedAt> updateUser(
       @RequestBody @Valid final UserUpdateRequest request, @PathVariable final Long id) {
-    return ResponseEntity
-        .ok(userService.updateUser(request, id));
+
+    try {
+      return ResponseEntity
+          .ok(userService.updateUser(request, id));
+    } catch (IllegalAccessException exception) {
+      throw new ReflectIllegalAccessException();
+    }
   }
 
 }
