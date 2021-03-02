@@ -45,6 +45,24 @@ public class UserService {
     return new UserResponseWithCreatedAt(savedUser);
   }
 
+  public void deleteUser(final Long id) {
+    Optional<User> userById = userRepository.findUserById(id);
+    if (userById.isEmpty()) {
+      throw new NotFoundException("user id not found.");
+    }
+
+    userRepository.deleteUser(userById.get());
+  }
+
+  public UserResponseWithDate findUser(final Long id) {
+    Optional<User> userById = userRepository.findUserById(id);
+    if (userById.isEmpty()) {
+      throw new NotFoundException("user id not found.");
+    }
+
+    return new UserResponseWithDate(userById.get());
+  }
+
   public List<UserResponseWithDate> getAllUsers() {
     return userRepository.findAllUsers()
         .stream()
@@ -56,7 +74,7 @@ public class UserService {
     // 정보 찾아오기
     Optional<User> userById = userRepository.findUserById(id);
     if (userById.isEmpty()) {
-      throw new NotFoundException("User Id not found.");
+      throw new NotFoundException("user id not found.");
     }
     User findUser = userById.get();
 
