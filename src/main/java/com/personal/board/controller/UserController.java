@@ -29,7 +29,6 @@ public class UserController {
   @PostMapping("/users")
   public ResponseEntity<UserResponseWithCreatedAt> signUp(@RequestBody @Valid final SignUpRequest signUpRequest) {
     UserResponseWithCreatedAt userResponse = userService.signUp(signUpRequest);
-
     return ResponseEntity
         .created(new UriTemplate(USER).expand(userResponse.getId()))
         .body(userResponse);
@@ -37,15 +36,13 @@ public class UserController {
 
   @GetMapping("/users")
   public ResponseEntity<ResultResponse<List<UserResponseWithDate>>> getAllUsers() {
-
     return ResponseEntity
         .ok(new ResultResponse<>(userService.getAllUsers()));
   }
 
   @PatchMapping("/users/{id}")
-  public ResponseEntity<UserResponseWithModifiedAt> updateUser(
+  public ResponseEntity<UserResponseWithModifiedAt> patchUser(
       @RequestBody @Valid final UserUpdateRequest request, @PathVariable final Long id) {
-
     try {
       return ResponseEntity
           .ok(userService.updateUser(request, id));
@@ -55,15 +52,14 @@ public class UserController {
   }
 
   @GetMapping("/users/{id}")
-  public ResponseEntity<UserResponseWithDate> findUser(@PathVariable final Long id) {
+  public ResponseEntity<UserResponseWithDate> getUser(@PathVariable final Long id) {
     return ResponseEntity
-        .ok(userService.findUser(id));
+        .ok(userService.getUser(id));
   }
 
   @DeleteMapping("/users/{id}")
   public ResponseEntity deleteUser(@PathVariable final Long id) {
     userService.deleteUser(id);
-
     return ResponseEntity
         .noContent()
         .build();
