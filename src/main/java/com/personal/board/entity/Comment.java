@@ -1,8 +1,14 @@
 package com.personal.board.entity;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SequenceGenerator(
     name = "COMMENT_SEQ_GEN",
     sequenceName = "COMMENT_SEQ",

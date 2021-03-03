@@ -5,11 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
 @Table(name = "users")
 @SequenceGenerator(
     name = "USER_SEQ_GEN",
@@ -24,8 +23,6 @@ public class User extends BaseEntity {
     this.name = name;
     this.age = age;
     this.password = password;
-    setCreatedAt(LocalDateTime.now());
-    setModifiedAt(LocalDateTime.now());
   }
 
   @Id

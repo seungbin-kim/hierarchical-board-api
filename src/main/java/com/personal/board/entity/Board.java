@@ -1,16 +1,24 @@
 package com.personal.board.entity;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SequenceGenerator(
     name = "BOARD_SEQ_GEN",
     sequenceName = "BOARD_SEQ",
     initialValue = 1, allocationSize = 1
 )
 public class Board extends BaseEntity {
+
+  public Board(String name) {
+    this.name = name;
+  }
 
   @Id
   @GeneratedValue(
