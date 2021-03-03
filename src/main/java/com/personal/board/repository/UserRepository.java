@@ -4,6 +4,7 @@ import com.personal.board.entity.User;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
@@ -24,45 +25,37 @@ public class UserRepository {
   }
 
   public Optional<User> findUserById(final Long id) {
-    List<User> result = em.createQuery(
-        "SELECT u FROM User u WHERE u.id = :id", User.class)
-        .setParameter("id", id)
-        .getResultList();
-
-    return makeOptionalObject(result);
+    try {
+      User user = em.createQuery(
+          "SELECT u FROM User u WHERE u.id = :id", User.class)
+          .setParameter("id", id)
+          .getSingleResult();
+      return Optional.of(user);
+    } catch (NoResultException exception) {
+      return Optional.empty();
+    }
   }
 
-  public Optional<User> findUserByEmail(final String email) {
-    List<User> result = em.createQuery(
-        "SELECT u FROM User u WHERE u.email = :email", User.class)
+  public boolean checkUserEmail(final String email) {
+    Long result = em.createQuery(
+        "SELECT count(u) FROM User u WHERE u.email = :email", Long.class)
         .setParameter("email", email)
-        .getResultList();
-
-    return makeOptionalObject(result);
+        .getSingleResult();
+    return result == 1;
   }
 
-  public Optional<User> findUserByNickname(final String nickname) {
-    List<User> result = em.createQuery(
-        "SELECT u FROM User u WHERE u.nickname = :nickname", User.class)
+  public boolean checkUserNickname(final String nickname) {
+    Long result = em.createQuery(
+        "SELECT count(u) FROM User u WHERE u.nickname = :nickname", Long.class)
         .setParameter("nickname", nickname)
-        .getResultList();
-
-    return makeOptionalObject(result);
+        .getSingleResult();
+    return result == 1;
   }
 
   public List<User> findAllUsers() {
     return em.createQuery(
         "SELECT u FROM User u", User.class)
         .getResultList();
-  }
-
-  private Optional<User> makeOptionalObject(final List<User> list) {
-    try {
-      return Optional.of(list.get(0));
-    } catch (IndexOutOfBoundsException exception) {
-      return Optional.empty();
-    }
-
   }
 
 }
