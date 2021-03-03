@@ -27,9 +27,10 @@ public class UserService {
   private final UserRepository userRepository;
 
   public UserResponseWithCreatedAt signUp(final SignUpRequest request) {
-    if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {
+    if (userRepository.checkUserEmail(request.getEmail())) {
       throw new EmailDuplicatedException();
-    } else if (userRepository.findUserByNickname(request.getNickname()).isPresent()) {
+    }
+    if (userRepository.checkUserNickname(request.getNickname())) {
       throw new NicknameDuplicatedException();
     }
 
@@ -54,12 +55,11 @@ public class UserService {
     userRepository.deleteUser(userById.get());
   }
 
-  public UserResponseWithDate findUser(final Long id) {
+  public UserResponseWithDate getUser(final Long id) {
     Optional<User> userById = userRepository.findUserById(id);
     if (userById.isEmpty()) {
       throw new NotFoundException("user id not found.");
     }
-
     return new UserResponseWithDate(userById.get());
   }
 
@@ -100,13 +100,13 @@ public class UserService {
     for (String validatedField : validatedFields) {
       switch (validatedField) {
         case "email":
-          if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {
+          if (userRepository.checkUserEmail(request.getEmail())) {
             throw new EmailDuplicatedException();
           }
           findUser.changeEmail(request.getEmail());
           break;
         case "nickname":
-          if (userRepository.findUserByNickname(request.getEmail()).isPresent()) {
+          if (userRepository.checkUserNickname(request.getEmail())) {
             throw new NicknameDuplicatedException();
           }
           findUser.changeNickname(request.getNickname());
@@ -123,7 +123,6 @@ public class UserService {
       }
     }
     findUser.setModifiedAt(LocalDateTime.now());
-
     return new UserResponseWithModifiedAt(findUser);
   }
 
