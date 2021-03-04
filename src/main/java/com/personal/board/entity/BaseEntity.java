@@ -13,7 +13,7 @@ public abstract class BaseEntity {
 
   private LocalDateTime modifiedAt = LocalDateTime.now();
 
-  public void setModifiedAt(LocalDateTime modifiedAt) {
+  public void setModifiedAt(final LocalDateTime modifiedAt) {
     this.modifiedAt = modifiedAt;
   }
 

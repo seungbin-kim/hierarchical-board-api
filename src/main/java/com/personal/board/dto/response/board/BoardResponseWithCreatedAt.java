@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 public class BoardResponseWithCreatedAt extends BoardResponse {
 
-  public BoardResponseWithCreatedAt(Board board) {
+  public BoardResponseWithCreatedAt(final Board board) {
     super(board);
     this.createdAt = board.getCreatedAt();
   }

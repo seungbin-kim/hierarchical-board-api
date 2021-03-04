@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class BoardResponse {
 
-  public BoardResponse(Board board) {
+  public BoardResponse(final Board board) {
     this.id = board.getId();
     this.name = board.getName();
   }

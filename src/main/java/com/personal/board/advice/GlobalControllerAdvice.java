@@ -18,14 +18,14 @@ import java.util.Objects;
 public class GlobalControllerAdvice {
 
   @ExceptionHandler(NotFoundException.class)
-  public ResponseEntity<ErrorResponse> notFoundExceptionHandler(NotFoundException exception) {
+  public ResponseEntity<ErrorResponse> notFoundExceptionHandler(final NotFoundException exception) {
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
         .body(makeErrorResponse(ErrorType.NOT_FOUND, exception.getMessage()));
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ErrorResponse> methodValidExceptionHandler(MethodArgumentNotValidException exception) {
+  public ResponseEntity<ErrorResponse> methodValidExceptionHandler(final MethodArgumentNotValidException exception) {
     String defaultMessage =
         Objects.requireNonNull(exception
             .getBindingResult()
@@ -38,7 +38,7 @@ public class GlobalControllerAdvice {
   }
 
   @ExceptionHandler(BadArgumentException.class)
-  public ResponseEntity<ErrorResponse> badArgumentExceptionHandler(BadArgumentException exception) {
+  public ResponseEntity<ErrorResponse> badArgumentExceptionHandler(final BadArgumentException exception) {
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
         .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, exception.getMessage()));
@@ -52,13 +52,13 @@ public class GlobalControllerAdvice {
   }
 
   @ExceptionHandler(ReflectIllegalAccessException.class)
-  public ResponseEntity<ErrorResponse> ReflectIllegalAccessExceptionHandler(ReflectIllegalAccessException exception) {
+  public ResponseEntity<ErrorResponse> ReflectIllegalAccessExceptionHandler(final ReflectIllegalAccessException exception) {
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(new ErrorResponse(ErrorType.SERVER_ERROR, exception.getMessage()));
+        .body(makeErrorResponse(ErrorType.SERVER_ERROR, exception.getMessage()));
   }
 
-  private ErrorResponse makeErrorResponse(ErrorType errorType, String message) {
+  private ErrorResponse makeErrorResponse(final ErrorType errorType, final String message) {
     return new ErrorResponse(errorType, message);
   }
 

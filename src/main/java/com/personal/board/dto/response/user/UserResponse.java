@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class UserResponse {
 
-  public UserResponse(User user) {
+  public UserResponse(final User user) {
     this.id = user.getId();
     this.email = user.getEmail();
     this.nickname = user.getNickname();

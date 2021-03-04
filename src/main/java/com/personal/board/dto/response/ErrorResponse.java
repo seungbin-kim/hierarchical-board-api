@@ -8,7 +8,7 @@ public class ErrorResponse {
 
   private final Error error;
 
-  public ErrorResponse(ErrorType errorType, String message) {
+  public ErrorResponse(final ErrorType errorType, final String message) {
     this.error = new Error(errorType.toString(), message);
   }
 
@@ -19,7 +19,7 @@ public class ErrorResponse {
 
     private final String message;
 
-    public Error(String type, String message) {
+    public Error(final String type, final String message) {
       this.type = type;
       this.message = message;
     }

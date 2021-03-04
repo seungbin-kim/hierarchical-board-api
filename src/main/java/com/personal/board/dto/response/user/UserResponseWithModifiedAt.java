@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 public class UserResponseWithModifiedAt extends UserResponse {
 
-  public UserResponseWithModifiedAt(User user) {
+  public UserResponseWithModifiedAt(final User user) {
     super(user);
     this.modifiedAt = user.getModifiedAt();
   }

@@ -17,7 +17,7 @@ import javax.persistence.*;
 )
 public class User extends BaseEntity {
 
-  public User(String email, String nickname, String name, int age, String password) {
+  public User(final String email, final String nickname, final String name, final int age, final String password) {
     this.email = email;
     this.nickname = nickname;
     this.name = name;

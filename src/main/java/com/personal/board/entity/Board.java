@@ -16,7 +16,7 @@ import javax.persistence.*;
 )
 public class Board extends BaseEntity {
 
-  public Board(String name) {
+  public Board(final String name) {
     this.name = name;
   }
 
