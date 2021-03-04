@@ -1,8 +1,8 @@
 package com.personal.board.service;
 
 import com.personal.board.dto.request.BoardRequest;
-import com.personal.board.dto.response.BoardResponseWithCreatedAt;
-import com.personal.board.dto.response.BoardResponseWithDate;
+import com.personal.board.dto.response.board.BoardResponseWithCreatedAt;
+import com.personal.board.dto.response.board.BoardResponseWithDate;
 import com.personal.board.entity.Board;
 import com.personal.board.exception.NameDuplicatedException;
 import com.personal.board.exception.NotFoundException;

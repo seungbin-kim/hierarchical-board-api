@@ -1,9 +1,9 @@
 package com.personal.board.controller;
 
 import com.personal.board.dto.request.BoardRequest;
-import com.personal.board.dto.response.BoardResponse;
-import com.personal.board.dto.response.BoardResponseWithCreatedAt;
-import com.personal.board.dto.response.BoardResponseWithDate;
+import com.personal.board.dto.response.board.BoardResponse;
+import com.personal.board.dto.response.board.BoardResponseWithCreatedAt;
+import com.personal.board.dto.response.board.BoardResponseWithDate;
 import com.personal.board.dto.response.ResultResponse;
 import com.personal.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
