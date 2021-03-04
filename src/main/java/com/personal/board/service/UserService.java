@@ -2,13 +2,14 @@ package com.personal.board.service;
 
 import com.personal.board.dto.request.SignUpRequest;
 import com.personal.board.dto.request.UserUpdateRequest;
-import com.personal.board.dto.response.UserResponseWithCreatedAt;
-import com.personal.board.dto.response.UserResponseWithDate;
-import com.personal.board.dto.response.UserResponseWithModifiedAt;
+import com.personal.board.dto.response.user.UserResponseWithCreatedAt;
+import com.personal.board.dto.response.user.UserResponseWithDate;
+import com.personal.board.dto.response.user.UserResponseWithModifiedAt;
 import com.personal.board.entity.User;
 import com.personal.board.exception.*;
 import com.personal.board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,6 +93,8 @@ public class UserService {
       Object fieldValue = declaredField.get(request);
       if (fieldValue == null) {
         continue;
+      } else if (StringUtils.isBlank(fieldValue.toString())) {
+        throw new BadArgumentException(fieldName + " is blank.");
       }
       validatedFields.add(fieldName);
     }
