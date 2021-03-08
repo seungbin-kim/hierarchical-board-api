@@ -15,14 +15,17 @@ public class UserRepository {
   @PersistenceContext
   private EntityManager em;
 
+
   public User save(final User user) {
     em.persist(user);
     return user;
   }
 
+
   public void deleteUser(final User user) {
     em.remove(user);
   }
+
 
   public Optional<User> findUserById(final Long id) {
     try {
@@ -36,6 +39,7 @@ public class UserRepository {
     }
   }
 
+
   public boolean checkUserEmail(final String email) {
     Long result = em.createQuery(
         "SELECT count(u) FROM User u WHERE u.email = :email", Long.class)
@@ -44,6 +48,7 @@ public class UserRepository {
     return result == 1;
   }
 
+
   public boolean checkUserNickname(final String nickname) {
     Long result = em.createQuery(
         "SELECT count(u) FROM User u WHERE u.nickname = :nickname", Long.class)
@@ -51,6 +56,7 @@ public class UserRepository {
         .getSingleResult();
     return result == 1;
   }
+
 
   public List<User> findAllUsers() {
     return em.createQuery(

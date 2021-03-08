@@ -15,10 +15,12 @@ public class BoardRepository {
   @PersistenceContext
   private EntityManager em;
 
+
   public Board save(final Board board) {
     em.persist(board);
     return board;
   }
+
 
   public Optional<Board> findBoardById(final Long id) {
     try {
@@ -32,6 +34,7 @@ public class BoardRepository {
     }
   }
 
+
   public boolean checkBoardId(final Long id) {
     Long result = em.createQuery(
         "SELECT count(b) FROM Board  b WHERE b.id = :id", Long.class)
@@ -40,6 +43,7 @@ public class BoardRepository {
     return result == 1;
   }
 
+
   public boolean checkBoardName(final String name) {
     Long result = em.createQuery(
         "SELECT count(b) FROM Board b WHERE b.name = :name", Long.class)
@@ -47,6 +51,7 @@ public class BoardRepository {
         .getSingleResult();
     return result == 1;
   }
+
 
   public List<Board> findAllBoard() {
     return em.createQuery(
