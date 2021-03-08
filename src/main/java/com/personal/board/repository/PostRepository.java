@@ -15,10 +15,12 @@ public class PostRepository {
   @PersistenceContext
   private EntityManager em;
 
+
   public Post save(final Post post) {
     em.persist(post);
     return post;
   }
+
 
   public void updateGroupOrder(final Post group, final int groupOrder) {
     em.createQuery(
@@ -27,6 +29,7 @@ public class PostRepository {
         .setParameter("groupOrder", groupOrder)
         .executeUpdate();
   }
+
 
   public Optional<Post> findPostById(final Long boardId, final Long postId) {
     try {
@@ -41,11 +44,19 @@ public class PostRepository {
     }
   }
 
+
   public List<Post> findAllPost(final Long boardId) {
     return em.createQuery(
-        "SELECT p FROM Post p WHERE p.board.id = :boardId ORDER BY p.group DESC, p.groupOrder ASC", Post.class)
+        "SELECT p FROM Post p WHERE p.board.id = :boardId ORDER BY p.group.id DESC, p.groupOrder ASC", Post.class)
         .setParameter("boardId", boardId)
         .getResultList();
+  }
+
+
+  public void deletePost(final Post post) {
+    post.changeDeletionStatus();
+    post.changeTitle("지워진 게시글");
+    post.changeContent("지워진 게시글");
   }
 
 }
