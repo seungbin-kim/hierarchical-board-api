@@ -4,7 +4,9 @@ import com.personal.board.dto.request.BoardRequest;
 import com.personal.board.dto.request.PostRequest;
 import com.personal.board.dto.response.board.BoardResponseWithCreatedAt;
 import com.personal.board.dto.response.board.BoardResponseWithDate;
-import com.personal.board.dto.response.post.PostResponseWithCreatedAt;
+import com.personal.board.dto.response.post.PostListResponse;
+import com.personal.board.dto.response.post.PostResponseWithContentAndCreatedAt;
+import com.personal.board.dto.response.post.PostResponseWithContentAndDate;
 import com.personal.board.entity.Board;
 import com.personal.board.entity.Post;
 import com.personal.board.entity.User;
@@ -50,16 +52,16 @@ public class BoardService {
         .collect(Collectors.toList());
   }
 
-  public BoardResponseWithDate getBoard(final Long id) {
-    Optional<Board> boardById = boardRepository.findBoardById(id);
+  public BoardResponseWithDate getBoard(final Long boardId) {
+    Optional<Board> boardById = boardRepository.findBoardById(boardId);
     if (boardById.isEmpty()) {
       throw new NotFoundException("board id not found.");
     }
     return new BoardResponseWithDate(boardById.get());
   }
 
-  public PostResponseWithCreatedAt addPost(final PostRequest request, final Long id) {
-    Optional<Board> boardById = boardRepository.findBoardById(id);
+  public PostResponseWithContentAndCreatedAt addPost(final PostRequest request, final Long boardId) {
+    Optional<Board> boardById = boardRepository.findBoardById(boardId);
     if (boardById.isEmpty()) {
       throw new NotFoundException("board id not found.");
     }
@@ -82,7 +84,7 @@ public class BoardService {
       post.setGroup(post);
     } else { // 답글인 경우
       // 답글인데 부모글 번호가 없는경우(잘못된 요청)
-      Optional<Post> postById = postRepository.findPostById(request.getParentId());
+      Optional<Post> postById = postRepository.findPostById(boardId, request.getParentId());
       if (postById.isEmpty()) {
         throw new NotFoundException("parent id not found.");
       }
@@ -95,14 +97,28 @@ public class BoardService {
       post.setGroupOrder(groupOrder + 1);
       post.setGroupDepth(parentPost.getGroupDepth() + 1);
     }
-    postRepository.save(post);
-    return new PostResponseWithCreatedAt(post);
+
+    Post savedPost = postRepository.save(post);
+    return new PostResponseWithContentAndCreatedAt(savedPost);
   }
 
-  public List<PostResponseWithCreatedAt> getAllPost() {
-    return postRepository.findAllPost()
+  public List<PostListResponse> getAllPost(final Long boardId) {
+    return postRepository.findAllPost(boardId)
         .stream()
-        .map(PostResponseWithCreatedAt::new)
+        .map(PostListResponse::new)
         .collect(Collectors.toList());
+  }
+
+  public PostResponseWithContentAndDate getPost(final Long boardId, final Long postId) {
+    if (!boardRepository.checkBoardId(boardId)) {
+      throw new NotFoundException("board id not found");
+    }
+
+    Optional<Post> postById = postRepository.findPostById(boardId, postId);
+    if (postById.isEmpty()) {
+      throw new NotFoundException("post id not found");
+    }
+
+    return new PostResponseWithContentAndDate(postById.get());
   }
 }
