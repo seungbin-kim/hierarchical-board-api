@@ -58,7 +58,7 @@ public class Post extends BaseEntity {
   private int groupDepth;
 
   @Column(columnDefinition = "boolean")
-  private boolean isDeleted;
+  private boolean deleted;
 
   public void setGroup(Post group) {
     this.group = group;
@@ -70,6 +70,18 @@ public class Post extends BaseEntity {
 
   public void setGroupDepth(int groupDepth) {
     this.groupDepth = groupDepth;
+  }
+
+  public void changeTitle(String title) {
+    this.title = title;
+  }
+
+  public void changeContent(String content) {
+    this.content = content;
+  }
+
+  public void changeDeletionStatus() {
+    this.deleted = true;
   }
 
 }

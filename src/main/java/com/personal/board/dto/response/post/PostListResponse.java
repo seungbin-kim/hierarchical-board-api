@@ -16,12 +16,15 @@ public class PostListResponse extends PostResponse {
 
   private int groupDepth;
 
+  private boolean deletedStatus;
+
   public PostListResponse(final Post post) {
     super(post);
     this.createdAt = post.getCreatedAt();
     this.groupId = post.getGroup().getId();
     this.groupOrder = post.getGroupOrder();
     this.groupDepth = post.getGroupDepth();
+    this.deletedStatus = post.isDeleted();
   }
 
 }
