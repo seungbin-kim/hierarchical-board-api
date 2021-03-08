@@ -27,6 +27,7 @@ public class UserService {
 
   private final UserRepository userRepository;
 
+
   public UserResponseWithCreatedAt signUp(final SignUpRequest request) {
     if (userRepository.checkUserEmail(request.getEmail())) {
       throw new EmailDuplicatedException();
@@ -43,26 +44,27 @@ public class UserService {
         request.getPassword());
 
     User savedUser = userRepository.save(user);
-
     return new UserResponseWithCreatedAt(savedUser);
   }
 
-  public void deleteUser(final Long id) {
-    Optional<User> userById = userRepository.findUserById(id);
+
+  public void deleteUser(final Long userId) {
+    Optional<User> userById = userRepository.findUserById(userId);
     if (userById.isEmpty()) {
       throw new NotFoundException("user id not found.");
     }
-
     userRepository.deleteUser(userById.get());
   }
 
-  public UserResponseWithDate getUser(final Long id) {
-    Optional<User> userById = userRepository.findUserById(id);
+
+  public UserResponseWithDate getUser(final Long userId) {
+    Optional<User> userById = userRepository.findUserById(userId);
     if (userById.isEmpty()) {
       throw new NotFoundException("user id not found.");
     }
     return new UserResponseWithDate(userById.get());
   }
+
 
   public List<UserResponseWithDate> getAllUsers() {
     return userRepository.findAllUsers()
@@ -71,9 +73,10 @@ public class UserService {
         .collect(Collectors.toList());
   }
 
-  public UserResponseWithModifiedAt updateUser(final UserUpdateRequest request, final Long id) throws IllegalAccessException {
+
+  public UserResponseWithModifiedAt updateUser(final UserUpdateRequest request, final Long postId) throws IllegalAccessException {
     // 정보 찾아오기
-    Optional<User> userById = userRepository.findUserById(id);
+    Optional<User> userById = userRepository.findUserById(postId);
     if (userById.isEmpty()) {
       throw new NotFoundException("user id not found.");
     }
@@ -86,18 +89,7 @@ public class UserService {
 
     // 들어온 값 확인
     Field[] declaredFields = request.getClass().getDeclaredFields();
-    ArrayList<String> validatedFields = new ArrayList<>();
-    for (Field declaredField : declaredFields) {
-      declaredField.setAccessible(true);
-      String fieldName = declaredField.getName();
-      Object fieldValue = declaredField.get(request);
-      if (fieldValue == null) {
-        continue;
-      } else if (StringUtils.isBlank(fieldValue.toString())) {
-        throw new BadArgumentException(fieldName + " is blank.");
-      }
-      validatedFields.add(fieldName);
-    }
+    ArrayList<String> validatedFields = PatchUtil.validateFields(request, declaredFields);
 
     // 변경감지
     for (String validatedField : validatedFields) {
