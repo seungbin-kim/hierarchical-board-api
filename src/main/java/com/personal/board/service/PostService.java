@@ -53,14 +53,11 @@ public class PostService {
         userById.get(),
         request.getTitle(),
         request.getContent(),
-        null,
-        0,
-        0
+        null
     );
 
-    if (request.getParentId() == null) { // 원글인 경우
-      post.setGroup(post);
-    } else { // 답글인 경우
+    if (request.getParentId() != null) {
+      // 답글인 경우
       // 답글인데 부모글 번호가 없는경우(잘못된 요청)
       Optional<Post> postById = postRepository.findPostById(boardId, request.getParentId());
       if (postById.isEmpty()) {
@@ -75,26 +72,22 @@ public class PostService {
       }
 
       // 부모글 번호가 정상적으로 있는경우
-      Post group = parentPost.getGroup();
-      post.setGroup(group);
-      int groupOrder = parentPost.getGroupOrder();
-      postRepository.updateGroupOrder(group, groupOrder);
-      post.setGroupOrder(groupOrder + 1);
-      post.setGroupDepth(parentPost.getGroupDepth() + 1);
+      post.setParent(parentPost);
     }
     Post savedPost = postRepository.save(post);
     return new PostResponseWithContentAndCreatedAt(savedPost);
   }
 
-
+  @Transactional(readOnly = true)
   public List<PostListResponse> getAllPost(final Long boardId) {
     return postRepository.findAllPost(boardId)
         .stream()
+        .filter(post -> post.getParent() == null)
         .map(PostListResponse::new)
         .collect(Collectors.toList());
   }
 
-
+  @Transactional(readOnly = true)
   public PostResponseWithContentAndDate getPost(final Long boardId, final Long postId) {
     Post findPost = checkBoardAndPost(boardId, postId);
     return new PostResponseWithContentAndDate(findPost);

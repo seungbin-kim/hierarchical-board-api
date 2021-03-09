@@ -22,15 +22,6 @@ public class PostRepository {
   }
 
 
-  public void updateGroupOrder(final Post group, final int groupOrder) {
-    em.createQuery(
-        "UPDATE Post p SET p.groupOrder = p.groupOrder + 1 WHERE p.group = :group AND p.groupOrder > :groupOrder")
-        .setParameter("group", group)
-        .setParameter("groupOrder", groupOrder)
-        .executeUpdate();
-  }
-
-
   public Optional<Post> findPostById(final Long boardId, final Long postId) {
     try {
       Post post = em.createQuery(
@@ -47,7 +38,7 @@ public class PostRepository {
 
   public List<Post> findAllPost(final Long boardId) {
     return em.createQuery(
-        "SELECT p FROM Post p WHERE p.board.id = :boardId ORDER BY p.group.id DESC, p.groupOrder ASC", Post.class)
+        "SELECT p FROM Post p WHERE p.board.id = :boardId ORDER BY p.id DESC", Post.class)
         .setParameter("boardId", boardId)
         .getResultList();
   }
@@ -55,8 +46,6 @@ public class PostRepository {
 
   public void deletePost(final Post post) {
     post.changeDeletionStatus();
-    post.changeTitle("지워진 게시글");
-    post.changeContent("지워진 게시글");
   }
 
 }

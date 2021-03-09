@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -16,14 +18,12 @@ import javax.persistence.*;
 )
 public class Post extends BaseEntity {
 
-  public Post(Board board, User user, String title, String content, Post group, int groupOrder, int groupDepth) {
+  public Post(Board board, User user, String title, String content, Post parent) {
     this.board = board;
     this.user = user;
     this.title = title;
     this.content = content;
-    this.group = group;
-    this.groupOrder = groupOrder;
-    this.groupDepth = groupDepth;
+    this.parent = parent;
   }
 
   @Id
@@ -47,29 +47,18 @@ public class Post extends BaseEntity {
   @Column(columnDefinition = "text")
   private String content;
 
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "group_id", columnDefinition = "bigint")
-  private Post group;
+  @ManyToOne
+  @JoinColumn(name = "parent_id", columnDefinition = "bigint")
+  private Post parent;
 
-  @Column(columnDefinition = "integer")
-  private int groupOrder;
-
-  @Column(columnDefinition = "integer")
-  private int groupDepth;
+  @OneToMany(mappedBy = "parent")
+  private final List<Post> child = new ArrayList<>();
 
   @Column(columnDefinition = "boolean")
   private boolean deleted;
 
-  public void setGroup(Post group) {
-    this.group = group;
-  }
-
-  public void setGroupOrder(int groupOrder) {
-    this.groupOrder = groupOrder;
-  }
-
-  public void setGroupDepth(int groupDepth) {
-    this.groupDepth = groupDepth;
+  public void setParent(Post parent) {
+    this.parent = parent;
   }
 
   public void changeTitle(String title) {
@@ -82,6 +71,8 @@ public class Post extends BaseEntity {
 
   public void changeDeletionStatus() {
     this.deleted = true;
+    this.changeTitle("지워진 게시글");
+    this.changeContent("지워진 게시글");
   }
 
 }

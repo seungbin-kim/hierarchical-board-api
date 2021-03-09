@@ -4,27 +4,32 @@ import com.personal.board.entity.Post;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class PostListResponse extends PostResponse {
 
   private LocalDateTime createdAt;
 
-  private Long groupId;
-
-  private int groupOrder;
-
-  private int groupDepth;
+  private Long parentId;
 
   private boolean deletedStatus;
+
+  private List<PostListResponse> reply = new ArrayList<>();
 
   public PostListResponse(final Post post) {
     super(post);
     this.createdAt = post.getCreatedAt();
-    this.groupId = post.getGroup().getId();
-    this.groupOrder = post.getGroupOrder();
-    this.groupDepth = post.getGroupDepth();
+    if (post.getParent() != null) {
+      this.parentId = post.getParent().getId();
+    }
     this.deletedStatus = post.isDeleted();
+    this.reply = post.getChild()
+        .stream()
+        .map(PostListResponse::new)
+        .collect(Collectors.toList());
   }
 
 }
