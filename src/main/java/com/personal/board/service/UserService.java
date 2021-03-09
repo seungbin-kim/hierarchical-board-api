@@ -57,6 +57,7 @@ public class UserService {
   }
 
 
+  @Transactional(readOnly = true)
   public UserResponseWithDate getUser(final Long userId) {
     Optional<User> userById = userRepository.findUserById(userId);
     if (userById.isEmpty()) {
@@ -66,6 +67,7 @@ public class UserService {
   }
 
 
+  @Transactional(readOnly = true)
   public List<UserResponseWithDate> getAllUsers() {
     return userRepository.findAllUsers()
         .stream()

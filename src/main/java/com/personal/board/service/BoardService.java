@@ -33,6 +33,7 @@ public class BoardService {
   }
 
 
+  @Transactional(readOnly = true)
   public List<BoardResponseWithDate> getAllBoard() {
     return boardRepository.findAllBoard()
         .stream()
@@ -41,6 +42,7 @@ public class BoardService {
   }
 
 
+  @Transactional(readOnly = true)
   public BoardResponseWithDate getBoard(final Long boardId) {
     Optional<Board> boardById = boardRepository.findBoardById(boardId);
     if (boardById.isEmpty()) {
