@@ -22,14 +22,14 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class PostController {
 
-  private static final String POSTS = "/api/v1/boards/posts";
+  private static final String POSTS = "/api/v1/boards/{boardId}/posts";
 
   private static final String POST = POSTS + "/{postId}";
 
   private final PostService postService;
 
   @PostMapping("/boards/{boardId}/posts")
-  public ResponseEntity<PostResponseWithContentAndCreatedAt> uploadPost(
+  public ResponseEntity<PostResponseWithContentAndCreatedAt> addPost(
       @RequestBody @Valid final PostRequest request, @PathVariable final Long boardId) {
     PostResponseWithContentAndCreatedAt postResponse = postService.addPost(request, boardId);
     return ResponseEntity

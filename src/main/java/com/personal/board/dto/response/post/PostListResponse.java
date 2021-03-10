@@ -26,7 +26,7 @@ public class PostListResponse extends PostResponse {
       this.parentId = post.getParent().getId();
     }
     this.deletedStatus = post.isDeleted();
-    this.reply = post.getChild()
+    this.reply = post.getChildren()
         .stream()
         .map(PostListResponse::new)
         .collect(Collectors.toList());
