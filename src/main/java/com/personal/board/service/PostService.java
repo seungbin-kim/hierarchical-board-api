@@ -79,10 +79,10 @@ public class PostService {
   }
 
   @Transactional(readOnly = true)
-  public List<PostListResponse> getAllPost(final Long boardId) {
+  public List<PostListResponse> getAllPost(final Long boardId) { // 답변형 출력을위해 부모글이 null인것만 골라서 DTO로 변환
     return postRepository.findAllPost(boardId)
         .stream()
-        .filter(post -> post.getParent() == null)
+        .filter(post -> post.getParent() == null) // 답변글들은 LAZY 로딩이 됨
         .map(PostListResponse::new)
         .collect(Collectors.toList());
   }
@@ -99,9 +99,9 @@ public class PostService {
     Post findPost = checkBoardAndPost(boardId, postId);
 
     Field[] declaredFields = request.getClass().getDeclaredFields();
-    ArrayList<String> validatedFields = PatchUtil.validateFields(request, declaredFields);
+    ArrayList<String> validatedFields = PatchUtil.validateFields(request, declaredFields); // PATCH를 위한 입력필드얻기
 
-    for (String validatedField : validatedFields) {
+    for (String validatedField : validatedFields) { // 입력이 확인된 필드를 변경감지로 데이터 변경
       switch (validatedField) {
         case "title":
           findPost.changeTitle(request.getTitle());
@@ -111,7 +111,7 @@ public class PostService {
           break;
       }
     }
-    findPost.setModifiedAt(LocalDateTime.now());
+    findPost.setModifiedAt(LocalDateTime.now()); // 수정시간
     return new PostResponseWithContentAndModifiedAt(findPost);
   }
 

@@ -24,8 +24,8 @@ public class BoardService {
 
 
   public BoardResponseWithCreatedAt addBoard(final BoardRequest request) {
-    if (boardRepository.checkBoardName(request.getName())) {
-      throw new NameDuplicatedException();
+    if (boardRepository.checkBoardName(request.getName())) { // 게시판이름 중복체크
+      throw new NameDuplicatedException(); // 중복발생시 예외발생
     }
     Board board = new Board(request.getName());
     Board savedBoard = boardRepository.save(board);
@@ -34,7 +34,7 @@ public class BoardService {
 
 
   @Transactional(readOnly = true)
-  public List<BoardResponseWithDate> getAllBoard() {
+  public List<BoardResponseWithDate> getAllBoard() { // 모든게시판을 조회하여 응답 Dto로 바꾸어 반환
     return boardRepository.findAllBoard()
         .stream()
         .map(BoardResponseWithDate::new)
@@ -43,12 +43,12 @@ public class BoardService {
 
 
   @Transactional(readOnly = true)
-  public BoardResponseWithDate getBoard(final Long boardId) {
+  public BoardResponseWithDate getBoard(final Long boardId) { // 요청 id에 대한 게시판을 조회
     Optional<Board> boardById = boardRepository.findBoardById(boardId);
-    if (boardById.isEmpty()) {
+    if (boardById.isEmpty()) { // 조회 안될 시 예외발생
       throw new NotFoundException("board id not found.");
     }
-    return new BoardResponseWithDate(boardById.get());
+    return new BoardResponseWithDate(boardById.get()); // 응답 Dto를 만들어서 반환
   }
 
 }

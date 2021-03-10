@@ -68,7 +68,7 @@ public class UserService {
 
 
   @Transactional(readOnly = true)
-  public List<UserResponseWithDate> getAllUsers() {
+  public List<UserResponseWithDate> getAllUsers() { // 조회한 유저들 Dto로 만들어서 반환
     return userRepository.findAllUsers()
         .stream()
         .map(UserResponseWithDate::new)
@@ -91,10 +91,10 @@ public class UserService {
 
     // 들어온 값 확인
     Field[] declaredFields = request.getClass().getDeclaredFields();
-    ArrayList<String> validatedFields = PatchUtil.validateFields(request, declaredFields);
+    ArrayList<String> validatedFields = PatchUtil.validateFields(request, declaredFields); // 입력필드들 얻기
 
     // 변경감지
-    for (String validatedField : validatedFields) {
+    for (String validatedField : validatedFields) { // 입력된 필드들 변경감지 사용하여 업데이트
       switch (validatedField) {
         case "email":
           if (userRepository.checkUserEmail(request.getEmail())) {
