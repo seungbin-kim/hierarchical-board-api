@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -15,6 +17,13 @@ import javax.persistence.*;
     initialValue = 1, allocationSize = 50
 )
 public class Comment extends BaseEntity {
+
+  public Comment(Post post, User user, String content, Comment parent) {
+    this.post = post;
+    this.user = user;
+    this.content = content;
+    this.parent = parent;
+  }
 
   @Id
   @GeneratedValue(
@@ -34,14 +43,27 @@ public class Comment extends BaseEntity {
   @Column(length = 500)
   private String content;
 
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "group_id")
-  private Comment group;
+  @ManyToOne
+  @JoinColumn(name = "parent_id", columnDefinition = "bigint")
+  private Comment parent;
 
-  @Column(columnDefinition = "integer")
-  private int groupOrder;
+  @OneToMany(mappedBy = "parent")
+  private final List<Comment> children = new ArrayList<>();
 
-  @Column(columnDefinition = "integer")
-  private int groupDepth;
+  @Column(columnDefinition = "boolean")
+  private boolean deleted;
+
+  public void setParent(Comment parent) {
+    this.parent = parent;
+  }
+
+  public void changeContent(String content) {
+    this.content = content;
+  }
+
+  public void changeDeletionStatus() {
+    this.deleted = true;
+    this.changeContent("지워진 답글");
+  }
 
 }

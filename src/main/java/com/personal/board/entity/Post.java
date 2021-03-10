@@ -52,7 +52,7 @@ public class Post extends BaseEntity {
   private Post parent;
 
   @OneToMany(mappedBy = "parent")
-  private final List<Post> child = new ArrayList<>();
+  private final List<Post> children = new ArrayList<>();
 
   @Column(columnDefinition = "boolean")
   private boolean deleted;
