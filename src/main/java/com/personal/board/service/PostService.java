@@ -59,7 +59,7 @@ public class PostService {
     if (request.getParentId() != null) {
       // 답글인 경우
       // 답글인데 부모글 번호가 없는경우(잘못된 요청)
-      Optional<Post> postById = postRepository.findPostById(boardId, request.getParentId());
+      Optional<Post> postById = postRepository.findPostById(request.getParentId());
       if (postById.isEmpty()) {
         throw new NotFoundException("parent id not found.");
       }
@@ -127,7 +127,7 @@ public class PostService {
       throw new NotFoundException("board id not found");
     }
 
-    Optional<Post> postById = postRepository.findPostById(boardId, postId);
+    Optional<Post> postById = postRepository.findPostById(postId);
     if (postById.isEmpty()) {
       throw new NotFoundException("post id not found");
     }

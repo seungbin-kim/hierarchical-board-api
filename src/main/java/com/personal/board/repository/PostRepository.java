@@ -22,11 +22,10 @@ public class PostRepository {
   }
 
 
-  public Optional<Post> findPostById(final Long boardId, final Long postId) {
+  public Optional<Post> findPostById(final Long postId) {
     try {
       Post post = em.createQuery(
-          "SELECT p FROM Post p WHERE p.board.id = :boardId AND p.id = :postId", Post.class)
-          .setParameter("boardId", boardId)
+          "SELECT p FROM Post p WHERE p.id = :postId", Post.class)
           .setParameter("postId", postId)
           .getSingleResult();
       return Optional.of(post);
