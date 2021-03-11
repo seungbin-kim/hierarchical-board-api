@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -31,6 +32,14 @@ public class CommentRepository {
     } catch (NoResultException exception) {
       return Optional.empty();
     }
+  }
+
+
+  public List<Comment> findAllComment(final Long postId) {
+    return em.createQuery(
+        "SELECT c FROM Comment c WHERE c.post.id = :postId ORDER BY c.id ASC", Comment.class)
+        .setParameter("postId", postId)
+        .getResultList();
   }
 
 }

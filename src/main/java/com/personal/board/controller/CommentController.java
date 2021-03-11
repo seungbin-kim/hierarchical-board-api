@@ -34,4 +34,10 @@ public class CommentController {
         .body(commentResponse);
   }
 
+  @GetMapping("/posts/{postId}/comments")
+  public ResponseEntity<ResultResponse<List<CommentListResponse>>> getAllComment(@PathVariable final Long postId) {
+    return ResponseEntity
+        .ok(new ResultResponse<>(commentService.getAllComment(postId)));
+  }
+
 }

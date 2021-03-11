@@ -1,13 +1,13 @@
 package com.personal.board.service;
 
 import com.personal.board.dto.request.CommentRequest;
+import com.personal.board.dto.response.comment.CommentListResponse;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
 import com.personal.board.dto.response.post.PostListResponse;
 import com.personal.board.entity.Comment;
 import com.personal.board.entity.Post;
 import com.personal.board.entity.User;
-import com.personal.board.exception.BadArgumentException;
-import com.personal.board.exception.NotFoundException;
+import com.personal.board.exception.*;
 import com.personal.board.repository.CommentRepository;
 import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -33,12 +34,12 @@ public class CommentService {
   public CommentResponseWithCreatedAt addComment(final CommentRequest request, final Long postId) {
     Optional<Post> postById = postRepository.findPostById(postId);
     if (postById.isEmpty()) {
-      throw new NotFoundException("post id not found.");
+      throw new PostNotFoundException();
     }
 
     Optional<User> userById = userRepository.findUserById(request.getWriterId());
     if (userById.isEmpty()) {
-      throw new NotFoundException("user id not found");
+      throw new UserNotFoundException();
     }
 
     Comment comment = new Comment(
@@ -53,7 +54,7 @@ public class CommentService {
       // 답 댓글인데 부모글 번호가 없는경우(잘못된 요청)
       Optional<Comment> commentById = commentRepository.findCommentById(request.getParentId());
       if (commentById.isEmpty()) {
-        throw new NotFoundException("parent id not found.");
+        throw new ParentNotFoundException();
       }
 
       Comment parentComment = commentById.get();
@@ -68,6 +69,18 @@ public class CommentService {
     }
     Comment savedPost = commentRepository.save(comment);
     return new CommentResponseWithCreatedAt(savedPost);
+  }
+
+  public List<CommentListResponse> getAllComment(final Long postId) {
+    if (postRepository.findPostById(postId).isEmpty()) {
+      throw new PostNotFoundException();
+    }
+
+    return commentRepository.findAllComment(postId)
+        .stream()
+        .filter(comment -> comment.getParent() == null)
+        .map(CommentListResponse::new)
+        .collect(Collectors.toList());
   }
 
 }
