@@ -35,21 +35,16 @@ public class BoardRepository {
   }
 
 
-  public boolean checkBoardId(final Long id) {
-    Long result = em.createQuery(
-        "SELECT count(b) FROM Board  b WHERE b.id = :id", Long.class)
-        .setParameter("id", id)
-        .getSingleResult();
-    return result == 1;
-  }
-
-
-  public boolean checkBoardName(final String name) {
-    Long result = em.createQuery(
-        "SELECT count(b) FROM Board b WHERE b.name = :name", Long.class)
-        .setParameter("name", name)
-        .getSingleResult();
-    return result == 1;
+  public Optional<Board> findBoardByName(final String name) {
+    try {
+      Board board = em.createQuery(
+          "SELECT count(b) FROM Board b WHERE b.name = :name", Board.class)
+          .setParameter("name", name)
+          .getSingleResult();
+      return Optional.of(board);
+    } catch (NoResultException exception) {
+      return Optional.empty();
+    }
   }
 
 
