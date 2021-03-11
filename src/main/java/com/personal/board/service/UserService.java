@@ -9,7 +9,6 @@ import com.personal.board.entity.User;
 import com.personal.board.exception.*;
 import com.personal.board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +50,7 @@ public class UserService {
   public void deleteUser(final Long userId) {
     Optional<User> userById = userRepository.findUserById(userId);
     if (userById.isEmpty()) {
-      throw new NotFoundException("user id not found.");
+      throw new UserNotFoundException();
     }
     userRepository.deleteUser(userById.get());
   }
@@ -61,7 +60,7 @@ public class UserService {
   public UserResponseWithDate getUser(final Long userId) {
     Optional<User> userById = userRepository.findUserById(userId);
     if (userById.isEmpty()) {
-      throw new NotFoundException("user id not found.");
+      throw new UserNotFoundException();
     }
     return new UserResponseWithDate(userById.get());
   }
@@ -80,7 +79,7 @@ public class UserService {
     // 정보 찾아오기
     Optional<User> userById = userRepository.findUserById(postId);
     if (userById.isEmpty()) {
-      throw new NotFoundException("user id not found.");
+      throw new UserNotFoundException();
     }
     User findUser = userById.get();
 

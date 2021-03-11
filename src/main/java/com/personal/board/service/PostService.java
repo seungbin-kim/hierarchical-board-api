@@ -9,8 +9,7 @@ import com.personal.board.dto.response.post.PostResponseWithContentAndModifiedAt
 import com.personal.board.entity.Board;
 import com.personal.board.entity.Post;
 import com.personal.board.entity.User;
-import com.personal.board.exception.BadArgumentException;
-import com.personal.board.exception.NotFoundException;
+import com.personal.board.exception.*;
 import com.personal.board.repository.BoardRepository;
 import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
@@ -40,12 +39,12 @@ public class PostService {
   public PostResponseWithContentAndCreatedAt addPost(final PostRequest request, final Long boardId) {
     Optional<Board> boardById = boardRepository.findBoardById(boardId);
     if (boardById.isEmpty()) {
-      throw new NotFoundException("board id not found.");
+      throw new BoardNotFoundException();
     }
 
     Optional<User> userById = userRepository.findUserById(request.getWriterId());
     if (userById.isEmpty()) {
-      throw new NotFoundException("user id not found.");
+      throw new UserNotFoundException();
     }
 
     Post post = new Post(
@@ -61,7 +60,7 @@ public class PostService {
       // 답글인데 부모글 번호가 없는경우(잘못된 요청)
       Optional<Post> postById = postRepository.findPostById(request.getParentId());
       if (postById.isEmpty()) {
-        throw new NotFoundException("parent id not found.");
+        throw new ParentNotFoundException();
       }
 
       Post parentPost = postById.get();
@@ -78,14 +77,20 @@ public class PostService {
     return new PostResponseWithContentAndCreatedAt(savedPost);
   }
 
+
   @Transactional(readOnly = true)
-  public List<PostListResponse> getAllPost(final Long boardId) { // 답변형 출력을위해 부모글이 null인것만 골라서 DTO로 변환
+  public List<PostListResponse> getAllPost(final Long boardId) {
+    if (boardRepository.findBoardById(boardId).isEmpty()) { // 게시판을 찾지 못할시
+      throw new BoardNotFoundException();
+    }
+    // 답변형 출력을위해 부모글이 null인것만 골라서 DTO로 변환
     return postRepository.findAllPost(boardId)
         .stream()
         .filter(post -> post.getParent() == null) // 답변글들은 LAZY 로딩이 됨
         .map(PostListResponse::new)
         .collect(Collectors.toList());
   }
+
 
   @Transactional(readOnly = true)
   public PostResponseWithContentAndDate getPost(final Long boardId, final Long postId) {
@@ -123,13 +128,13 @@ public class PostService {
 
 
   private Post checkBoardAndPost(Long boardId, Long postId) {
-    if (!boardRepository.checkBoardId(boardId)) {
-      throw new NotFoundException("board id not found");
+    if (boardRepository.findBoardById(boardId).isEmpty()) {
+      throw new BoardNotFoundException();
     }
 
     Optional<Post> postById = postRepository.findPostById(postId);
     if (postById.isEmpty()) {
-      throw new NotFoundException("post id not found");
+      throw new PostNotFoundException();
     }
 
     Post findPost = postById.get();
