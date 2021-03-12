@@ -21,7 +21,7 @@ public class PatchUtil {
       }
       validatedFields.add(fieldName); // 정상적으로 내용이 있다면 입력된 해당 필드이름 저장
     }
-    return validatedFields;
+    return validatedFields; // 정상 입력된 필드이름들 리턴
   }
 
 }

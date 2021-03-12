@@ -127,7 +127,7 @@ public class PostService {
   }
 
 
-  private Post checkBoardAndPost(Long boardId, Long postId) {
+  private Post checkBoardAndPost(final Long boardId, final Long postId) {
     if (boardRepository.findBoardById(boardId).isEmpty()) {
       throw new BoardNotFoundException();
     }
