@@ -1,6 +1,6 @@
 package com.personal.board.exception;
 
-public class NicknameDuplicatedException extends BadArgumentException {
+public class NicknameDuplicatedException extends DuplicatedException {
 
   public NicknameDuplicatedException() {
     super("nickname is duplicated.");

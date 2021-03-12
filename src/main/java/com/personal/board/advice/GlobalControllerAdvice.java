@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.personal.board.dto.response.ErrorResponse;
 import com.personal.board.enumeration.ErrorType;
 import com.personal.board.exception.BadArgumentException;
+import com.personal.board.exception.DuplicatedException;
 import com.personal.board.exception.NotFoundException;
 import com.personal.board.exception.ReflectIllegalAccessException;
 import org.springframework.http.HttpStatus;
@@ -41,6 +42,13 @@ public class GlobalControllerAdvice {
   public ResponseEntity<ErrorResponse> badArgumentExceptionHandler(final BadArgumentException exception) {
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
+        .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, exception.getMessage()));
+  }
+
+  @ExceptionHandler(DuplicatedException.class)
+  public ResponseEntity<ErrorResponse> duplicatedExceptionHandler(final DuplicatedException exception) {
+    return ResponseEntity
+        .status(HttpStatus.CONFLICT)
         .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, exception.getMessage()));
   }
 
