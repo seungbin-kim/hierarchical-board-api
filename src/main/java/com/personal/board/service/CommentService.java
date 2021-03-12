@@ -83,4 +83,26 @@ public class CommentService {
         .collect(Collectors.toList());
   }
 
+  public void deleteComment(final Long postId, final Long commentsId) {
+    Comment findComment = checkPostAndComment(postId, commentsId);
+    commentRepository.deleteComment(findComment);
+  }
+
+  private Comment checkPostAndComment(final Long postId, final Long commentsId) {
+    if (postRepository.findPostById(postId).isEmpty()) {
+      throw new PostNotFoundException();
+    }
+
+    Optional<Comment> commentById = commentRepository.findCommentById(commentsId);
+    if (commentById.isEmpty()) {
+      throw new CommentNotFoundException();
+    }
+
+    Comment findComment = commentById.get();
+    if (findComment.isDeleted()) {
+      throw new BadArgumentException("comment has already been deleted.");
+    }
+    return findComment;
+  }
+
 }

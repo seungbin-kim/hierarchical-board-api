@@ -42,4 +42,8 @@ public class CommentRepository {
         .getResultList();
   }
 
+  public void deleteComment(final Comment findComment) {
+    findComment.changeDeletionStatus();
+  }
+
 }
