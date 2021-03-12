@@ -38,7 +38,7 @@ public class BoardRepository {
   public Optional<Board> findBoardByName(final String name) {
     try {
       Board board = em.createQuery(
-          "SELECT count(b) FROM Board b WHERE b.name = :name", Board.class)
+          "SELECT b FROM Board b WHERE b.name = :name", Board.class)
           .setParameter("name", name)
           .getSingleResult();
       return Optional.of(board);
