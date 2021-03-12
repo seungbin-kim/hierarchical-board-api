@@ -1,9 +1,11 @@
 package com.personal.board.controller;
 
 import com.personal.board.dto.request.CommentRequest;
+import com.personal.board.dto.request.CommentUpdateRequest;
 import com.personal.board.dto.response.ResultResponse;
 import com.personal.board.dto.response.comment.CommentListResponse;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
+import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
 import com.personal.board.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,9 +42,16 @@ public class CommentController {
         .ok(new ResultResponse<>(commentService.getAllComment(postId)));
   }
 
-  @DeleteMapping("/posts/{postId}/comments/{commentsId}")
-  public ResponseEntity deleteComment(@PathVariable final Long postId, @PathVariable final Long commentsId) {
-    commentService.deleteComment(postId, commentsId);
+  @PatchMapping("/posts/{postId}/comments/{commentId}")
+  public ResponseEntity<CommentResponseWithModifiedAt> patchComment(
+      @RequestBody final CommentUpdateRequest request, @PathVariable final Long postId, @PathVariable final Long commentId) {
+    return ResponseEntity
+        .ok(commentService.updateComment(request, postId, commentId));
+  }
+
+  @DeleteMapping("/posts/{postId}/comments/{commentId}")
+  public ResponseEntity deleteComment(@PathVariable final Long postId, @PathVariable final Long commentId) {
+    commentService.deleteComment(postId, commentId);
     return ResponseEntity
         .noContent()
         .build();

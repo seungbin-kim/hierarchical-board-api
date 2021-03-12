@@ -1,8 +1,10 @@
 package com.personal.board.service;
 
 import com.personal.board.dto.request.CommentRequest;
+import com.personal.board.dto.request.CommentUpdateRequest;
 import com.personal.board.dto.response.comment.CommentListResponse;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
+import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
 import com.personal.board.dto.response.post.PostListResponse;
 import com.personal.board.entity.Comment;
 import com.personal.board.entity.Post;
@@ -12,9 +14,11 @@ import com.personal.board.repository.CommentRepository;
 import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,6 +39,8 @@ public class CommentService {
     Optional<Post> postById = postRepository.findPostById(postId);
     if (postById.isEmpty()) {
       throw new PostNotFoundException();
+    } else if (postById.get().isDeleted()) {
+      throw new BadArgumentException("post has been deleted.");
     }
 
     Optional<User> userById = userRepository.findUserById(request.getWriterId());
@@ -72,15 +78,33 @@ public class CommentService {
   }
 
   public List<CommentListResponse> getAllComment(final Long postId) {
-    if (postRepository.findPostById(postId).isEmpty()) {
+    Optional<Post> postById = postRepository.findPostById(postId);
+    if (postById.isEmpty()) {
       throw new PostNotFoundException();
+    } else if (postById.get().isDeleted()) {
+      throw new BadArgumentException("post has been deleted.");
     }
-
+    // 답변형 출력을 위한 DTO변환
     return commentRepository.findAllComment(postId)
         .stream()
         .filter(comment -> comment.getParent() == null)
         .map(CommentListResponse::new)
         .collect(Collectors.toList());
+  }
+
+  public CommentResponseWithModifiedAt updateComment(
+      final CommentUpdateRequest request, final Long postId, final Long commentId) {
+    Comment findComment = checkPostAndComment(postId, commentId);
+
+    if (request.getContent() != null) {
+      if (StringUtils.isBlank(request.getContent())) {
+        throw new BadArgumentException("content is blank.");
+      }
+      findComment.changeContent(request.getContent());
+      findComment.setModifiedAt(LocalDateTime.now());
+    }
+
+    return new CommentResponseWithModifiedAt(findComment);
   }
 
   public void deleteComment(final Long postId, final Long commentsId) {
@@ -89,8 +113,11 @@ public class CommentService {
   }
 
   private Comment checkPostAndComment(final Long postId, final Long commentsId) {
-    if (postRepository.findPostById(postId).isEmpty()) {
+    Optional<Post> postById = postRepository.findPostById(postId);
+    if (postById.isEmpty()) {
       throw new PostNotFoundException();
+    } else if (postById.get().isDeleted()) {
+      throw new BadArgumentException("post has been deleted.");
     }
 
     Optional<Comment> commentById = commentRepository.findCommentById(commentsId);
@@ -100,7 +127,7 @@ public class CommentService {
 
     Comment findComment = commentById.get();
     if (findComment.isDeleted()) {
-      throw new BadArgumentException("comment has already been deleted.");
+      throw new BadArgumentException("comment has been deleted.");
     }
     return findComment;
   }
