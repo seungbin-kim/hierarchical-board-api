@@ -2,10 +2,12 @@ package com.personal.board.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -21,8 +23,9 @@ public class SignUpRequest {
   @NotBlank(message = "name is required.")
   private String name;
 
-  @NotNull(message = "age is required.")
-  private Integer age;
+  @NotNull(message = "birthday is required.")
+  @DateTimeFormat(pattern = "yyyy-MM-dd")
+  private LocalDate birthday;
 
   @NotBlank(message = "password is required.")
   private String password;

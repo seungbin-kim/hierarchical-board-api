@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -17,11 +18,11 @@ import javax.persistence.*;
 )
 public class User extends BaseEntity {
 
-  public User(final String email, final String nickname, final String name, final int age, final String password) {
+  public User(final String email, final String nickname, final String name, final LocalDate birthday, final String password) {
     this.email = email;
     this.nickname = nickname;
     this.name = name;
-    this.age = age;
+    this.birthday = birthday;
     this.password = password;
   }
 
@@ -41,8 +42,8 @@ public class User extends BaseEntity {
   @Column(length = 20)
   private String name;
 
-  @Column(columnDefinition = "integer default 0")
-  private int age;
+  @Column(columnDefinition = "date")
+  private LocalDate birthday;
 
   @Column(columnDefinition = "text", nullable = false)
   private String password;
@@ -59,8 +60,8 @@ public class User extends BaseEntity {
     this.name = name;
   }
 
-  public void changeAge(final int age) {
-    this.age = age;
+  public void changeBirthday(final LocalDate birthday) {
+    this.birthday = birthday;
   }
 
   public void changePassword(final String password) {

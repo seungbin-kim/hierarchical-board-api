@@ -39,7 +39,7 @@ public class UserService {
         request.getEmail(),
         request.getNickname(),
         request.getName(),
-        request.getAge(),
+        request.getBirthday(),
         request.getPassword());
 
     User savedUser = userRepository.save(user);
@@ -110,8 +110,8 @@ public class UserService {
         case "name":
           findUser.changeName(request.getName());
           break;
-        case "age":
-          findUser.changeAge(request.getAge());
+        case "birthday":
+          findUser.changeBirthday(request.getBirthday());
           break;
         case "newPassword":
           findUser.changePassword(request.getNewPassword());
