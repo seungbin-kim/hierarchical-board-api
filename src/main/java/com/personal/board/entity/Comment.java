@@ -63,7 +63,7 @@ public class Comment extends BaseEntity {
 
   public void changeDeletionStatus() {
     this.deleted = true;
-    this.changeContent("지워진 답글");
+    this.changeContent("지워진 댓글");
   }
 
 }
