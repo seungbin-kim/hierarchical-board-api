@@ -139,7 +139,7 @@ public class PostService {
 
     Post findPost = postById.get();
     if (findPost.isDeleted()) {
-      throw new BadArgumentException("post has already been deleted.");
+      throw new BadArgumentException("post has been deleted.");
     }
     return findPost;
   }
