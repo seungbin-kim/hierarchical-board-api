@@ -25,7 +25,7 @@ public class BoardService {
 
 
   public BoardResponseWithCreatedAt addBoard(final BoardRequest request) {
-    if (boardRepository.findBoardByName(request.getName()).isEmpty()) { // 게시판이름 중복체크
+    if (!boardRepository.findBoardByName(request.getName()).isEmpty()) { // 게시판이름 중복체크
       throw new NameDuplicatedException(); // 중복발생시 예외발생
     }
     Board board = new Board(request.getName());
