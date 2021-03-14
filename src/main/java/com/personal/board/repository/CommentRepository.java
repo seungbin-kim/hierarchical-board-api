@@ -37,7 +37,7 @@ public class CommentRepository {
 
   public List<Comment> findAllComment(final Long postId) {
     return em.createQuery(
-        "SELECT c FROM Comment c WHERE c.post.id = :postId ORDER BY c.id ASC", Comment.class)
+        "SELECT c FROM Comment c WHERE c.parent IS NULL AND c.post.id = :postId ORDER BY c.id ASC", Comment.class)
         .setParameter("postId", postId)
         .getResultList();
   }

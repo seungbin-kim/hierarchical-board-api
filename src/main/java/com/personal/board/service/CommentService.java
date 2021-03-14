@@ -64,7 +64,6 @@ public class CommentService {
     // 답변형 출력을 위한 DTO변환
     return commentRepository.findAllComment(postId)
         .stream()
-        .filter(comment -> comment.getParent() == null)
         .map(CommentListResponse::new)
         .collect(Collectors.toList());
   }
