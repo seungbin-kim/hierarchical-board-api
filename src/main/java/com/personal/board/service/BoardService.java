@@ -25,7 +25,7 @@ public class BoardService {
 
 
   public BoardResponseWithCreatedAt addBoard(final BoardRequest request) {
-    if (!boardRepository.findBoardByName(request.getName()).isEmpty()) { // 게시판이름 중복체크
+    if (boardRepository.findBoardByName(request.getName()).isPresent()) { // 게시판이름 중복체크
       throw new NameDuplicatedException(); // 중복발생시 예외발생
     }
     Board board = new Board(request.getName());
@@ -46,9 +46,8 @@ public class BoardService {
   @Transactional(readOnly = true)
   public BoardResponseWithDate getBoard(final Long boardId) { // 요청 id에 대한 게시판을 조회
     Optional<Board> boardById = boardRepository.findBoardById(boardId);
-    if (boardById.isEmpty()) { // 조회 안될 시 예외발생
-      throw new BoardNotFoundException();
-    }
+    boardById.orElseThrow(BoardNotFoundException::new); // 조회 안될 시 예외발생
+
     return new BoardResponseWithDate(boardById.get()); // 응답 Dto를 만들어서 반환
   }
 

@@ -78,9 +78,7 @@ public class UserService {
   public UserResponseWithModifiedAt updateUser(final UserUpdateRequest request, final Long postId) throws IllegalAccessException {
     // 정보 찾아오기
     Optional<User> userById = userRepository.findUserById(postId);
-    if (userById.isEmpty()) {
-      throw new UserNotFoundException();
-    }
+    userById.orElseThrow(UserNotFoundException::new);
     User findUser = userById.get();
 
     // Password 체크

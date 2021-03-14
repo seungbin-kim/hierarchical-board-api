@@ -36,17 +36,10 @@ public class CommentService {
 
 
   public CommentResponseWithCreatedAt addComment(final CommentRequest request, final Long postId) {
-    Optional<Post> postById = postRepository.findPostById(postId);
-    if (postById.isEmpty()) {
-      throw new PostNotFoundException();
-    } else if (postById.get().isDeleted()) {
-      throw new BadArgumentException("post has been deleted.");
-    }
+    Optional<Post> postById = checkPost(postId);
 
     Optional<User> userById = userRepository.findUserById(request.getWriterId());
-    if (userById.isEmpty()) {
-      throw new UserNotFoundException();
-    }
+    userById.orElseThrow(UserNotFoundException::new);
 
     Comment comment = new Comment(
         postById.get(),
@@ -59,9 +52,7 @@ public class CommentService {
       // 답 댓글인 경우
       // 답 댓글인데 부모글 번호가 없는경우(잘못된 요청)
       Optional<Comment> commentById = commentRepository.findCommentById(request.getParentId());
-      if (commentById.isEmpty()) {
-        throw new ParentNotFoundException();
-      }
+      commentById.orElseThrow(ParentNotFoundException::new);
 
       Comment parentComment = commentById.get();
 
@@ -78,12 +69,7 @@ public class CommentService {
   }
 
   public List<CommentListResponse> getAllComment(final Long postId) {
-    Optional<Post> postById = postRepository.findPostById(postId);
-    if (postById.isEmpty()) {
-      throw new PostNotFoundException();
-    } else if (postById.get().isDeleted()) {
-      throw new BadArgumentException("post has been deleted.");
-    }
+    checkPost(postId);
     // 답변형 출력을 위한 DTO변환
     return commentRepository.findAllComment(postId)
         .stream()
@@ -94,6 +80,7 @@ public class CommentService {
 
   public CommentResponseWithModifiedAt updateComment(
       final CommentUpdateRequest request, final Long postId, final Long commentId) {
+
     Comment findComment = checkPostAndComment(postId, commentId);
 
     if (request.getContent() != null) {
@@ -113,23 +100,25 @@ public class CommentService {
   }
 
   private Comment checkPostAndComment(final Long postId, final Long commentsId) {
-    Optional<Post> postById = postRepository.findPostById(postId);
-    if (postById.isEmpty()) {
-      throw new PostNotFoundException();
-    } else if (postById.get().isDeleted()) {
-      throw new BadArgumentException("post has been deleted.");
-    }
+    checkPost(postId);
 
     Optional<Comment> commentById = commentRepository.findCommentById(commentsId);
-    if (commentById.isEmpty()) {
-      throw new CommentNotFoundException();
-    }
+    commentById.orElseThrow(CommentNotFoundException::new);
 
     Comment findComment = commentById.get();
     if (findComment.isDeleted()) {
       throw new BadArgumentException("comment has been deleted.");
     }
     return findComment;
+  }
+
+  private Optional<Post> checkPost(final Long postId) {
+    Optional<Post> postById = postRepository.findPostById(postId);
+    postById.orElseThrow(PostNotFoundException::new);
+    if (postById.get().isDeleted()) {
+      throw new BadArgumentException("post has been deleted.");
+    }
+    return postById;
   }
 
 }

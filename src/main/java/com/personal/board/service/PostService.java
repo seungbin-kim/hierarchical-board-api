@@ -38,14 +38,10 @@ public class PostService {
 
   public PostResponseWithContentAndCreatedAt addPost(final PostRequest request, final Long boardId) {
     Optional<Board> boardById = boardRepository.findBoardById(boardId);
-    if (boardById.isEmpty()) {
-      throw new BoardNotFoundException();
-    }
+    boardById.orElseThrow(BoardNotFoundException::new);
 
     Optional<User> userById = userRepository.findUserById(request.getWriterId());
-    if (userById.isEmpty()) {
-      throw new UserNotFoundException();
-    }
+    userById.orElseThrow(UserNotFoundException::new);
 
     Post post = new Post(
         boardById.get(),
@@ -59,9 +55,7 @@ public class PostService {
       // 답글인 경우
       // 답글인데 부모글 번호가 없는경우(잘못된 요청)
       Optional<Post> postById = postRepository.findPostById(request.getParentId());
-      if (postById.isEmpty()) {
-        throw new ParentNotFoundException();
-      }
+      postById.orElseThrow(ParentNotFoundException::new);
 
       Post parentPost = postById.get();
 
@@ -80,9 +74,9 @@ public class PostService {
 
   @Transactional(readOnly = true)
   public List<PostListResponse> getAllPost(final Long boardId) {
-    if (boardRepository.findBoardById(boardId).isEmpty()) { // 게시판을 찾지 못할시
-      throw new BoardNotFoundException();
-    }
+    // 게시판을 찾지 못할시
+    boardRepository.findBoardById(boardId).orElseThrow(BoardNotFoundException::new);
+
     // 답변형 출력을위해 부모글이 null인것만 골라서 DTO로 변환
     return postRepository.findAllPost(boardId)
         .stream()
@@ -127,14 +121,10 @@ public class PostService {
 
 
   private Post checkBoardAndPost(final Long boardId, final Long postId) {
-    if (boardRepository.findBoardById(boardId).isEmpty()) {
-      throw new BoardNotFoundException();
-    }
+    boardRepository.findBoardById(boardId).orElseThrow(BoardNotFoundException::new);
 
     Optional<Post> postById = postRepository.findPostById(postId);
-    if (postById.isEmpty()) {
-      throw new PostNotFoundException();
-    }
+    postById.orElseThrow(PostNotFoundException::new);
 
     Post findPost = postById.get();
     if (findPost.isDeleted()) {
