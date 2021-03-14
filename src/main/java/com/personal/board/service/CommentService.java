@@ -36,37 +36,28 @@ public class CommentService {
 
 
   public CommentResponseWithCreatedAt addComment(final CommentRequest request, final Long postId) {
-    Optional<Post> postById = checkPost(postId);
+    Post findPost = checkPost(postId);
 
     Optional<User> userById = userRepository.findUserById(request.getWriterId());
     userById.orElseThrow(UserNotFoundException::new);
 
     Comment comment = new Comment(
-        postById.get(),
+        findPost,
         userById.get(),
         request.getContent(),
         null
     );
 
     if (request.getParentId() != null) {
-      // 답 댓글인 경우
-      // 답 댓글인데 부모글 번호가 없는경우(잘못된 요청)
-      Optional<Comment> commentById = commentRepository.findCommentById(request.getParentId());
-      commentById.orElseThrow(ParentNotFoundException::new);
-
-      Comment parentComment = commentById.get();
-
-      // 답 댓글인데 부모글이 지워진 경우(답글 불가)
-      if (parentComment.isDeleted()) {
-        throw new BadArgumentException("parent comment has been deleted.");
-      }
-      
+      // 답 댓글인데 부모글 번호가 없거나 지워진 경우 예외발생(잘못된 요청)
+      Comment parentComment = checkComment(request.getParentId());
       // 부모글 번호가 정상적으로 있는 경우
       comment.setParent(parentComment);
     }
     Comment savedPost = commentRepository.save(comment);
     return new CommentResponseWithCreatedAt(savedPost);
   }
+
 
   public List<CommentListResponse> getAllComment(final Long postId) {
     checkPost(postId);
@@ -78,10 +69,12 @@ public class CommentService {
         .collect(Collectors.toList());
   }
 
+
   public CommentResponseWithModifiedAt updateComment(
       final CommentUpdateRequest request, final Long postId, final Long commentId) {
 
-    Comment findComment = checkPostAndComment(postId, commentId);
+    checkPost(postId);
+    Comment findComment = checkComment(commentId);
 
     if (request.getContent() != null) {
       if (StringUtils.isBlank(request.getContent())) {
@@ -94,14 +87,15 @@ public class CommentService {
     return new CommentResponseWithModifiedAt(findComment);
   }
 
+
   public void deleteComment(final Long postId, final Long commentsId) {
-    Comment findComment = checkPostAndComment(postId, commentsId);
+    checkPost(postId);
+    Comment findComment = checkComment(commentsId);
     commentRepository.deleteComment(findComment);
   }
 
-  private Comment checkPostAndComment(final Long postId, final Long commentsId) {
-    checkPost(postId);
 
+  private Comment checkComment(final Long commentsId) {
     Optional<Comment> commentById = commentRepository.findCommentById(commentsId);
     commentById.orElseThrow(CommentNotFoundException::new);
 
@@ -112,13 +106,16 @@ public class CommentService {
     return findComment;
   }
 
-  private Optional<Post> checkPost(final Long postId) {
+
+  private Post checkPost(final Long postId) {
     Optional<Post> postById = postRepository.findPostById(postId);
     postById.orElseThrow(PostNotFoundException::new);
-    if (postById.get().isDeleted()) {
+
+    Post findPost = postById.get();
+    if (findPost.isDeleted()) {
       throw new BadArgumentException("post has been deleted.");
     }
-    return postById;
+    return findPost;
   }
 
 }

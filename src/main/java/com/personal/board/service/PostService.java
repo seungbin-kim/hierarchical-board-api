@@ -37,14 +37,13 @@ public class PostService {
 
 
   public PostResponseWithContentAndCreatedAt addPost(final PostRequest request, final Long boardId) {
-    Optional<Board> boardById = boardRepository.findBoardById(boardId);
-    boardById.orElseThrow(BoardNotFoundException::new);
+    Board findBoard = checkBoard(boardId);
 
     Optional<User> userById = userRepository.findUserById(request.getWriterId());
     userById.orElseThrow(UserNotFoundException::new);
 
     Post post = new Post(
-        boardById.get(),
+        findBoard,
         userById.get(),
         request.getTitle(),
         request.getContent(),
@@ -52,18 +51,8 @@ public class PostService {
     );
 
     if (request.getParentId() != null) {
-      // 답글인 경우
-      // 답글인데 부모글 번호가 없는경우(잘못된 요청)
-      Optional<Post> postById = postRepository.findPostById(request.getParentId());
-      postById.orElseThrow(ParentNotFoundException::new);
-
-      Post parentPost = postById.get();
-
-      // 답글인데 부모글이 지워진 경우(답글 불가)
-      if (parentPost.isDeleted()) {
-        throw new BadArgumentException("parent post has been deleted.");
-      }
-
+      // 답글인데 부모글 번호가 없거나 지워진 경우 예외발생(잘못된 요청)
+      Post parentPost = checkPost(request.getParentId());
       // 부모글 번호가 정상적으로 있는경우
       post.setParent(parentPost);
     }
@@ -74,8 +63,8 @@ public class PostService {
 
   @Transactional(readOnly = true)
   public List<PostListResponse> getAllPost(final Long boardId) {
-    // 게시판을 찾지 못할시
-    boardRepository.findBoardById(boardId).orElseThrow(BoardNotFoundException::new);
+    // 게시판을 찾지 못할시 예외발생
+    checkBoard(boardId);
 
     // 답변형 출력을위해 부모글이 null인것만 골라서 DTO로 변환
     return postRepository.findAllPost(boardId)
@@ -87,14 +76,17 @@ public class PostService {
 
   @Transactional(readOnly = true)
   public PostResponseWithContentAndDate getPost(final Long boardId, final Long postId) {
-    Post findPost = checkBoardAndPost(boardId, postId);
+    checkBoard(boardId);
+    Post findPost = checkPost(postId);
     return new PostResponseWithContentAndDate(findPost);
   }
 
 
   public PostResponseWithContentAndModifiedAt updatePost(
       final PostUpdateRequest request, final Long boardId, final Long postId) throws IllegalAccessException {
-    Post findPost = checkBoardAndPost(boardId, postId);
+
+    checkBoard(boardId);
+    Post findPost = checkPost(postId);
 
     Field[] declaredFields = request.getClass().getDeclaredFields();
     ArrayList<String> validatedFields = PatchUtil.validateFields(request, declaredFields); // PATCH를 위한 입력필드얻기
@@ -115,14 +107,20 @@ public class PostService {
 
 
   public void deletePost(final Long boardId, final Long postId) {
-    Post findPost = checkBoardAndPost(boardId, postId);
+    checkBoard(boardId);
+    Post findPost = checkPost(postId);
     postRepository.deletePost(findPost);
   }
 
 
-  private Post checkBoardAndPost(final Long boardId, final Long postId) {
-    boardRepository.findBoardById(boardId).orElseThrow(BoardNotFoundException::new);
+  private Board checkBoard(final Long boardId) {
+    Optional<Board> boardById = boardRepository.findBoardById(boardId);
+    boardById.orElseThrow(BoardNotFoundException::new);
+    return boardById.get();
+  }
 
+
+  public Post checkPost(final Long postId) {
     Optional<Post> postById = postRepository.findPostById(postId);
     postById.orElseThrow(PostNotFoundException::new);
 
