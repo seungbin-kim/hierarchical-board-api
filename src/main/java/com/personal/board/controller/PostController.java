@@ -30,7 +30,9 @@ public class PostController {
 
   @PostMapping("/boards/{boardId}/posts")
   public ResponseEntity<PostResponseWithContentAndCreatedAt> addPost(
-      @RequestBody @Valid final PostRequest request, @PathVariable final Long boardId) {
+      @RequestBody @Valid final PostRequest request,
+      @PathVariable final Long boardId) {
+
     PostResponseWithContentAndCreatedAt postResponse = postService.addPost(request, boardId);
     return ResponseEntity
         .created(new UriTemplate(POST)
@@ -39,21 +41,28 @@ public class PostController {
   }
 
   @GetMapping("/boards/{boardId}/posts")
-  public ResponseEntity<ResultResponse<List<PostListResponse>>> getAllPost(@PathVariable final Long boardId) {
+  public ResponseEntity<ResultResponse<List<PostListResponse>>> getAllPost(
+      @PathVariable final Long boardId) {
+
     return ResponseEntity
         .ok(new ResultResponse<>(postService.getAllPost(boardId)));
   }
 
   @GetMapping("/boards/{boardId}/posts/{postId}")
   public ResponseEntity<PostResponseWithContentAndDate> getPost(
-      @PathVariable final Long boardId, @PathVariable final Long postId) {
+      @PathVariable final Long boardId,
+      @PathVariable final Long postId) {
+
     return ResponseEntity
         .ok(postService.getPost(boardId, postId));
   }
 
   @PatchMapping("/boards/{boardId}/posts/{postId}")
   public ResponseEntity<PostResponseWithContentAndModifiedAt> patchPost(
-      @RequestBody final PostUpdateRequest request, @PathVariable final Long boardId, @PathVariable final Long postId) {
+      @RequestBody final PostUpdateRequest request,
+      @PathVariable final Long boardId,
+      @PathVariable final Long postId) {
+
     try {
       return ResponseEntity
           .ok(postService.updatePost(request, boardId, postId));
@@ -63,7 +72,10 @@ public class PostController {
   }
 
   @DeleteMapping("/boards/{boardId}/posts/{postId}")
-  public ResponseEntity deletePost(@PathVariable final Long boardId, @PathVariable final Long postId) {
+  public ResponseEntity deletePost(
+      @PathVariable final Long boardId,
+      @PathVariable final Long postId) {
+
     postService.deletePost(boardId, postId);
     return ResponseEntity
         .noContent()

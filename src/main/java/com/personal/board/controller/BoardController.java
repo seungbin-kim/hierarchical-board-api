@@ -25,7 +25,9 @@ public class BoardController {
   private final BoardService boardService;
 
   @PostMapping("/boards")
-  public ResponseEntity<BoardResponseWithCreatedAt> addBoard(@RequestBody @Valid final BoardRequest request) {
+  public ResponseEntity<BoardResponseWithCreatedAt> addBoard(
+      @RequestBody @Valid final BoardRequest request) {
+
     BoardResponseWithCreatedAt boardResponse = boardService.addBoard(request);
     return ResponseEntity
         .created(new UriTemplate(BOARD).expand(boardResponse.getId()))
@@ -39,7 +41,9 @@ public class BoardController {
   }
 
   @GetMapping("/boards/{boardId}")
-  public ResponseEntity<BoardResponseWithDate> getBoard(@PathVariable final Long boardId) {
+  public ResponseEntity<BoardResponseWithDate> getBoard(
+      @PathVariable final Long boardId) {
+
     return ResponseEntity
         .ok(boardService.getBoard(boardId));
   }

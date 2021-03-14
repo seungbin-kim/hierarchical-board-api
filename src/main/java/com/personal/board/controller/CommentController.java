@@ -28,7 +28,9 @@ public class CommentController {
 
   @PostMapping("/posts/{postId}/comments")
   public ResponseEntity<CommentResponseWithCreatedAt> addComment(
-      @RequestBody @Valid final CommentRequest request, @PathVariable final Long postId) {
+      @RequestBody @Valid final CommentRequest request,
+      @PathVariable final Long postId) {
+
     CommentResponseWithCreatedAt commentResponse = commentService.addComment(request, postId);
     return ResponseEntity
         .created(new UriTemplate(COMMENT)
@@ -37,20 +39,28 @@ public class CommentController {
   }
 
   @GetMapping("/posts/{postId}/comments")
-  public ResponseEntity<ResultResponse<List<CommentListResponse>>> getAllComment(@PathVariable final Long postId) {
+  public ResponseEntity<ResultResponse<List<CommentListResponse>>> getAllComment(
+      @PathVariable final Long postId) {
+
     return ResponseEntity
         .ok(new ResultResponse<>(commentService.getAllComment(postId)));
   }
 
   @PatchMapping("/posts/{postId}/comments/{commentId}")
   public ResponseEntity<CommentResponseWithModifiedAt> patchComment(
-      @RequestBody final CommentUpdateRequest request, @PathVariable final Long postId, @PathVariable final Long commentId) {
+      @RequestBody final CommentUpdateRequest request,
+      @PathVariable final Long postId,
+      @PathVariable final Long commentId) {
+
     return ResponseEntity
         .ok(commentService.updateComment(request, postId, commentId));
   }
 
   @DeleteMapping("/posts/{postId}/comments/{commentId}")
-  public ResponseEntity deleteComment(@PathVariable final Long postId, @PathVariable final Long commentId) {
+  public ResponseEntity deleteComment(
+      @PathVariable final Long postId,
+      @PathVariable final Long commentId) {
+    
     commentService.deleteComment(postId, commentId);
     return ResponseEntity
         .noContent()
