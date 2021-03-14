@@ -22,16 +22,12 @@ public class BoardRepository {
   }
 
 
-  public Optional<Board> findBoardById(final Long id) {
-    try {
-      Board board = em.createQuery(
-          "SELECT b FROM Board b WHERE b.id = :id", Board.class)
-          .setParameter("id", id)
-          .getSingleResult();
-      return Optional.of(board);
-    } catch (NoResultException exception) {
+  public Optional<Board> findBoardById(final Long boardId) {
+    Board board = em.find(Board.class, boardId);
+    if (board == null) {
       return Optional.empty();
     }
+    return Optional.of(board);
   }
 
 

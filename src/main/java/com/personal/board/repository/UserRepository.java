@@ -27,16 +27,12 @@ public class UserRepository {
   }
 
 
-  public Optional<User> findUserById(final Long id) {
-    try {
-      User user = em.createQuery(
-          "SELECT u FROM User u WHERE u.id = :id", User.class)
-          .setParameter("id", id)
-          .getSingleResult();
-      return Optional.of(user);
-    } catch (NoResultException exception) {
+  public Optional<User> findUserById(final Long userId) {
+    User user = em.find(User.class, userId);
+    if (user == null) {
       return Optional.empty();
     }
+    return Optional.of(user);
   }
 
 

@@ -4,7 +4,6 @@ import com.personal.board.entity.Post;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
@@ -23,15 +22,11 @@ public class PostRepository {
 
 
   public Optional<Post> findPostById(final Long postId) {
-    try {
-      Post post = em.createQuery(
-          "SELECT p FROM Post p WHERE p.id = :postId", Post.class)
-          .setParameter("postId", postId)
-          .getSingleResult();
-      return Optional.of(post);
-    } catch (NoResultException exception) {
+    Post post = em.find(Post.class, postId);
+    if (post == null) {
       return Optional.empty();
     }
+    return Optional.of(post);
   }
 
 
@@ -44,7 +39,7 @@ public class PostRepository {
 
 
   public void deletePost(final Post post) {
-    post.changeDeletionStatus();
+    em.remove(post);
   }
 
 }

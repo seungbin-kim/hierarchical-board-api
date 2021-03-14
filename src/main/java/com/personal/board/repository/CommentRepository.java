@@ -22,16 +22,12 @@ public class CommentRepository {
   }
 
 
-  public Optional<Comment> findCommentById(final Long id) {
-    try {
-      Comment comment = em.createQuery(
-          "SELECT c FROM Comment c WHERE c.id = :id", Comment.class)
-          .setParameter("id", id)
-          .getSingleResult();
-      return Optional.of(comment);
-    } catch (NoResultException exception) {
+  public Optional<Comment> findCommentById(final Long boardId) {
+    Comment comment = em.find(Comment.class, boardId);
+    if (comment == null) {
       return Optional.empty();
     }
+    return Optional.of(comment);
   }
 
 
