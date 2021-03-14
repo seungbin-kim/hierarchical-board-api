@@ -37,7 +37,7 @@ public class PostRepository {
 
   public List<Post> findAllPost(final Long boardId) {
     return em.createQuery(
-        "SELECT p FROM Post p WHERE p.board.id = :boardId ORDER BY p.id DESC", Post.class)
+        "SELECT p FROM Post p WHERE p.parent IS NULL AND p.board.id = :boardId ORDER BY p.id DESC", Post.class)
         .setParameter("boardId", boardId)
         .getResultList();
   }

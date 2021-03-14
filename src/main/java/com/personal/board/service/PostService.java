@@ -86,7 +86,6 @@ public class PostService {
     // 답변형 출력을위해 부모글이 null인것만 골라서 DTO로 변환
     return postRepository.findAllPost(boardId)
         .stream()
-        .filter(post -> post.getParent() == null) // 답변글들은 LAZY 로딩이 됨
         .map(PostListResponse::new)
         .collect(Collectors.toList());
   }
