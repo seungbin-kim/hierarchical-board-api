@@ -72,7 +72,7 @@ public class PostController {
   }
 
   @DeleteMapping("/boards/{boardId}/posts/{postId}")
-  public ResponseEntity deletePost(
+  public ResponseEntity<?> deletePost(
       @PathVariable final Long boardId,
       @PathVariable final Long postId) {
 
