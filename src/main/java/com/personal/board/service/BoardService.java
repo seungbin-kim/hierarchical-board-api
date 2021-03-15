@@ -6,7 +6,6 @@ import com.personal.board.dto.response.board.BoardResponseWithDate;
 import com.personal.board.entity.Board;
 import com.personal.board.exception.BoardNotFoundException;
 import com.personal.board.exception.NameDuplicatedException;
-import com.personal.board.exception.NotFoundException;
 import com.personal.board.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
