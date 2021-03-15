@@ -42,7 +42,7 @@ public class PostService {
     Optional<User> userById = userRepository.findUserById(request.getWriterId());
     userById.orElseThrow(UserNotFoundException::new);
 
-    Post post = new Post(
+    Post post = Post.createPost(
         findBoard,
         userById.get(),
         request.getTitle(),
@@ -53,8 +53,8 @@ public class PostService {
     if (request.getParentId() != null) {
       // 답글인데 부모글 번호가 없거나 지워진 경우 예외발생(잘못된 요청)
       Post parentPost = checkPost(request.getParentId());
-      // 부모글 번호가 정상적으로 있는경우
-      post.setParent(parentPost);
+      // 부모글 번호가 정상적으로 있는경우 부모글 세팅
+      post.changeParent(parentPost);
     }
     Post savedPost = postRepository.save(post);
     return new PostResponseWithContentAndCreatedAt(savedPost);
@@ -89,19 +89,10 @@ public class PostService {
     Post findPost = checkPost(postId);
 
     Field[] declaredFields = request.getClass().getDeclaredFields();
-    ArrayList<String> validatedFields = PatchUtil.validateFields(request, declaredFields); // PATCH를 위한 입력필드얻기
+    ArrayList<String> validatedFields = PatchUtil.validateFields(request, declaredFields); // 입력된 필드 얻기
 
-    for (String validatedField : validatedFields) { // 입력이 확인된 필드를 변경감지로 데이터 변경
-      switch (validatedField) {
-        case "title":
-          findPost.changeTitle(request.getTitle());
-          break;
-        case "content":
-          findPost.changeContent(request.getContent());
-          break;
-      }
-    }
-    findPost.setModifiedAt(LocalDateTime.now()); // 수정시간
+    findPost.updatePost(validatedFields, request.getTitle(), request.getContent());
+
     return new PostResponseWithContentAndModifiedAt(findPost);
   }
 

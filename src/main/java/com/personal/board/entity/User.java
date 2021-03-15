@@ -18,14 +18,6 @@ import java.time.LocalDate;
 )
 public class User extends BaseEntity {
 
-  public User(final String email, final String nickname, final String name, final LocalDate birthday, final String password) {
-    this.email = email;
-    this.nickname = nickname;
-    this.name = name;
-    this.birthday = birthday;
-    this.password = password;
-  }
-
   @Id
   @GeneratedValue(
       strategy = GenerationType.SEQUENCE,
@@ -47,6 +39,16 @@ public class User extends BaseEntity {
 
   @Column(columnDefinition = "text", nullable = false)
   private String password;
+
+  public static User createUser(final String email, final String nickname, final String name, final LocalDate birthday, final String password) {
+    User user = new User();
+    user.changeEmail(email);
+    user.changeNickname(nickname);
+    user.changeName(name);
+    user.changeBirthday(birthday);
+    user.changePassword(password);
+    return user;
+  }
 
   public void changeEmail(final String email) {
     this.email = email;

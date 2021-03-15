@@ -35,7 +35,7 @@ public class UserService {
       throw new NicknameDuplicatedException();
     }
 
-    User user = new User(
+    User user = User.createUser(
         request.getEmail(),
         request.getNickname(),
         request.getName(),

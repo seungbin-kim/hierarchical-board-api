@@ -1,10 +1,13 @@
 package com.personal.board.entity;
 
+import com.personal.board.exception.BadArgumentException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,13 +20,6 @@ import java.util.List;
     initialValue = 1, allocationSize = 50
 )
 public class Comment extends BaseEntity {
-
-  public Comment(Post post, User user, String content, Comment parent) {
-    this.post = post;
-    this.user = user;
-    this.content = content;
-    this.parent = parent;
-  }
 
   @Id
   @GeneratedValue(
@@ -53,12 +49,42 @@ public class Comment extends BaseEntity {
   @Column(columnDefinition = "boolean")
   private boolean deleted;
 
-  public void setParent(Comment parent) {
-    this.parent = parent;
+
+  public static Comment createComment(final Post post, final User user, final String content, final Comment parent) {
+    Comment comment = new Comment();
+    comment.setPost(post);
+    comment.setUser(user);
+    comment.changeContent(content);
+    comment.changeParent(parent);
+    return comment;
   }
 
-  public void changeContent(String content) {
+
+  public void updateComment(final String content) {
+    if (content != null) {
+      if (StringUtils.isBlank(content)) {
+        throw new BadArgumentException("content is blank.");
+      }
+      this.changeContent(content);
+      this.setModifiedAt(LocalDateTime.now());
+    }
+  }
+
+
+  private void setPost(Post post) {
+    this.post = post;
+  }
+
+  private void setUser(User user) {
+    this.user = user;
+  }
+
+  private void changeContent(String content) {
     this.content = content;
+  }
+
+  public void changeParent(Comment parent) {
+    this.parent = parent;
   }
 
   public void changeDeletionStatus() {

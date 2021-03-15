@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,14 +22,6 @@ import java.util.List;
     initialValue = 1, allocationSize = 1
 )
 public class Post extends BaseEntity {
-
-  public Post(Board board, User user, String title, String content, Post parent) {
-    this.board = board;
-    this.user = user;
-    this.title = title;
-    this.content = content;
-    this.parent = parent;
-  }
 
   @Id
   @GeneratedValue(
@@ -61,20 +54,56 @@ public class Post extends BaseEntity {
   @Column(columnDefinition = "boolean")
   private boolean deleted;
 
+
+  public static Post createPost(final Board board, final User user, final String title, final String content, final Post parent) {
+    Post post = new Post();
+    post.setBoard(board);
+    post.setUser(user);
+    post.changeTitle(title);
+    post.changeContent(content);
+    post.changeParent(parent);
+    return post;
+  }
+
+
+  public void updatePost(final ArrayList<String> validatedFields, final String title, final String content) {
+    for (String validatedField : validatedFields) { // 입력이 확인된 필드를 변경감지로 데이터 변경
+      switch (validatedField) {
+        case "title":
+          this.changeTitle(title);
+          break;
+        case "content":
+          this.changeContent(content);
+          break;
+      }
+    }
+    this.setModifiedAt(LocalDateTime.now()); // 수정시간
+  }
+
+
   public void removeChildPost(Post child) {
 
   }
 
-  public void setParent(Post parent) {
-    this.parent = parent;
+
+  private void setBoard(Board board) {
+    this.board = board;
   }
 
-  public void changeTitle(String title) {
+  private void setUser(User user) {
+    this.user = user;
+  }
+
+  private void changeTitle(String title) {
     this.title = title;
   }
 
-  public void changeContent(String content) {
+  private void changeContent(String content) {
     this.content = content;
+  }
+
+  public void changeParent(Post parent) {
+    this.parent = parent;
   }
 
   public void changeDeletionStatus() {

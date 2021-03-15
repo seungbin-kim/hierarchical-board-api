@@ -5,7 +5,6 @@ import com.personal.board.dto.request.CommentUpdateRequest;
 import com.personal.board.dto.response.comment.CommentListResponse;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
 import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
-import com.personal.board.dto.response.post.PostListResponse;
 import com.personal.board.entity.Comment;
 import com.personal.board.entity.Post;
 import com.personal.board.entity.User;
@@ -14,11 +13,9 @@ import com.personal.board.repository.CommentRepository;
 import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,7 +38,7 @@ public class CommentService {
     Optional<User> userById = userRepository.findUserById(request.getWriterId());
     userById.orElseThrow(UserNotFoundException::new);
 
-    Comment comment = new Comment(
+    Comment comment = Comment.createComment(
         findPost,
         userById.get(),
         request.getContent(),
@@ -52,7 +49,7 @@ public class CommentService {
       // 답 댓글인데 부모글 번호가 없거나 지워진 경우 예외발생(잘못된 요청)
       Comment parentComment = checkComment(request.getParentId());
       // 부모글 번호가 정상적으로 있는 경우
-      comment.setParent(parentComment);
+      comment.changeParent(parentComment);
     }
     Comment savedPost = commentRepository.save(comment);
     return new CommentResponseWithCreatedAt(savedPost);
@@ -76,13 +73,7 @@ public class CommentService {
     checkPost(postId);
     Comment findComment = checkComment(commentId);
 
-    if (request.getContent() != null) {
-      if (StringUtils.isBlank(request.getContent())) {
-        throw new BadArgumentException("content is blank.");
-      }
-      findComment.changeContent(request.getContent());
-      findComment.setModifiedAt(LocalDateTime.now());
-    }
+    findComment.updateComment(request.getContent());
 
     return new CommentResponseWithModifiedAt(findComment);
   }
