@@ -17,7 +17,7 @@ public class CommentListResponse extends CommentResponse {
 
   private boolean deletedStatus;
 
-  private List<CommentResponse> reply = new ArrayList<>();
+  private List<CommentResponse> reply;
 
   public CommentListResponse(final Comment comment) {
     super(comment);

@@ -17,7 +17,7 @@ public class PostListResponse extends PostResponse {
 
   private boolean deletedStatus;
 
-  private List<PostListResponse> reply = new ArrayList<>();
+  private List<PostListResponse> reply;
 
   public PostListResponse(final Post post) {
     super(post);
