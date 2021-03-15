@@ -59,6 +59,7 @@ public class CommentService {
   }
 
 
+  @Transactional(readOnly = true)
   public List<CommentListResponse> getAllComment(final Long postId) {
     checkPost(postId);
     // 답변형 출력을 위한 DTO변환
