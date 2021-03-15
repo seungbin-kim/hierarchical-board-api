@@ -120,7 +120,7 @@ public class PostService {
   }
 
 
-  public Post checkPost(final Long postId) {
+  private Post checkPost(final Long postId) {
     Optional<Post> postById = postRepository.findPostById(postId);
     postById.orElseThrow(PostNotFoundException::new);
 

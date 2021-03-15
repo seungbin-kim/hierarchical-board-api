@@ -8,6 +8,10 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@NamedEntityGraph(
+    name = "Post.user",
+    attributeNodes = @NamedAttributeNode("user"))
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -47,7 +51,7 @@ public class Post extends BaseEntity {
   @Column(columnDefinition = "text")
   private String content;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "parent_id", columnDefinition = "bigint")
   private Post parent;
 
@@ -56,6 +60,10 @@ public class Post extends BaseEntity {
 
   @Column(columnDefinition = "boolean")
   private boolean deleted;
+
+  public void removeChildPost(Post child) {
+
+  }
 
   public void setParent(Post parent) {
     this.parent = parent;
