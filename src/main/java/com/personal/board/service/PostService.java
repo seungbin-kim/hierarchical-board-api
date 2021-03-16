@@ -66,9 +66,10 @@ public class PostService {
     // 게시판을 찾지 못할시 예외발생
     checkBoard(boardId);
 
-    // 답변형 출력을위해 부모글이 null인것만 골라서 DTO로 변환
+    // 답변형 출력
     return postRepository.findAllPost(boardId)
         .stream()
+        .filter(post -> post.getParent() == null)
         .map(PostListResponse::new)
         .collect(Collectors.toList());
   }
@@ -99,8 +100,28 @@ public class PostService {
 
   public void deletePost(final Long boardId, final Long postId) {
     checkBoard(boardId);
-    Post findPost = checkPost(postId);
-    postRepository.deletePost(findPost);
+    Post targetPost = checkPost(postId);
+
+    Post parentPost = targetPost.getParent();
+    if (targetPost.getChildren().isEmpty()) {
+
+      while (parentPost != null) {
+        parentPost = targetPost.getParent();
+        if (parentPost == null) {
+          postRepository.deletePost(targetPost);
+          break;
+        }
+        parentPost.getChildren().remove(targetPost);
+        postRepository.deletePost(targetPost);
+        if (parentPost.getChildren().isEmpty() && parentPost.isDeleted()) {
+          targetPost = parentPost;
+        } else {
+          break;
+        }
+      }
+    } else {
+      targetPost.changeDeletionStatus();
+    }
   }
 
 
