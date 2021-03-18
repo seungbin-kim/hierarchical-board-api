@@ -37,15 +37,6 @@ public class PostRepository {
   }
 
 
-  public List<Post> findAllPost(final Long boardId) {
-    return em.createQuery(
-        "SELECT DISTINCT p FROM Post p JOIN FETCH p.user LEFT JOIN FETCH p.children" +
-            " WHERE p.board.id = :boardId ORDER BY p.parent.id ASC, p.id DESC", Post.class)
-        .setParameter("boardId", boardId)
-        .getResultList();
-  }
-
-
   public void deletePost(final Post post) {
     em.remove(post);
   }

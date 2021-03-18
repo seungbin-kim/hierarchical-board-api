@@ -3,10 +3,7 @@ package com.personal.board.controller;
 import com.personal.board.dto.request.PostRequest;
 import com.personal.board.dto.request.PostUpdateRequest;
 import com.personal.board.dto.response.ResultResponse;
-import com.personal.board.dto.response.post.PostListResponse;
-import com.personal.board.dto.response.post.PostResponseWithContentAndCreatedAt;
-import com.personal.board.dto.response.post.PostResponseWithContentAndDate;
-import com.personal.board.dto.response.post.PostResponseWithContentAndModifiedAt;
+import com.personal.board.dto.response.post.*;
 import com.personal.board.exception.ReflectIllegalAccessException;
 import com.personal.board.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +38,7 @@ public class PostController {
   }
 
   @GetMapping("/boards/{boardId}/posts")
-  public ResponseEntity<ResultResponse<List<PostListResponse>>> getAllPost(
+  public ResponseEntity<ResultResponse<List<ParentPostDto>>> getAllPost(
       @PathVariable final Long boardId) {
 
     return ResponseEntity

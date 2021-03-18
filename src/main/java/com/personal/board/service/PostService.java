@@ -2,10 +2,7 @@ package com.personal.board.service;
 
 import com.personal.board.dto.request.PostRequest;
 import com.personal.board.dto.request.PostUpdateRequest;
-import com.personal.board.dto.response.post.PostListResponse;
-import com.personal.board.dto.response.post.PostResponseWithContentAndCreatedAt;
-import com.personal.board.dto.response.post.PostResponseWithContentAndDate;
-import com.personal.board.dto.response.post.PostResponseWithContentAndModifiedAt;
+import com.personal.board.dto.response.post.*;
 import com.personal.board.entity.Board;
 import com.personal.board.entity.Post;
 import com.personal.board.entity.User;
@@ -13,6 +10,7 @@ import com.personal.board.exception.*;
 import com.personal.board.repository.BoardRepository;
 import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
+import com.personal.board.repository.query.PostQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,9 +29,11 @@ public class PostService {
 
   private final BoardRepository boardRepository;
 
+  private final UserRepository userRepository;
+
   private final PostRepository postRepository;
 
-  private final UserRepository userRepository;
+  private final PostQueryRepository postQueryRepository;
 
 
   public PostResponseWithContentAndCreatedAt addPost(final PostRequest request, final Long boardId) {
@@ -62,16 +62,12 @@ public class PostService {
 
 
   @Transactional(readOnly = true)
-  public List<PostListResponse> getAllPost(final Long boardId) {
+  public List<ParentPostDto> getAllPost(final Long boardId) {
     // 게시판을 찾지 못할시 예외발생
     checkBoard(boardId);
 
     // 답변형 출력
-    return postRepository.findAllPost(boardId)
-        .stream()
-        .filter(post -> post.getParent() == null)
-        .map(PostListResponse::new)
-        .collect(Collectors.toList());
+    return postQueryRepository.findAllPostByDto(boardId);
   }
 
 
