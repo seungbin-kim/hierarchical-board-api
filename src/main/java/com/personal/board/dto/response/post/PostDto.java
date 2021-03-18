@@ -1,5 +1,6 @@
 package com.personal.board.dto.response.post;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -10,7 +11,10 @@ import java.util.List;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class ParentPostDto {
+public class PostDto {
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Long parentId;
 
   private final Long id;
 
@@ -22,6 +26,6 @@ public class ParentPostDto {
 
   private final LocalDateTime createdAt;
 
-  private List<ChildPostDto> reply;
+  private List<PostDto> reply;
 
 }

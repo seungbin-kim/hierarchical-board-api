@@ -38,7 +38,7 @@ public class PostController {
   }
 
   @GetMapping("/boards/{boardId}/posts")
-  public ResponseEntity<ResultResponse<List<ParentPostDto>>> getAllPost(
+  public ResponseEntity<ResultResponse<List<PostDto>>> getAllPost(
       @PathVariable final Long boardId) {
 
     return ResponseEntity

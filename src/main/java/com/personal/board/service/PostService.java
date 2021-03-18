@@ -16,11 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -62,7 +60,7 @@ public class PostService {
 
 
   @Transactional(readOnly = true)
-  public List<ParentPostDto> getAllPost(final Long boardId) {
+  public List<PostDto> getAllPost(final Long boardId) {
     // 게시판을 찾지 못할시 예외발생
     checkBoard(boardId);
 
