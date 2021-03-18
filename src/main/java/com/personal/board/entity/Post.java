@@ -48,7 +48,7 @@ public class Post extends BaseEntity {
   @JoinColumn(name = "parent_id", columnDefinition = "bigint")
   private Post parent;
 
-  @OneToMany(mappedBy = "parent")
+  @OneToMany(mappedBy = "parent", orphanRemoval = true)
   private final List<Post> children = new ArrayList<>();
 
   @Column(columnDefinition = "boolean")
@@ -78,11 +78,6 @@ public class Post extends BaseEntity {
       }
     }
     this.setModifiedAt(LocalDateTime.now()); // 수정시간
-  }
-
-
-  public void removeChildPost(Post child) {
-
   }
 
 

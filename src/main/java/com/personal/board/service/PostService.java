@@ -96,26 +96,19 @@ public class PostService {
     checkBoard(boardId);
     Post targetPost = checkPost(postId);
 
-    Post parentPost = targetPost.getParent();
     if (targetPost.getChildren().isEmpty()) {
-
-      while (parentPost != null) {
-        parentPost = targetPost.getParent();
-        if (parentPost == null) {
-          postRepository.deletePost(targetPost);
-          break;
-        }
-        parentPost.getChildren().remove(targetPost);
-        postRepository.deletePost(targetPost);
-        if (parentPost.getChildren().isEmpty() && parentPost.isDeleted()) {
-          targetPost = parentPost;
-        } else {
-          break;
-        }
-      }
+      postRepository.deletePost(getDeletableAncestorPost(targetPost));
     } else {
       targetPost.changeDeletionStatus();
     }
+  }
+
+  private Post getDeletableAncestorPost(Post targetPost) {
+    Post parent = targetPost.getParent();
+    if (parent != null && parent.getChildren().size() == 1 && parent.isDeleted()) {
+      return getDeletableAncestorPost(parent);
+    }
+    return targetPost;
   }
 
 

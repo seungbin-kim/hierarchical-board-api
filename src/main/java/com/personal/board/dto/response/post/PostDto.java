@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @RequiredArgsConstructor
 public class PostDto {
 
@@ -27,5 +27,13 @@ public class PostDto {
   private final LocalDateTime createdAt;
 
   private List<PostDto> reply;
+
+  public void setReply(List<PostDto> reply) {
+    if (reply == null) {
+      this.reply = new ArrayList<>();
+      return;
+    }
+    this.reply = reply;
+  }
 
 }

@@ -19,22 +19,18 @@ public class PostQueryRepository {
   public List<PostDto> findAllPostByDto(final Long boardId) {
     List<PostDto> parentList = getParentPostDtos(boardId);
 
-    List<Long> parentIds = parentList.stream()
-        .map(PostDto::getId)
-        .collect(Collectors.toList());
-
     List<PostDto> parentListForLoop = parentList;
-    while (!parentIds.isEmpty()) {
+    while (!parentListForLoop.isEmpty()) {
+      List<Long> parentIds = parentListForLoop.stream()
+          .map(PostDto::getId)
+          .collect(Collectors.toList());
+
       List<PostDto> children = getChildPostDtos(boardId, parentIds);
 
       Map<Long, List<PostDto>> childrenPostMap = children.stream()
           .collect(Collectors.groupingBy(PostDto::getParentId));
 
       parentListForLoop.forEach(p -> p.setReply(childrenPostMap.get(p.getId())));
-
-      parentIds = children.stream()
-          .map(PostDto::getId)
-          .collect(Collectors.toList());
 
       parentListForLoop = children;
     }
