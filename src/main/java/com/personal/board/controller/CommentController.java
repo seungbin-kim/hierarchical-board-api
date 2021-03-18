@@ -3,7 +3,7 @@ package com.personal.board.controller;
 import com.personal.board.dto.request.CommentRequest;
 import com.personal.board.dto.request.CommentUpdateRequest;
 import com.personal.board.dto.response.ResultResponse;
-import com.personal.board.dto.response.comment.CommentListResponse;
+import com.personal.board.dto.response.comment.CommentDto;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
 import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
 import com.personal.board.service.CommentService;
@@ -39,7 +39,7 @@ public class CommentController {
   }
 
   @GetMapping("/posts/{postId}/comments")
-  public ResponseEntity<ResultResponse<List<CommentListResponse>>> getAllComment(
+  public ResponseEntity<ResultResponse<List<CommentDto>>> getAllComment(
       @PathVariable final Long postId) {
 
     return ResponseEntity

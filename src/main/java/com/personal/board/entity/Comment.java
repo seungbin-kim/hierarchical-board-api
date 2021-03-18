@@ -43,7 +43,7 @@ public class Comment extends BaseEntity {
   @JoinColumn(name = "parent_id", columnDefinition = "bigint")
   private Comment parent;
 
-  @OneToMany(mappedBy = "parent")
+  @OneToMany(mappedBy = "parent", orphanRemoval = true)
   private final List<Comment> children = new ArrayList<>();
 
   @Column(columnDefinition = "boolean")

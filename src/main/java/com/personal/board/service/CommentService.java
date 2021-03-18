@@ -2,7 +2,7 @@ package com.personal.board.service;
 
 import com.personal.board.dto.request.CommentRequest;
 import com.personal.board.dto.request.CommentUpdateRequest;
-import com.personal.board.dto.response.comment.CommentListResponse;
+import com.personal.board.dto.response.comment.CommentDto;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
 import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
 import com.personal.board.entity.Comment;
@@ -12,24 +12,26 @@ import com.personal.board.exception.*;
 import com.personal.board.repository.CommentRepository;
 import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
+import com.personal.board.repository.query.CommentQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class CommentService {
 
-  private final CommentRepository commentRepository;
-
   private final UserRepository userRepository;
 
   private final PostRepository postRepository;
+
+  private final CommentRepository commentRepository;
+
+  private final CommentQueryRepository commentQueryRepository;
 
 
   public CommentResponseWithCreatedAt addComment(final CommentRequest request, final Long postId) {
@@ -57,13 +59,10 @@ public class CommentService {
 
 
   @Transactional(readOnly = true)
-  public List<CommentListResponse> getAllComment(final Long postId) {
+  public List<CommentDto> getAllComment(final Long postId) {
     checkPost(postId);
     // 답변형 출력을 위한 DTO변환
-    return commentRepository.findAllComment(postId)
-        .stream()
-        .map(CommentListResponse::new)
-        .collect(Collectors.toList());
+    return commentQueryRepository.findAllCommentByDto(postId);
   }
 
 
@@ -81,8 +80,21 @@ public class CommentService {
 
   public void deleteComment(final Long postId, final Long commentsId) {
     checkPost(postId);
-    Comment findComment = checkComment(commentsId);
-    commentRepository.deleteComment(findComment);
+    Comment targetComment = checkComment(commentsId);
+
+    if (targetComment.getChildren().isEmpty()) {
+      commentRepository.deleteComment(getDeletableAncestorComment(targetComment));
+    } else {
+      targetComment.changeDeletionStatus();
+    }
+  }
+
+  private Comment getDeletableAncestorComment(final Comment targetComment) {
+    Comment parent = targetComment.getParent();
+    if (parent != null && parent.getChildren().size() == 1 && parent.isDeleted()) {
+      return getDeletableAncestorComment(parent);
+    }
+    return targetComment;
   }
 
 
