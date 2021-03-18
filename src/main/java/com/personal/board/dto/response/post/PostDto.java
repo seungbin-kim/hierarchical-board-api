@@ -3,7 +3,6 @@ package com.personal.board.dto.response.post;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,9 +21,9 @@ public class PostDto {
 
   private final String userNickname;
 
-  private final boolean deletedStatus;
-
   private final LocalDateTime createdAt;
+
+  private final boolean deletedStatus;
 
   private List<PostDto> reply;
 
