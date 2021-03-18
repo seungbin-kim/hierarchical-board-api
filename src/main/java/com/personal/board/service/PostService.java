@@ -103,7 +103,7 @@ public class PostService {
     }
   }
 
-  private Post getDeletableAncestorPost(Post targetPost) {
+  private Post getDeletableAncestorPost(final Post targetPost) {
     Post parent = targetPost.getParent();
     if (parent != null && parent.getChildren().size() == 1 && parent.isDeleted()) {
       return getDeletableAncestorPost(parent);
