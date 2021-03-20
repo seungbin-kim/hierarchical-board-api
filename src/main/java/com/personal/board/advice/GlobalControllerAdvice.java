@@ -9,9 +9,11 @@ import com.personal.board.exception.NotFoundException;
 import com.personal.board.exception.ReflectIllegalAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -69,15 +71,22 @@ public class GlobalControllerAdvice {
         .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, exception.getMessage()));
   }
 
-  @ExceptionHandler(InvalidFormatException.class)
-  public ResponseEntity<ErrorResponse> InvalidFormatExceptionHandler() {
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<ErrorResponse> httpMessageNotReadableExceptionHandler(HttpMessageNotReadableException exception) {
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
-        .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, "incorrect data type."));
+        .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, "incorrect data value."));
   }
 
   @ExceptionHandler(ReflectIllegalAccessException.class)
-  public ResponseEntity<ErrorResponse> ReflectIllegalAccessExceptionHandler(final ReflectIllegalAccessException exception) {
+  public ResponseEntity<ErrorResponse> reflectIllegalAccessExceptionHandler(final ReflectIllegalAccessException exception) {
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(makeErrorResponse(ErrorType.SERVER_ERROR, exception.getMessage()));
+  }
+
+  @ExceptionHandler(RuntimeException.class)
+  public ResponseEntity<ErrorResponse> runtimeExceptionHandler(final RuntimeException exception) {
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(makeErrorResponse(ErrorType.SERVER_ERROR, exception.getMessage()));
