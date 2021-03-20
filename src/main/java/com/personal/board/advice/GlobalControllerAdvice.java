@@ -1,6 +1,5 @@
 package com.personal.board.advice;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.personal.board.dto.response.ErrorResponse;
 import com.personal.board.enumeration.ErrorType;
 import com.personal.board.exception.BadArgumentException;
@@ -13,7 +12,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
