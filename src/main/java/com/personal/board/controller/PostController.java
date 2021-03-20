@@ -8,12 +8,15 @@ import com.personal.board.exception.ReflectIllegalAccessException;
 import com.personal.board.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriTemplate;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -39,7 +42,9 @@ public class PostController {
 
   @GetMapping("/boards/{boardId}/posts")
   public ResponseEntity<ResultResponse<List<PostDto>>> getAllPost(
-      @PathVariable final Long boardId) {
+      @PathVariable final Long boardId,
+      @RequestParam(required = false, defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
+      @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "page must be at least 1.") final int page) {
 
     return ResponseEntity
         .ok(new ResultResponse<>(postService.getAllPost(boardId)));

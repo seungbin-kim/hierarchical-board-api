@@ -13,7 +13,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.Objects;
+import java.util.Set;
 
 @RestControllerAdvice(basePackages = "com.personal.board.controller")
 public class GlobalControllerAdvice {
@@ -36,6 +39,20 @@ public class GlobalControllerAdvice {
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
         .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, defaultMessage));
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<ErrorResponse> constraintViolationException(final ConstraintViolationException exception) {
+    Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
+    StringBuilder stringBuilder = new StringBuilder();
+    constraintViolations.iterator()
+        .forEachRemaining(constraintViolation -> {
+          stringBuilder.append(constraintViolation.getMessage());
+        });
+
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, stringBuilder.toString()));
   }
 
   @ExceptionHandler(BadArgumentException.class)
