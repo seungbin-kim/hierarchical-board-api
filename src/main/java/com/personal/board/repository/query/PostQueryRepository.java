@@ -41,7 +41,7 @@ public class PostQueryRepository {
 
   private List<PostDto> getChildPostDtos(Long boardId, List<Long> parentIds) {
     return em.createQuery(
-        "SELECT new com.personal.board.dto.response.post.PostDto(p.parent.id, p.id, p.title, u.nickname, p.deleted, p.createdAt)" +
+        "SELECT new com.personal.board.dto.response.post.PostDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
             " FROM Post p JOIN p.user u" +
             " WHERE p.board.id = :boardId" +
             " AND p.parent.id IN :parentIds" +
@@ -54,7 +54,7 @@ public class PostQueryRepository {
 
   private List<PostDto> getParentPostDtos(Long boardId) {
     return em.createQuery(
-        "SELECT new com.personal.board.dto.response.post.PostDto(p.parent.id, p.id, p.title, u.nickname, p.deleted, p.createdAt)" +
+        "SELECT new com.personal.board.dto.response.post.PostDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
             " FROM Post p JOIN p.user u" +
             " WHERE p.board.id = :boardId" +
             " AND p.parent.id IS NULL" +
