@@ -1,5 +1,7 @@
 package com.personal.board.repository.query;
 
+import com.personal.board.dto.response.PageDto;
+import com.personal.board.dto.response.ListResponse;
 import com.personal.board.dto.response.post.PostDto;
 import org.springframework.stereotype.Repository;
 
@@ -16,8 +18,16 @@ public class PostQueryRepository {
   EntityManager em;
 
 
-  public List<PostDto> findAllPostByDto(final Long boardId) {
-    List<PostDto> parentList = getParentPostDtos(boardId);
+  public PageDto<PostDto> findPageablePostByDto(final Long boardId, final int size, final int page) {
+    List<PostDto> parentList = getParentPostDtos(boardId, size, page);
+
+    int totalParentPostCount = getParentPostCount(boardId);
+    int totalPages = (totalParentPostCount / size) - 1;
+    if (totalParentPostCount % size != 0) {
+      totalPages++;
+    }
+    boolean isFirst = (page == 0);
+    boolean isLast = (page == totalPages);
 
     List<PostDto> parentListForLoop = parentList;
     while (!parentListForLoop.isEmpty()) {
@@ -35,11 +45,22 @@ public class PostQueryRepository {
       parentListForLoop = children;
     }
 
-    return parentList;
+    return new PageDto<>(parentList, totalParentPostCount, size, totalPages, page, isFirst, isLast);
+  }
+
+  private int getParentPostCount(Long boardId) {
+    return em.createQuery(
+        "SELECT COUNT(p)" +
+            " FROM Post p" +
+            " WHERE p.board.id = :boardId" +
+            " AND p.parent.id IS NULL", Long.class)
+        .setParameter("boardId", boardId)
+        .getSingleResult()
+        .intValue();
   }
 
 
-  private List<PostDto> getChildPostDtos(Long boardId, List<Long> parentIds) {
+  private List<PostDto> getChildPostDtos(final Long boardId, final List<Long> parentIds) {
     return em.createQuery(
         "SELECT new com.personal.board.dto.response.post.PostDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
             " FROM Post p JOIN p.user u" +
@@ -52,7 +73,7 @@ public class PostQueryRepository {
   }
 
 
-  private List<PostDto> getParentPostDtos(Long boardId) {
+  private List<PostDto> getParentPostDtos(final Long boardId, final int size, final int page) {
     return em.createQuery(
         "SELECT new com.personal.board.dto.response.post.PostDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
             " FROM Post p JOIN p.user u" +
@@ -60,6 +81,8 @@ public class PostQueryRepository {
             " AND p.parent.id IS NULL" +
             " ORDER BY p.id DESC", PostDto.class)
         .setParameter("boardId", boardId)
+        .setFirstResult(page * size)
+        .setMaxResults(size)
         .getResultList();
   }
 

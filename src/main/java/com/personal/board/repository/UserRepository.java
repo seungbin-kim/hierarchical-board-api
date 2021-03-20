@@ -54,10 +54,20 @@ public class UserRepository {
   }
 
 
-  public List<User> findAllUsers() {
+  public List<User> findPageableUsers(final int size, final int page) {
     return em.createQuery(
         "SELECT u FROM User u", User.class)
+        .setFirstResult(page * size)
+        .setMaxResults(size)
         .getResultList();
+  }
+
+
+  public int getUserCount() {
+    return em.createQuery(
+        "SELECT COUNT(u) FROM User u", Long.class)
+        .getSingleResult()
+        .intValue();
   }
 
 }

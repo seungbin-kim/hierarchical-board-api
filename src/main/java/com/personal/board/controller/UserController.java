@@ -1,7 +1,7 @@
 package com.personal.board.controller;
 
 import com.personal.board.dto.request.UserUpdateRequest;
-import com.personal.board.dto.response.ResultResponse;
+import com.personal.board.dto.response.PageDto;
 import com.personal.board.dto.request.SignUpRequest;
 import com.personal.board.dto.response.user.UserResponseWithCreatedAt;
 import com.personal.board.dto.response.user.UserResponseWithDate;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriTemplate;
 
 import javax.validation.Valid;
-import java.util.List;
+import javax.validation.constraints.Min;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,9 +37,12 @@ public class UserController {
   }
 
   @GetMapping("/users")
-  public ResponseEntity<ResultResponse<List<UserResponseWithDate>>> getAllUsers() {
+  public ResponseEntity<PageDto<UserResponseWithDate>> getPageableUsers(
+      @RequestParam(required = false, defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
+      @RequestParam(required = false, defaultValue = "0") @Min(value = 0, message = "page must be at least 0.") final int page) {
+
     return ResponseEntity
-        .ok(new ResultResponse<>(userService.getAllUsers()));
+        .ok(userService.getPageableUsers(size, page));
   }
 
   @PatchMapping("/users/{id}")

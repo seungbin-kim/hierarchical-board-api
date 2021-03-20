@@ -2,6 +2,7 @@ package com.personal.board.service;
 
 import com.personal.board.dto.request.CommentRequest;
 import com.personal.board.dto.request.CommentUpdateRequest;
+import com.personal.board.dto.response.PageDto;
 import com.personal.board.dto.response.comment.CommentDto;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
 import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
@@ -17,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -59,10 +59,10 @@ public class CommentService {
 
 
   @Transactional(readOnly = true)
-  public List<CommentDto> getAllComment(final Long postId) {
+  public PageDto<CommentDto> getPageableComment(final Long postId, final int size, final int page) {
     checkPost(postId);
-    // 답변형 출력을 위한 DTO변환
-    return commentQueryRepository.findAllCommentByDto(postId);
+
+    return commentQueryRepository.findPageableCommentByDto(postId, size, page);
   }
 
 

@@ -2,7 +2,7 @@ package com.personal.board.controller;
 
 import com.personal.board.dto.request.CommentRequest;
 import com.personal.board.dto.request.CommentUpdateRequest;
-import com.personal.board.dto.response.ResultResponse;
+import com.personal.board.dto.response.PageDto;
 import com.personal.board.dto.response.comment.CommentDto;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
 import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriTemplate;
 
 import javax.validation.Valid;
-import java.util.List;
+import javax.validation.constraints.Min;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,11 +39,13 @@ public class CommentController {
   }
 
   @GetMapping("/posts/{postId}/comments")
-  public ResponseEntity<ResultResponse<List<CommentDto>>> getAllComment(
-      @PathVariable final Long postId) {
+  public ResponseEntity<PageDto<CommentDto>> getPageableComment(
+      @PathVariable final Long postId,
+      @RequestParam(required = false, defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
+      @RequestParam(required = false, defaultValue = "0") @Min(value = 0, message = "page must be at least 0.") final int page) {
 
     return ResponseEntity
-        .ok(new ResultResponse<>(commentService.getAllComment(postId)));
+        .ok(commentService.getPageableComment(postId, size, page));
   }
 
   @PatchMapping("/posts/{postId}/comments/{commentId}")

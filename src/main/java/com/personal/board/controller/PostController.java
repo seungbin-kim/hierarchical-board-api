@@ -2,7 +2,7 @@ package com.personal.board.controller;
 
 import com.personal.board.dto.request.PostRequest;
 import com.personal.board.dto.request.PostUpdateRequest;
-import com.personal.board.dto.response.ResultResponse;
+import com.personal.board.dto.response.PageDto;
 import com.personal.board.dto.response.post.*;
 import com.personal.board.exception.ReflectIllegalAccessException;
 import com.personal.board.service.PostService;
@@ -14,7 +14,6 @@ import org.springframework.web.util.UriTemplate;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.List;
 
 @Validated
 @RestController
@@ -41,13 +40,13 @@ public class PostController {
   }
 
   @GetMapping("/boards/{boardId}/posts")
-  public ResponseEntity<ResultResponse<List<PostDto>>> getAllPost(
+  public ResponseEntity<PageDto<PostDto>> getPageablePost(
       @PathVariable final Long boardId,
       @RequestParam(required = false, defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
-      @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "page must be at least 1.") final int page) {
+      @RequestParam(required = false, defaultValue = "0") @Min(value = 0, message = "page must be at least 0.") final int page) {
 
     return ResponseEntity
-        .ok(new ResultResponse<>(postService.getAllPost(boardId)));
+        .ok(postService.getPageablePost(boardId, size, page));
   }
 
   @GetMapping("/boards/{boardId}/posts/{postId}")

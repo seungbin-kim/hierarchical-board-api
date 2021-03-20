@@ -2,6 +2,7 @@ package com.personal.board.service;
 
 import com.personal.board.dto.request.PostRequest;
 import com.personal.board.dto.request.PostUpdateRequest;
+import com.personal.board.dto.response.PageDto;
 import com.personal.board.dto.response.post.*;
 import com.personal.board.entity.Board;
 import com.personal.board.entity.Post;
@@ -17,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -60,12 +60,12 @@ public class PostService {
 
 
   @Transactional(readOnly = true)
-  public List<PostDto> getAllPost(final Long boardId) {
+  public PageDto<PostDto> getPageablePost(final Long boardId, final int size, final int page) {
     // 게시판을 찾지 못할시 예외발생
     checkBoard(boardId);
 
     // 답변형 출력
-    return postQueryRepository.findAllPostByDto(boardId);
+    return postQueryRepository.findPageablePostByDto(boardId, size, page);
   }
 
 

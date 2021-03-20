@@ -1,9 +1,9 @@
 package com.personal.board.controller;
 
 import com.personal.board.dto.request.BoardRequest;
+import com.personal.board.dto.response.ListResponse;
 import com.personal.board.dto.response.board.BoardResponseWithCreatedAt;
 import com.personal.board.dto.response.board.BoardResponseWithDate;
-import com.personal.board.dto.response.ResultResponse;
 import com.personal.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriTemplate;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,9 +34,9 @@ public class BoardController {
   }
 
   @GetMapping("/boards")
-  public ResponseEntity<ResultResponse<List<BoardResponseWithDate>>> getAllBoard() {
+  public ResponseEntity<ListResponse<BoardResponseWithDate>> getAllBoard() {
     return ResponseEntity
-        .ok(new ResultResponse<>(boardService.getAllBoard()));
+        .ok(new ListResponse<>(boardService.getAllBoard()));
   }
 
   @GetMapping("/boards/{boardId}")
