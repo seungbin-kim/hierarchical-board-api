@@ -6,6 +6,7 @@ spring:
     username: scott
     password: tiger
     driver-class-name: org.postgresql.Driver
+    initialization-mode: always
 
   jpa:
     hibernate:
@@ -20,3 +21,8 @@ spring:
 logging.level:
   org.hibernate.SQL: debug
 #  org.hibernate.type: trace
+
+jwt:
+  header: Authorization
+  secret: aGVsbG8sIG15IG5hbWUgaXMgc2V1bmdiaW4ga2ltLgpteSBjZWxsIHBob25lIG51bWJlciBpcyAwMTAtNzQ3OC03Mzg5Lg==
+  token-validity-in-seconds: 86400
