@@ -35,6 +35,18 @@ public class UserRepository {
     return Optional.of(user);
   }
 
+  public Optional<User> findUserWithAuthoritiesByEmail(String email) {
+    try {
+      User user = em.createQuery(
+          "SELECT u FROM User u JOIN FETCH u.authorities WHERE u.email = :email", User.class)
+          .setParameter("email", email)
+          .getSingleResult();
+      return Optional.of(user);
+    } catch (NoResultException exception) {
+      return Optional.empty();
+    }
+  }
+
 
   public boolean checkUserEmail(final String email) {
     Long result = em.createQuery(

@@ -2,13 +2,12 @@ package com.personal.board.advice;
 
 import com.personal.board.dto.response.ErrorResponse;
 import com.personal.board.enumeration.ErrorType;
-import com.personal.board.exception.BadArgumentException;
-import com.personal.board.exception.DuplicatedException;
-import com.personal.board.exception.NotFoundException;
-import com.personal.board.exception.ReflectIllegalAccessException;
+import com.personal.board.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -19,13 +18,13 @@ import java.util.Objects;
 import java.util.Set;
 
 @RestControllerAdvice(basePackages = "com.personal.board.controller")
-public class GlobalControllerAdvice {
+public class ControllerExceptionHandler {
 
   @ExceptionHandler(NotFoundException.class)
   public ResponseEntity<ErrorResponse> notFoundExceptionHandler(final NotFoundException exception) {
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
-        .body(makeErrorResponse(ErrorType.NOT_FOUND, exception.getMessage()));
+        .body(GlobalExceptionHandler.makeErrorResponse(ErrorType.NOT_FOUND, exception.getMessage()));
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -38,7 +37,7 @@ public class GlobalControllerAdvice {
 
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
-        .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, defaultMessage));
+        .body(GlobalExceptionHandler.makeErrorResponse(ErrorType.BAD_ARGUMENT, defaultMessage));
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
@@ -52,46 +51,49 @@ public class GlobalControllerAdvice {
 
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
-        .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, stringBuilder.toString()));
+        .body(GlobalExceptionHandler.makeErrorResponse(ErrorType.BAD_ARGUMENT, stringBuilder.toString()));
   }
 
   @ExceptionHandler(BadArgumentException.class)
   public ResponseEntity<ErrorResponse> badArgumentExceptionHandler(final BadArgumentException exception) {
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
-        .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, exception.getMessage()));
+        .body(GlobalExceptionHandler.makeErrorResponse(ErrorType.BAD_ARGUMENT, exception.getMessage()));
   }
 
   @ExceptionHandler(DuplicatedException.class)
   public ResponseEntity<ErrorResponse> duplicatedExceptionHandler(final DuplicatedException exception) {
     return ResponseEntity
         .status(HttpStatus.CONFLICT)
-        .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, exception.getMessage()));
+        .body(GlobalExceptionHandler.makeErrorResponse(ErrorType.BAD_ARGUMENT, exception.getMessage()));
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<ErrorResponse> httpMessageNotReadableExceptionHandler(HttpMessageNotReadableException exception) {
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
-        .body(makeErrorResponse(ErrorType.BAD_ARGUMENT, "incorrect data value."));
+        .body(GlobalExceptionHandler.makeErrorResponse(ErrorType.BAD_ARGUMENT, "incorrect data value."));
   }
 
   @ExceptionHandler(ReflectIllegalAccessException.class)
   public ResponseEntity<ErrorResponse> reflectIllegalAccessExceptionHandler(final ReflectIllegalAccessException exception) {
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(makeErrorResponse(ErrorType.SERVER_ERROR, exception.getMessage()));
+        .body(GlobalExceptionHandler.makeErrorResponse(ErrorType.SERVER_ERROR, exception.getMessage()));
+  }
+
+  @ExceptionHandler({AccessDeniedException.class, AuthenticationException.class})
+  public ResponseEntity<ErrorResponse> authenticationExceptionHandler() {
+    return ResponseEntity
+        .status(HttpStatus.FORBIDDEN)
+        .body(GlobalExceptionHandler.makeErrorResponse(ErrorType.FORBIDDEN, "Authentication error."));
   }
 
   @ExceptionHandler(RuntimeException.class)
   public ResponseEntity<ErrorResponse> runtimeExceptionHandler(final RuntimeException exception) {
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(makeErrorResponse(ErrorType.SERVER_ERROR, exception.getMessage()));
-  }
-
-  private ErrorResponse makeErrorResponse(final ErrorType errorType, final String message) {
-    return new ErrorResponse(errorType, message);
+        .body(GlobalExceptionHandler.makeErrorResponse(ErrorType.SERVER_ERROR, exception.getMessage()));
   }
 
 }

@@ -6,10 +6,15 @@ import com.personal.board.dto.response.PageDto;
 import com.personal.board.dto.response.user.UserResponseWithCreatedAt;
 import com.personal.board.dto.response.user.UserResponseWithDate;
 import com.personal.board.dto.response.user.UserResponseWithModifiedAt;
+import com.personal.board.entity.Authority;
 import com.personal.board.entity.User;
+import com.personal.board.enumeration.Role;
 import com.personal.board.exception.*;
 import com.personal.board.repository.UserRepository;
+import com.personal.board.util.PatchUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +32,8 @@ public class UserService {
 
   private final UserRepository userRepository;
 
+  private final PasswordEncoder passwordEncoder;
+
 
   public UserResponseWithCreatedAt signUp(final SignUpRequest request) {
     if (userRepository.checkUserEmail(request.getEmail())) {
@@ -36,12 +43,15 @@ public class UserService {
       throw new NicknameDuplicatedException();
     }
 
+    Authority authority = new Authority(Role.ROLE_USER);
+
     User user = User.createUser(
         request.getEmail(),
         request.getNickname(),
         request.getName(),
         request.getBirthday(),
-        request.getPassword());
+        passwordEncoder.encode(request.getPassword()),
+        authority);
 
     User savedUser = userRepository.save(user);
     return new UserResponseWithCreatedAt(savedUser);
@@ -86,14 +96,17 @@ public class UserService {
   }
 
 
-  public UserResponseWithModifiedAt updateUser(final UserUpdateRequest request, final Long postId) throws IllegalAccessException {
-    // 정보 찾아오기
-    Optional<User> userById = userRepository.findUserById(postId);
+  public UserResponseWithModifiedAt updateUser(
+      final UserUpdateRequest request,
+      final Long userId,
+      final Authentication authentication) throws IllegalAccessException {
+    // 유저정보 찾아오기
+    Optional<User> userById = userRepository.findUserById(userId);
     userById.orElseThrow(UserNotFoundException::new);
     User findUser = userById.get();
 
     // Password 체크
-    if (!findUser.getPassword().equals(request.getPassword())) {
+    if (!passwordEncoder.matches(request.getPassword(), findUser.getPassword())) {
       throw new PasswordIncorrectException();
     }
 
@@ -123,7 +136,7 @@ public class UserService {
           findUser.changeBirthday(request.getBirthday());
           break;
         case "newPassword":
-          findUser.changePassword(request.getNewPassword());
+          findUser.changePassword(passwordEncoder.encode(request.getNewPassword()));
           break;
       }
     }

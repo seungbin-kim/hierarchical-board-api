@@ -12,6 +12,7 @@ import com.personal.board.repository.BoardRepository;
 import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
 import com.personal.board.repository.query.PostQueryRepository;
+import com.personal.board.util.PatchUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
