@@ -15,20 +15,18 @@ public class SecurityUtil {
 
   private static final Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
 
-  public static Optional<String> getCurrentUserId() {
+  public static Optional<Long> getCurrentUserId() {
     final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
     if (authentication == null) {
       logger.debug("Security Context에 인증 정보가 없습니다.");
       return Optional.empty();
     }
-
-    String userId = null;
+    Long userId = null;
     if (authentication.getPrincipal() instanceof UserDetails) {
       UserDetails springSecurityUser = (UserDetails) authentication.getPrincipal();
-      userId = springSecurityUser.getUsername();
+      userId = Long.parseLong(springSecurityUser.getUsername());
     } else if (authentication.getPrincipal() instanceof String) {
-      userId = (String) authentication.getPrincipal();
+      userId = Long.parseLong((String) authentication.getPrincipal());
     }
 
     return Optional.ofNullable(userId);
