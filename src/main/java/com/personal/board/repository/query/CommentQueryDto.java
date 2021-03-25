@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-public class CommentDto {
+public class CommentQueryDto {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private final Long parentId;
@@ -25,9 +25,9 @@ public class CommentDto {
 
   private final boolean deletedStatus;
 
-  private List<CommentDto> reply;
+  private List<CommentQueryDto> reply;
 
-  public void setReply(List<CommentDto> reply) {
+  public void setReply(List<CommentQueryDto> reply) {
     if (reply == null) {
       this.reply = new ArrayList<>();
       return;

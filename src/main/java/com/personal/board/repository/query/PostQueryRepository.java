@@ -1,8 +1,6 @@
 package com.personal.board.repository.query;
 
 import com.personal.board.dto.response.PageDto;
-import com.personal.board.dto.response.ListResponse;
-import com.personal.board.dto.response.post.PostDto;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -18,8 +16,8 @@ public class PostQueryRepository {
   EntityManager em;
 
 
-  public PageDto<PostDto> findPageablePostByDto(final Long boardId, final int size, final int page) {
-    List<PostDto> parentList = getParentPostDtos(boardId, size, page);
+  public PageDto<PostQueryDto> findPageablePostByDto(final Long boardId, final int size, final int page) {
+    List<PostQueryDto> parentList = getParentPostDtos(boardId, size, page);
 
     int totalParentPostCount = getParentPostCount(boardId);
     int totalPages = (totalParentPostCount / size) - 1;
@@ -29,16 +27,16 @@ public class PostQueryRepository {
     boolean isFirst = (page == 0);
     boolean isLast = (page == totalPages);
 
-    List<PostDto> parentListForLoop = parentList;
+    List<PostQueryDto> parentListForLoop = parentList;
     while (!parentListForLoop.isEmpty()) {
       List<Long> parentIds = parentListForLoop.stream()
-          .map(PostDto::getId)
+          .map(PostQueryDto::getId)
           .collect(Collectors.toList());
 
-      List<PostDto> children = getChildPostDtos(boardId, parentIds);
+      List<PostQueryDto> children = getChildPostDtos(boardId, parentIds);
 
-      Map<Long, List<PostDto>> childrenPostMap = children.stream()
-          .collect(Collectors.groupingBy(PostDto::getParentId));
+      Map<Long, List<PostQueryDto>> childrenPostMap = children.stream()
+          .collect(Collectors.groupingBy(PostQueryDto::getParentId));
 
       parentListForLoop.forEach(p -> p.setReply(childrenPostMap.get(p.getId())));
 
@@ -60,26 +58,26 @@ public class PostQueryRepository {
   }
 
 
-  private List<PostDto> getChildPostDtos(final Long boardId, final List<Long> parentIds) {
+  private List<PostQueryDto> getChildPostDtos(final Long boardId, final List<Long> parentIds) {
     return em.createQuery(
-        "SELECT new com.personal.board.dto.response.post.PostDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
+        "SELECT new com.personal.board.repository.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
             " FROM Post p JOIN p.user u" +
             " WHERE p.board.id = :boardId" +
             " AND p.parent.id IN :parentIds" +
-            " ORDER BY p.id ASC", PostDto.class)
+            " ORDER BY p.id ASC", PostQueryDto.class)
         .setParameter("boardId", boardId)
         .setParameter("parentIds", parentIds)
         .getResultList();
   }
 
 
-  private List<PostDto> getParentPostDtos(final Long boardId, final int size, final int page) {
+  private List<PostQueryDto> getParentPostDtos(final Long boardId, final int size, final int page) {
     return em.createQuery(
-        "SELECT new com.personal.board.dto.response.post.PostDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
+        "SELECT new com.personal.board.repository.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
             " FROM Post p JOIN p.user u" +
             " WHERE p.board.id = :boardId" +
             " AND p.parent.id IS NULL" +
-            " ORDER BY p.id DESC", PostDto.class)
+            " ORDER BY p.id DESC", PostQueryDto.class)
         .setParameter("boardId", boardId)
         .setFirstResult(page * size)
         .setMaxResults(size)
