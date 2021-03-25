@@ -3,7 +3,7 @@ package com.personal.board.exception;
 public class UserNotFoundException extends NotFoundException {
 
   public UserNotFoundException() {
-    super("user id not found.");
+    super("사용자가 존재하지 않습니다.");
   }
 
 }
