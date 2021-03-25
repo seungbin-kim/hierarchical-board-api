@@ -1,7 +1,6 @@
-package com.personal.board.dto.response.comment;
+package com.personal.board.repository.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.personal.board.dto.response.post.PostDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
