@@ -4,9 +4,7 @@ import com.personal.board.entity.Comment;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -22,12 +20,21 @@ public class CommentRepository {
   }
 
 
-  public Optional<Comment> findCommentById(final Long boardId) {
-    Comment comment = em.find(Comment.class, boardId);
-    if (comment == null) {
+  public Optional<Comment> findCommentByIdAndPostId(final Long commentId, final Long postId) {
+    try {
+      Comment comment = em.createQuery(
+          "SELECT c" +
+              " FROM Comment c" +
+              " WHERE c.id = :commentId" +
+              " AND c.post.id = :postId", Comment.class)
+          .setParameter("commentId", commentId)
+          .setParameter("postId", postId)
+          .getSingleResult();
+
+      return Optional.of(comment);
+    } catch (Exception exception) {
       return Optional.empty();
     }
-    return Optional.of(comment);
   }
 
 

@@ -5,6 +5,7 @@ import com.personal.board.dto.request.PostUpdateRequest;
 import com.personal.board.dto.response.PageDto;
 import com.personal.board.dto.response.post.*;
 import com.personal.board.exception.ReflectIllegalAccessException;
+import com.personal.board.repository.query.PostQueryDto;
 import com.personal.board.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class PostController {
   }
 
   @GetMapping("/boards/{boardId}/posts")
-  public ResponseEntity<PageDto<PostDto>> getPageablePost(
+  public ResponseEntity<PageDto<PostQueryDto>> getPageablePost(
       @PathVariable final Long boardId,
       @RequestParam(required = false, defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
       @RequestParam(required = false, defaultValue = "0") @Min(value = 0, message = "page must be at least 0.") final int page) {

@@ -3,7 +3,7 @@ package com.personal.board.service;
 import com.personal.board.dto.request.CommentRequest;
 import com.personal.board.dto.request.CommentUpdateRequest;
 import com.personal.board.dto.response.PageDto;
-import com.personal.board.dto.response.comment.CommentDto;
+import com.personal.board.repository.query.CommentQueryDto;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
 import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
 import com.personal.board.entity.Comment;
@@ -11,10 +11,11 @@ import com.personal.board.entity.Post;
 import com.personal.board.entity.User;
 import com.personal.board.exception.*;
 import com.personal.board.repository.CommentRepository;
-import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
 import com.personal.board.repository.query.CommentQueryRepository;
+import com.personal.board.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,40 +28,41 @@ public class CommentService {
 
   private final UserRepository userRepository;
 
-  private final PostRepository postRepository;
-
   private final CommentRepository commentRepository;
 
   private final CommentQueryRepository commentQueryRepository;
 
+  private final PostService postService;
+
 
   public CommentResponseWithCreatedAt addComment(final CommentRequest request, final Long postId) {
-    Post findPost = checkPost(postId);
+    Post findPost = postService.checkPost(postId, null);
 
-    Optional<User> userById = userRepository.findUserById(request.getWriterId());
+    Long userId = SecurityUtil.getCurrentUserId().get();
+    Optional<User> userById = userRepository.findUserById(userId);
     userById.orElseThrow(UserNotFoundException::new);
+
+    Long parentId = request.getParentId();
+    Comment parentComment  = null;
+    if (parentId != null) {
+      parentComment = checkComment(parentId, postId);
+    }
 
     Comment comment = Comment.createComment(
         findPost,
         userById.get(),
         request.getContent(),
-        null
+        parentComment
     );
 
-    if (request.getParentId() != null) {
-      // 답 댓글인데 부모글 번호가 없거나 지워진 경우 예외발생(잘못된 요청)
-      Comment parentComment = checkComment(request.getParentId());
-      // 부모글 번호가 정상적으로 있는 경우
-      comment.changeParent(parentComment);
-    }
     Comment savedPost = commentRepository.save(comment);
     return new CommentResponseWithCreatedAt(savedPost);
   }
 
 
   @Transactional(readOnly = true)
-  public PageDto<CommentDto> getPageableComment(final Long postId, final int size, final int page) {
-    checkPost(postId);
+  public PageDto<CommentQueryDto> getPageableComment(final Long postId, final int size, final int page) {
+    postService.checkPost(postId, null);
 
     return commentQueryRepository.findPageableCommentByDto(postId, size, page);
   }
@@ -69,8 +71,9 @@ public class CommentService {
   public CommentResponseWithModifiedAt updateComment(
       final CommentUpdateRequest request, final Long postId, final Long commentId) {
 
-    checkPost(postId);
-    Comment findComment = checkComment(commentId);
+    postService.checkPost(postId, null);
+    Comment findComment = checkComment(commentId, postId);
+    checkWriter(findComment);
 
     findComment.updateComment(request.getContent());
 
@@ -78,9 +81,10 @@ public class CommentService {
   }
 
 
-  public void deleteComment(final Long postId, final Long commentsId) {
-    checkPost(postId);
-    Comment targetComment = checkComment(commentsId);
+  public void deleteComment(final Long postId, final Long commentId) {
+    postService.checkPost(postId, null);
+    Comment targetComment = checkComment(commentId, postId);
+    checkWriter(targetComment);
 
     if (targetComment.getChildren().isEmpty()) {
       commentRepository.deleteComment(getDeletableAncestorComment(targetComment));
@@ -88,6 +92,7 @@ public class CommentService {
       targetComment.changeDeletionStatus();
     }
   }
+
 
   private Comment getDeletableAncestorComment(final Comment targetComment) {
     Comment parent = targetComment.getParent();
@@ -98,8 +103,8 @@ public class CommentService {
   }
 
 
-  private Comment checkComment(final Long commentsId) {
-    Optional<Comment> commentById = commentRepository.findCommentById(commentsId);
+  private Comment checkComment(final Long commentId, final Long postId) {
+    Optional<Comment> commentById = commentRepository.findCommentByIdAndPostId(commentId, postId);
     commentById.orElseThrow(CommentNotFoundException::new);
 
     Comment findComment = commentById.get();
@@ -110,15 +115,11 @@ public class CommentService {
   }
 
 
-  private Post checkPost(final Long postId) {
-    Optional<Post> postById = postRepository.findPostById(postId);
-    postById.orElseThrow(PostNotFoundException::new);
-
-    Post findPost = postById.get();
-    if (findPost.isDeleted()) {
-      throw new BadArgumentException("post has been deleted.");
+  private void checkWriter(final Comment comment) {
+    Long currentUserId = SecurityUtil.getCurrentUserId().get();
+    if (!currentUserId.equals(comment.getUser().getId())) {
+      throw new AccessDeniedException("작성자가 아닙니다.");
     }
-    return findPost;
   }
 
 }

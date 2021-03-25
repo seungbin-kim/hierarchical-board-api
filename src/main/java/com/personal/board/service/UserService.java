@@ -13,7 +13,6 @@ import com.personal.board.exception.*;
 import com.personal.board.repository.UserRepository;
 import com.personal.board.util.PatchUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,8 +97,7 @@ public class UserService {
 
   public UserResponseWithModifiedAt updateUser(
       final UserUpdateRequest request,
-      final Long userId,
-      final Authentication authentication) throws IllegalAccessException {
+      final Long userId) throws IllegalAccessException {
     // 유저정보 찾아오기
     Optional<User> userById = userRepository.findUserById(userId);
     userById.orElseThrow(UserNotFoundException::new);

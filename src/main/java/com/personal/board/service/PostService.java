@@ -8,12 +8,14 @@ import com.personal.board.entity.Board;
 import com.personal.board.entity.Post;
 import com.personal.board.entity.User;
 import com.personal.board.exception.*;
-import com.personal.board.repository.BoardRepository;
 import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
+import com.personal.board.repository.query.PostQueryDto;
 import com.personal.board.repository.query.PostQueryRepository;
 import com.personal.board.util.PatchUtil;
+import com.personal.board.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,54 +28,53 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostService {
 
-  private final BoardRepository boardRepository;
-
   private final UserRepository userRepository;
 
   private final PostRepository postRepository;
 
   private final PostQueryRepository postQueryRepository;
 
+  private final BoardService boardService;
+
 
   public PostResponseWithContentAndCreatedAt addPost(final PostRequest request, final Long boardId) {
-    Board findBoard = checkBoard(boardId);
+    Board findBoard = boardService.checkBoard(boardId);
 
-    Optional<User> userById = userRepository.findUserById(request.getWriterId());
+    Long userId = SecurityUtil.getCurrentUserId().get();
+    Optional<User> userById = userRepository.findUserById(userId);
     userById.orElseThrow(UserNotFoundException::new);
+
+    Long parentId = request.getParentId();
+    Post parentPost = null;
+    if (parentId != null) {
+      parentPost = checkPost(parentId, boardId);
+    }
 
     Post post = Post.createPost(
         findBoard,
         userById.get(),
         request.getTitle(),
         request.getContent(),
-        null
+        parentPost
     );
 
-    if (request.getParentId() != null) {
-      // 답글인데 부모글 번호가 없거나 지워진 경우 예외발생(잘못된 요청)
-      Post parentPost = checkPost(request.getParentId());
-      // 부모글 번호가 정상적으로 있는경우 부모글 세팅
-      post.changeParent(parentPost);
-    }
     Post savedPost = postRepository.save(post);
     return new PostResponseWithContentAndCreatedAt(savedPost);
   }
 
 
   @Transactional(readOnly = true)
-  public PageDto<PostDto> getPageablePost(final Long boardId, final int size, final int page) {
-    // 게시판을 찾지 못할시 예외발생
-    checkBoard(boardId);
+  public PageDto<PostQueryDto> getPageablePost(final Long boardId, final int size, final int page) {
+    boardService.checkBoard(boardId);
 
-    // 답변형 출력
     return postQueryRepository.findPageablePostByDto(boardId, size, page);
   }
 
 
   @Transactional(readOnly = true)
   public PostResponseWithContentAndDate getPost(final Long boardId, final Long postId) {
-    checkBoard(boardId);
-    Post findPost = checkPost(postId);
+    boardService.checkBoard(boardId);
+    Post findPost = checkPost(postId, boardId);
     return new PostResponseWithContentAndDate(findPost);
   }
 
@@ -81,8 +82,9 @@ public class PostService {
   public PostResponseWithContentAndModifiedAt updatePost(
       final PostUpdateRequest request, final Long boardId, final Long postId) throws IllegalAccessException {
 
-    checkBoard(boardId);
-    Post findPost = checkPost(postId);
+    boardService.checkBoard(boardId);
+    Post findPost = checkPost(postId, boardId);
+    checkWriter(findPost);
 
     Field[] declaredFields = request.getClass().getDeclaredFields();
     ArrayList<String> validatedFields = PatchUtil.validateFields(request, declaredFields); // 입력된 필드 얻기
@@ -94,8 +96,9 @@ public class PostService {
 
 
   public void deletePost(final Long boardId, final Long postId) {
-    checkBoard(boardId);
-    Post targetPost = checkPost(postId);
+    boardService.checkBoard(boardId);
+    Post targetPost = checkPost(postId, boardId);
+    checkWriter(targetPost);
 
     if (targetPost.getChildren().isEmpty()) {
       postRepository.deletePost(getDeletableAncestorPost(targetPost));
@@ -103,6 +106,7 @@ public class PostService {
       targetPost.changeDeletionStatus();
     }
   }
+
 
   private Post getDeletableAncestorPost(final Post targetPost) {
     Post parent = targetPost.getParent();
@@ -113,22 +117,23 @@ public class PostService {
   }
 
 
-  private Board checkBoard(final Long boardId) {
-    Optional<Board> boardById = boardRepository.findBoardById(boardId);
-    boardById.orElseThrow(BoardNotFoundException::new);
-    return boardById.get();
-  }
+  public Post checkPost(final Long postId, final Long boardId) {
+    Optional<Post> post = postRepository.findPostByIdAndBoardId(postId, boardId);
+    post.orElseThrow(PostNotFoundException::new);
 
-
-  private Post checkPost(final Long postId) {
-    Optional<Post> postById = postRepository.findPostById(postId);
-    postById.orElseThrow(PostNotFoundException::new);
-
-    Post findPost = postById.get();
+    Post findPost = post.get();
     if (findPost.isDeleted()) {
       throw new BadArgumentException("post has been deleted.");
     }
     return findPost;
+  }
+
+
+  private void checkWriter(final Post post) {
+    Long currentUserId = SecurityUtil.getCurrentUserId().get();
+    if (!currentUserId.equals(post.getUser().getId())) {
+      throw new AccessDeniedException("작성자가 아닙니다.");
+    }
   }
 
 }

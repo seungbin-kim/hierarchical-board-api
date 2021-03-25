@@ -3,11 +3,8 @@ package com.personal.board.repository;
 import com.personal.board.entity.Post;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -23,16 +20,26 @@ public class PostRepository {
   }
 
 
-  public Optional<Post> findPostById(final Long postId) {
-    EntityGraph<?> entityGraph = em.getEntityGraph("Post.user");
-    Map<String, Object> hints = new HashMap<>();
-    hints.put("javax.persistence.fetchgraph", entityGraph);
+  public Optional<Post> findPostByIdAndBoardId(final Long postId, final Long boardId) {
+    String query = "SELECT p FROM Post p WHERE p.id = :postId";
 
-    Post post = em.find(Post.class, postId, hints);
-    if (post == null) {
+    Post post;
+    try {
+      if (boardId != null) {
+        query += " AND p.board.id = :boardId";
+        post = em.createQuery(query, Post.class)
+            .setParameter("postId", postId)
+            .setParameter("boardId", boardId)
+            .getSingleResult();
+      } else {
+        post = em.createQuery(query, Post.class)
+            .setParameter("postId", postId)
+            .getSingleResult();
+      }
+      return Optional.of(post);
+    } catch (Exception exception) {
       return Optional.empty();
     }
-    return Optional.of(post);
   }
 
 

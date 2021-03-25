@@ -5,8 +5,10 @@ import com.personal.board.dto.response.ListResponse;
 import com.personal.board.dto.response.board.BoardResponseWithCreatedAt;
 import com.personal.board.dto.response.board.BoardResponseWithDate;
 import com.personal.board.service.BoardService;
+import com.personal.board.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriTemplate;
 
@@ -25,7 +27,10 @@ public class BoardController {
 
   @PostMapping("/boards")
   public ResponseEntity<BoardResponseWithCreatedAt> addBoard(
-      @RequestBody @Valid final BoardRequest request) {
+      @RequestBody @Valid final BoardRequest request,
+      final Authentication authentication) {
+
+    AuthenticationUtil.checkAdmin(authentication);
 
     BoardResponseWithCreatedAt boardResponse = boardService.addBoard(request);
     return ResponseEntity

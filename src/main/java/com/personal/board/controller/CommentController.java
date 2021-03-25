@@ -3,7 +3,7 @@ package com.personal.board.controller;
 import com.personal.board.dto.request.CommentRequest;
 import com.personal.board.dto.request.CommentUpdateRequest;
 import com.personal.board.dto.response.PageDto;
-import com.personal.board.dto.response.comment.CommentDto;
+import com.personal.board.repository.query.CommentQueryDto;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
 import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
 import com.personal.board.service.CommentService;
@@ -39,7 +39,7 @@ public class CommentController {
   }
 
   @GetMapping("/posts/{postId}/comments")
-  public ResponseEntity<PageDto<CommentDto>> getPageableComment(
+  public ResponseEntity<PageDto<CommentQueryDto>> getPageableComment(
       @PathVariable final Long postId,
       @RequestParam(required = false, defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
       @RequestParam(required = false, defaultValue = "0") @Min(value = 0, message = "page must be at least 0.") final int page) {

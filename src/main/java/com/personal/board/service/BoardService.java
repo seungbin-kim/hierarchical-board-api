@@ -50,4 +50,11 @@ public class BoardService {
     return new BoardResponseWithDate(boardById.get());
   }
 
+
+  public Board checkBoard(final Long boardId) {
+    Optional<Board> boardById = boardRepository.findBoardById(boardId);
+    boardById.orElseThrow(BoardNotFoundException::new);
+    return boardById.get();
+  }
+
 }

@@ -9,6 +9,7 @@ import com.personal.board.dto.response.user.UserResponseWithModifiedAt;
 import com.personal.board.exception.BadArgumentException;
 import com.personal.board.exception.ReflectIllegalAccessException;
 import com.personal.board.service.UserService;
+import com.personal.board.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -34,6 +35,7 @@ public class UserController {
   public ResponseEntity<UserResponseWithCreatedAt> signUp(
       @RequestBody @Valid final SignUpRequest signUpRequest,
       final Authentication authentication) {
+
     if (authentication != null) {
       throw new BadArgumentException("이미 로그인 되어 있네요?");
     }
@@ -59,9 +61,11 @@ public class UserController {
       @PathVariable final Long id,
       final Authentication authentication) {
 
+    AuthenticationUtil.checkUserId(id, authentication);
+
     try {
       return ResponseEntity
-          .ok(userService.updateUser(request, id, authentication));
+          .ok(userService.updateUser(request, id));
     } catch (IllegalAccessException exception) {
       throw new ReflectIllegalAccessException();
     }
@@ -72,6 +76,8 @@ public class UserController {
       @PathVariable final Long id,
       final Authentication authentication) {
 
+    AuthenticationUtil.checkUserId(id, authentication);
+
     return ResponseEntity
         .ok(userService.getUser(id));
   }
@@ -81,6 +87,8 @@ public class UserController {
       @PathVariable final Long id,
       final HttpServletResponse response,
       final Authentication authentication) {
+
+    AuthenticationUtil.checkUserId(id, authentication);
 
     Cookie token = new Cookie("token", null);
     token.setHttpOnly(true);
