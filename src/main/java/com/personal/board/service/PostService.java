@@ -16,6 +16,7 @@ import com.personal.board.util.PatchUtil;
 import com.personal.board.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -131,8 +132,10 @@ public class PostService {
 
   private void checkWriter(final Post post) {
     Long currentUserId = SecurityUtil.getCurrentUserId().get();
-    if (!currentUserId.equals(post.getUser().getId())) {
-      throw new AccessDeniedException("작성자가 아닙니다.");
+    if (!SecurityUtil.isAdmin()) {
+      if (!currentUserId.equals(post.getUser().getId())) {
+        throw new AccessDeniedException("작성자가 아닙니다.");
+      }
     }
   }
 

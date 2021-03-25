@@ -5,10 +5,10 @@ import com.personal.board.dto.response.ListResponse;
 import com.personal.board.dto.response.board.BoardResponseWithCreatedAt;
 import com.personal.board.dto.response.board.BoardResponseWithDate;
 import com.personal.board.service.BoardService;
-import com.personal.board.util.AuthenticationUtil;
+import com.personal.board.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriTemplate;
 
@@ -26,11 +26,11 @@ public class BoardController {
   private final BoardService boardService;
 
   @PostMapping("/boards")
-  public ResponseEntity<BoardResponseWithCreatedAt> addBoard(
-      @RequestBody @Valid final BoardRequest request,
-      final Authentication authentication) {
+  public ResponseEntity<BoardResponseWithCreatedAt> addBoard(@RequestBody @Valid final BoardRequest request) {
 
-    AuthenticationUtil.checkAdmin(authentication);
+    if (!SecurityUtil.isAdmin()) {
+      throw new AccessDeniedException("관리자가 아님");
+    }
 
     BoardResponseWithCreatedAt boardResponse = boardService.addBoard(request);
     return ResponseEntity
@@ -40,13 +40,13 @@ public class BoardController {
 
   @GetMapping("/boards")
   public ResponseEntity<ListResponse<BoardResponseWithDate>> getAllBoard() {
+
     return ResponseEntity
         .ok(new ListResponse<>(boardService.getAllBoard()));
   }
 
   @GetMapping("/boards/{boardId}")
-  public ResponseEntity<BoardResponseWithDate> getBoard(
-      @PathVariable final Long boardId) {
+  public ResponseEntity<BoardResponseWithDate> getBoard(@PathVariable final Long boardId) {
 
     return ResponseEntity
         .ok(boardService.getBoard(boardId));

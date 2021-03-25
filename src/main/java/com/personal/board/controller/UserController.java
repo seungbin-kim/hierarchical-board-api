@@ -9,10 +9,10 @@ import com.personal.board.dto.response.user.UserResponseWithModifiedAt;
 import com.personal.board.exception.BadArgumentException;
 import com.personal.board.exception.ReflectIllegalAccessException;
 import com.personal.board.service.UserService;
-import com.personal.board.util.AuthenticationUtil;
+import com.personal.board.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriTemplate;
 
@@ -32,11 +32,9 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping("/users")
-  public ResponseEntity<UserResponseWithCreatedAt> signUp(
-      @RequestBody @Valid final SignUpRequest signUpRequest,
-      final Authentication authentication) {
+  public ResponseEntity<UserResponseWithCreatedAt> signUp(@RequestBody @Valid final SignUpRequest signUpRequest) {
 
-    if (authentication != null) {
+    if (SecurityUtil.getAuthentication() != null) {
       throw new BadArgumentException("이미 로그인 되어 있네요?");
     }
 
@@ -58,10 +56,9 @@ public class UserController {
   @PatchMapping("/users/{id}")
   public ResponseEntity<UserResponseWithModifiedAt> patchUser(
       @RequestBody @Valid final UserUpdateRequest request,
-      @PathVariable final Long id,
-      final Authentication authentication) {
+      @PathVariable final Long id) {
 
-    AuthenticationUtil.checkUserId(id, authentication);
+    SecurityUtil.checkAdminAndUserAuthentication(id);
 
     try {
       return ResponseEntity
@@ -72,23 +69,18 @@ public class UserController {
   }
 
   @GetMapping("/users/{id}")
-  public ResponseEntity<UserResponseWithDate> getUser(
-      @PathVariable final Long id,
-      final Authentication authentication) {
+  public ResponseEntity<UserResponseWithDate> getUser(@PathVariable final Long id) {
 
-    AuthenticationUtil.checkUserId(id, authentication);
+    SecurityUtil.checkAdminAndUserAuthentication(id);
 
     return ResponseEntity
         .ok(userService.getUser(id));
   }
 
   @DeleteMapping("/users/{id}")
-  public ResponseEntity<?> deleteUser(
-      @PathVariable final Long id,
-      final HttpServletResponse response,
-      final Authentication authentication) {
+  public ResponseEntity<?> deleteUser(@PathVariable final Long id, final HttpServletResponse response) {
 
-    AuthenticationUtil.checkUserId(id, authentication);
+    SecurityUtil.checkAdminAndUserAuthentication(id);
 
     Cookie token = new Cookie("token", null);
     token.setHttpOnly(true);

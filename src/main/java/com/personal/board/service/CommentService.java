@@ -37,7 +37,6 @@ public class CommentService {
 
   public CommentResponseWithCreatedAt addComment(final CommentRequest request, final Long postId) {
     Post findPost = postService.checkPost(postId, null);
-
     Long userId = SecurityUtil.getCurrentUserId().get();
     Optional<User> userById = userRepository.findUserById(userId);
     userById.orElseThrow(UserNotFoundException::new);
@@ -117,8 +116,10 @@ public class CommentService {
 
   private void checkWriter(final Comment comment) {
     Long currentUserId = SecurityUtil.getCurrentUserId().get();
-    if (!currentUserId.equals(comment.getUser().getId())) {
-      throw new AccessDeniedException("작성자가 아닙니다.");
+    if (!SecurityUtil.isAdmin()) {
+      if (!currentUserId.equals(comment.getUser().getId())) {
+        throw new AccessDeniedException("작성자가 아닙니다.");
+      }
     }
   }
 
