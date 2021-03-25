@@ -12,9 +12,6 @@ public class CommentRequest {
 
   private Long parentId;
 
-  @NotNull(message = "user id is required.")
-  private Long writerId;
-
   @NotBlank(message = "content is required.")
   private String content;
 
