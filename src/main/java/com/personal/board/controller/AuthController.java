@@ -4,6 +4,7 @@ import com.personal.board.dto.request.SignInRequest;
 import com.personal.board.dto.response.TokenResponse;
 import com.personal.board.exception.BadArgumentException;
 import com.personal.board.jwt.TokenProvider;
+import com.personal.board.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -31,8 +32,9 @@ public class AuthController {
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
   @PostMapping("/sign-in")
-  public ResponseEntity<TokenResponse> signIn(@RequestBody @Valid SignInRequest signInRequest, HttpServletResponse response , Authentication auth) {
-    if (auth != null) {
+  public ResponseEntity<TokenResponse> signIn(@RequestBody @Valid SignInRequest signInRequest, HttpServletResponse response) {
+
+    if (!SecurityUtil.getAuthentication().getName().equals("anonymousUser")) {
       throw new BadArgumentException("이미 로그인 되어 있네요?");
     }
 
@@ -46,7 +48,7 @@ public class AuthController {
 
       Cookie token = new Cookie("token", jwt);
       token.setHttpOnly(true);
-      token.setPath("/");
+      token.setPath("/api/v1");
       response.addCookie(token);
 
       return ResponseEntity
@@ -62,7 +64,8 @@ public class AuthController {
   public void logOut(HttpServletRequest request, HttpServletResponse response) {
     Cookie token = new Cookie("token", null);
     token.setHttpOnly(true);
-    token.setPath("/");
+    token.setPath("/api/v1");
+    token.setMaxAge(0);
     response.addCookie(token);
   }
 

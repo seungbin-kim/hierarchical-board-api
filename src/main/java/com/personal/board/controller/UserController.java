@@ -12,7 +12,6 @@ import com.personal.board.service.UserService;
 import com.personal.board.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriTemplate;
 
@@ -34,7 +33,7 @@ public class UserController {
   @PostMapping("/users")
   public ResponseEntity<UserResponseWithCreatedAt> signUp(@RequestBody @Valid final SignUpRequest signUpRequest) {
 
-    if (SecurityUtil.getAuthentication() != null) {
+    if (!SecurityUtil.getAuthentication().getName().equals("anonymousUser")) {
       throw new BadArgumentException("이미 로그인 되어 있네요?");
     }
 
@@ -84,7 +83,7 @@ public class UserController {
 
     Cookie token = new Cookie("token", null);
     token.setHttpOnly(true);
-    token.setPath("/");
+    token.setPath("/api/v1");
     response.addCookie(token);
 
     userService.deleteUser(id);
