@@ -47,8 +47,7 @@ public class JwtFilter extends GenericFilterBean {
       }
       chain.doFilter(request, response);
     } catch (Exception exception) {
-      handlerExceptionResolver
-          .resolveException(httpServletRequest, (HttpServletResponse) response, null, exception);
+      handlerExceptionResolver.resolveException(httpServletRequest, (HttpServletResponse) response, null, exception);
     }
 
   }
