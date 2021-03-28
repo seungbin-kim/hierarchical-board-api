@@ -2,7 +2,7 @@ package com.personal.board.service;
 
 import com.personal.board.dto.request.SignUpRequest;
 import com.personal.board.dto.request.UserUpdateRequest;
-import com.personal.board.dto.response.PageDto;
+import com.personal.board.dto.response.PageQueryDto;
 import com.personal.board.dto.response.user.UserResponseWithCreatedAt;
 import com.personal.board.dto.response.user.UserResponseWithDate;
 import com.personal.board.dto.response.user.UserResponseWithModifiedAt;
@@ -77,7 +77,7 @@ public class UserService {
 
 
   @Transactional(readOnly = true)
-  public PageDto<UserResponseWithDate> getPageableUsers(final int size, final int page) { // 조회한 유저들 Dto로 만들어서 반환
+  public PageQueryDto<UserResponseWithDate> getPageableUsers(final int size, final int page) { // 조회한 유저들 Dto로 만들어서 반환
     List<UserResponseWithDate> result = userRepository.findPageableUsers(size, page)
         .stream()
         .map(UserResponseWithDate::new)
@@ -91,7 +91,7 @@ public class UserService {
     boolean isFirst = (page == 0);
     boolean isLast = (page == totalPages);
 
-    return new PageDto<>(result, totalUserCount, size, totalPages, page, isFirst, isLast);
+    return new PageQueryDto<>(result, totalUserCount, size, totalPages, page, isFirst, isLast);
   }
 
 

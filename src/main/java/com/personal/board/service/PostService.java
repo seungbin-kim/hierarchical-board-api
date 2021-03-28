@@ -2,7 +2,7 @@ package com.personal.board.service;
 
 import com.personal.board.dto.request.PostRequest;
 import com.personal.board.dto.request.PostUpdateRequest;
-import com.personal.board.dto.response.PageDto;
+import com.personal.board.dto.response.PageQueryDto;
 import com.personal.board.dto.response.post.*;
 import com.personal.board.entity.Board;
 import com.personal.board.entity.Post;
@@ -16,7 +16,6 @@ import com.personal.board.util.PatchUtil;
 import com.personal.board.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +64,7 @@ public class PostService {
 
 
   @Transactional(readOnly = true)
-  public PageDto<PostQueryDto> getPageablePost(final Long boardId, final int size, final int page) {
+  public PageQueryDto<PostQueryDto> getPageablePost(final Long boardId, final int size, final int page) {
     boardService.checkBoard(boardId);
 
     return postQueryRepository.findPageablePostByDto(boardId, size, page);

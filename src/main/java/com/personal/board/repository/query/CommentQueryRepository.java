@@ -1,6 +1,6 @@
 package com.personal.board.repository.query;
 
-import com.personal.board.dto.response.PageDto;
+import com.personal.board.dto.response.PageQueryDto;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -16,7 +16,7 @@ public class CommentQueryRepository {
   EntityManager em;
 
 
-  public PageDto<CommentQueryDto> findPageableCommentByDto(final Long postId, final int size, final int page) {
+  public PageQueryDto<CommentQueryDto> findPageableCommentByDto(final Long postId, final int size, final int page) {
     List<CommentQueryDto> parentList = getParentCommentDtos(postId, size, page);
 
     int totalParentCommentCount = getParentCommentCount(postId);
@@ -43,7 +43,7 @@ public class CommentQueryRepository {
       parentListForLoop = children;
     }
 
-    return new PageDto<>(parentList, totalParentCommentCount, size, totalPages, page, isFirst, isLast);
+    return new PageQueryDto<>(parentList, totalParentCommentCount, size, totalPages, page, isFirst, isLast);
   }
 
 

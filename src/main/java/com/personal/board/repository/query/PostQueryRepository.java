@@ -1,6 +1,6 @@
 package com.personal.board.repository.query;
 
-import com.personal.board.dto.response.PageDto;
+import com.personal.board.dto.response.PageQueryDto;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -16,7 +16,7 @@ public class PostQueryRepository {
   EntityManager em;
 
 
-  public PageDto<PostQueryDto> findPageablePostByDto(final Long boardId, final int size, final int page) {
+  public PageQueryDto<PostQueryDto> findPageablePostByDto(final Long boardId, final int size, final int page) {
     List<PostQueryDto> parentList = getParentPostDtos(boardId, size, page);
 
     int totalParentPostCount = getParentPostCount(boardId);
@@ -43,7 +43,7 @@ public class PostQueryRepository {
       parentListForLoop = children;
     }
 
-    return new PageDto<>(parentList, totalParentPostCount, size, totalPages, page, isFirst, isLast);
+    return new PageQueryDto<>(parentList, totalParentPostCount, size, totalPages, page, isFirst, isLast);
   }
 
   private int getParentPostCount(Long boardId) {

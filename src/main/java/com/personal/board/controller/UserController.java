@@ -1,7 +1,7 @@
 package com.personal.board.controller;
 
 import com.personal.board.dto.request.UserUpdateRequest;
-import com.personal.board.dto.response.PageDto;
+import com.personal.board.dto.response.PageQueryDto;
 import com.personal.board.dto.request.SignUpRequest;
 import com.personal.board.dto.response.user.UserResponseWithCreatedAt;
 import com.personal.board.dto.response.user.UserResponseWithDate;
@@ -44,7 +44,7 @@ public class UserController {
   }
 
   @GetMapping("/users")
-  public ResponseEntity<PageDto<UserResponseWithDate>> getPageableUsers(
+  public ResponseEntity<PageQueryDto<UserResponseWithDate>> getPageableUsers(
       @RequestParam(required = false, defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
       @RequestParam(required = false, defaultValue = "0") @Min(value = 0, message = "page must be at least 0.") final int page) {
 

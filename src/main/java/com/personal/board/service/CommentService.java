@@ -2,7 +2,7 @@ package com.personal.board.service;
 
 import com.personal.board.dto.request.CommentRequest;
 import com.personal.board.dto.request.CommentUpdateRequest;
-import com.personal.board.dto.response.PageDto;
+import com.personal.board.dto.response.PageQueryDto;
 import com.personal.board.repository.query.CommentQueryDto;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
 import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
@@ -60,7 +60,7 @@ public class CommentService {
 
 
   @Transactional(readOnly = true)
-  public PageDto<CommentQueryDto> getPageableComment(final Long postId, final int size, final int page) {
+  public PageQueryDto<CommentQueryDto> getPageableComment(final Long postId, final int size, final int page) {
     postService.checkPost(postId, null);
 
     return commentQueryRepository.findPageableCommentByDto(postId, size, page);

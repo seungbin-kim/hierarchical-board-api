@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-public class PageDto<T> {
+public class PageQueryDto<T> {
 
   private final List<T> content;
 
