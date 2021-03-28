@@ -1,19 +1,24 @@
 package com.personal.board.repository.query;
 
 import com.personal.board.dto.response.PageQueryDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
+@RequiredArgsConstructor
 public class PostQueryRepository {
 
   @PersistenceContext
   EntityManager em;
+
+  private final CommentQueryRepository commentQueryRepository;
 
 
   public PageQueryDto<PostQueryDto> findPageablePostByDto(final Long boardId, final int size, final int page) {
@@ -34,17 +39,25 @@ public class PostQueryRepository {
           .collect(Collectors.toList());
 
       List<PostQueryDto> children = getChildPostDtos(boardId, parentIds);
-
       Map<Long, List<PostQueryDto>> childrenPostMap = children.stream()
           .collect(Collectors.groupingBy(PostQueryDto::getParentId));
 
-      parentListForLoop.forEach(p -> p.setReply(childrenPostMap.get(p.getId())));
+      List<CommentIdAndPostIdQueryDto> commentCountByPostId = commentQueryRepository.findCommentIdByPostId(parentIds);
+      Map<Long, List<CommentIdAndPostIdQueryDto>> commentIdMap = commentCountByPostId.stream()
+          .collect(Collectors.groupingBy(CommentIdAndPostIdQueryDto::getPostId));
+
+      parentListForLoop.forEach(p -> {
+        p.setReply(childrenPostMap.get(p.getId()));
+        Optional<List<CommentIdAndPostIdQueryDto>> optionalComments = Optional.ofNullable(commentIdMap.get(p.getId()));
+        optionalComments.ifPresent(c -> p.setCommentCount(c.size()));
+      });
 
       parentListForLoop = children;
     }
 
     return new PageQueryDto<>(parentList, totalParentPostCount, size, totalPages, page, isFirst, isLast);
   }
+
 
   private int getParentPostCount(Long boardId) {
     return em.createQuery(

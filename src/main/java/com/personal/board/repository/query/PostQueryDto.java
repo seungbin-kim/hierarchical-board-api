@@ -21,11 +21,17 @@ public class PostQueryDto {
 
   private final String userNickname;
 
+  private int commentCount;
+
   private final LocalDateTime createdAt;
 
   private final boolean deletedStatus;
 
   private List<PostQueryDto> reply;
+
+  public void setCommentCount(final int count) {
+    this.commentCount = count;
+  }
 
   public void setReply(List<PostQueryDto> reply) {
     if (reply == null) {
