@@ -43,8 +43,8 @@ public class PostController {
   @GetMapping("/boards/{boardId}/posts")
   public ResponseEntity<PageQueryDto<PostQueryDto>> getPageablePost(
       @PathVariable final Long boardId,
-      @RequestParam(required = false, defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
-      @RequestParam(required = false, defaultValue = "0") @Min(value = 0, message = "page must be at least 0.") final int page) {
+      @RequestParam(defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
+      @RequestParam(defaultValue = "0") @Min(value = 0, message = "page must be at least 0.") final int page) {
 
     return ResponseEntity
         .ok(postService.getPageablePost(boardId, size, page));
