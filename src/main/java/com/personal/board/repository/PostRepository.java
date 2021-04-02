@@ -47,4 +47,14 @@ public class PostRepository {
     em.remove(post);
   }
 
+
+  public void setWriterIdToNull(final Long userId) {
+    em.createQuery(
+        "UPDATE Post p" +
+            " SET p.user = NULL" +
+            " WHERE p.user.id = :userId")
+        .setParameter("userId", userId)
+        .executeUpdate();
+  }
+
 }

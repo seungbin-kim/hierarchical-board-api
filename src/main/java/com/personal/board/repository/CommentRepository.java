@@ -43,4 +43,14 @@ public class CommentRepository {
     em.remove(comment);
   }
 
+
+  public void setWriterIdToNull(final Long userId) {
+    em.createQuery(
+        "UPDATE Comment c" +
+            " SET c.user = NULL" +
+            " WHERE c.user.id = :userId")
+        .setParameter("userId", userId)
+        .executeUpdate();
+  }
+
 }

@@ -10,6 +10,8 @@ import com.personal.board.entity.Authority;
 import com.personal.board.entity.User;
 import com.personal.board.enumeration.Role;
 import com.personal.board.exception.*;
+import com.personal.board.repository.CommentRepository;
+import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
 import com.personal.board.util.PatchUtil;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,10 @@ import java.util.stream.Collectors;
 public class UserService {
 
   private final UserRepository userRepository;
+
+  private final CommentRepository commentRepository;
+
+  private final PostRepository postRepository;
 
   private final PasswordEncoder passwordEncoder;
 
@@ -62,6 +68,8 @@ public class UserService {
     if (userById.isEmpty()) {
       throw new UserNotFoundException();
     }
+    commentRepository.setWriterIdToNull(userId);
+    postRepository.setWriterIdToNull(userId);
     userRepository.deleteUser(userById.get());
   }
 

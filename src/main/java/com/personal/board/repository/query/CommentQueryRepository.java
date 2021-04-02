@@ -62,7 +62,7 @@ public class CommentQueryRepository {
   private List<CommentQueryDto> getChildCommentDtos(Long postId, List<Long> parentIds) {
     return em.createQuery(
         "SELECT new com.personal.board.repository.query.CommentQueryDto(c.parent.id, c.id, c.user.nickname, c.content, c.createdAt, c.deleted)" +
-            " FROM Comment c JOIN c.user u" +
+            " FROM Comment c LEFT OUTER JOIN c.user u" +
             " WHERE c.post.id = :postId" +
             " AND c.parent.id IN :parentIds" +
             " ORDER BY c.id ASC", CommentQueryDto.class)
@@ -75,7 +75,7 @@ public class CommentQueryRepository {
   private List<CommentQueryDto> getParentCommentDtos(final Long postId, final int size, final int page) {
     return em.createQuery(
         "SELECT new com.personal.board.repository.query.CommentQueryDto(c.parent.id, c.id, c.user.nickname, c.content, c.createdAt, c.deleted)" +
-            " FROM Comment c JOIN c.user u" +
+            " FROM Comment c LEFT OUTER JOIN c.user u" +
             " WHERE c.post.id = :postId" +
             " AND c.parent.id IS NULL" +
             " ORDER BY c.id ASC", CommentQueryDto.class)
