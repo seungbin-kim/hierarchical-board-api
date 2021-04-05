@@ -22,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
   @Override
   @Transactional(readOnly = true)
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    return userRepository.findUserWithAuthoritiesByEmail(email)
+    return userRepository.findByEmailWithAuthorities(email)
         .map(this::createUser)
         .orElseThrow(() -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다."));
   }

@@ -38,7 +38,7 @@ public class CommentService {
   public CommentResponseWithCreatedAt addComment(final CommentRequest request, final Long postId) {
     Post findPost = postService.checkPost(postId, null);
     Long userId = SecurityUtil.getCurrentUserId().get();
-    Optional<User> userById = userRepository.findUserById(userId);
+    Optional<User> userById = userRepository.findById(userId);
     userById.orElseThrow(UserNotFoundException::new);
 
     Long parentId = request.getParentId();

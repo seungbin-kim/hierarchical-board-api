@@ -15,6 +15,9 @@ import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
 import com.personal.board.util.PatchUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,10 +44,10 @@ public class UserService {
 
 
   public UserResponseWithCreatedAt signUp(final SignUpRequest request) {
-    if (userRepository.checkUserEmail(request.getEmail())) {
+    if (userRepository.existsByEmail(request.getEmail())) {
       throw new EmailDuplicatedException();
     }
-    if (userRepository.checkUserNickname(request.getNickname())) {
+    if (userRepository.existsByNickname(request.getNickname())) {
       throw new NicknameDuplicatedException();
     }
 
@@ -64,19 +67,19 @@ public class UserService {
 
 
   public void deleteUser(final Long userId) {
-    Optional<User> userById = userRepository.findUserById(userId);
+    Optional<User> userById = userRepository.findById(userId);
     if (userById.isEmpty()) {
       throw new UserNotFoundException();
     }
     commentRepository.setWriterIdToNull(userId);
     postRepository.setWriterIdToNull(userId);
-    userRepository.deleteUser(userById.get());
+    userRepository.delete(userById.get());
   }
 
 
   @Transactional(readOnly = true)
   public UserResponseWithDate getUser(final Long userId) {
-    Optional<User> userById = userRepository.findUserById(userId);
+    Optional<User> userById = userRepository.findById(userId);
     if (userById.isEmpty()) {
       throw new UserNotFoundException();
     }
@@ -84,22 +87,29 @@ public class UserService {
   }
 
 
+//  @Transactional(readOnly = true)
+//  public PageQueryDto<UserResponseWithDate> getPageableUsers(final long size, final long page) {
+//    List<UserResponseWithDate> result = userRepository.findPageableUsers(size, page)
+//        .stream()
+//        .map(UserResponseWithDate::new)
+//        .collect(Collectors.toList());
+//
+//    long totalUserCount = userRepository.count();
+//    long totalPages = (totalUserCount / size) - 1;
+//    if (totalUserCount % size != 0) {
+//      totalPages++;
+//    }
+//    boolean isFirst = (page == 0);
+//    boolean isLast = (page == totalPages);
+//
+//    return new PageQueryDto<>(result, totalUserCount, size, totalPages, page, isFirst, isLast);
+//  }
+
+
   @Transactional(readOnly = true)
-  public PageQueryDto<UserResponseWithDate> getPageableUsers(final int size, final int page) { // 조회한 유저들 Dto로 만들어서 반환
-    List<UserResponseWithDate> result = userRepository.findPageableUsers(size, page)
-        .stream()
-        .map(UserResponseWithDate::new)
-        .collect(Collectors.toList());
-
-    int totalUserCount = userRepository.getUserCount();
-    int totalPages = (totalUserCount / size) - 1;
-    if (totalUserCount % size != 0) {
-      totalPages++;
-    }
-    boolean isFirst = (page == 0);
-    boolean isLast = (page == totalPages);
-
-    return new PageQueryDto<>(result, totalUserCount, size, totalPages, page, isFirst, isLast);
+  public Page<UserResponseWithDate> getPageableUsers(final Pageable pageable) {
+    Page<User> userPage = userRepository.findAll(pageable);
+    return userPage.map(UserResponseWithDate::new);
   }
 
 
@@ -107,7 +117,7 @@ public class UserService {
       final UserUpdateRequest request,
       final Long userId) throws IllegalAccessException {
     // 유저정보 찾아오기
-    Optional<User> userById = userRepository.findUserById(userId);
+    Optional<User> userById = userRepository.findById(userId);
     userById.orElseThrow(UserNotFoundException::new);
     User findUser = userById.get();
 
@@ -124,13 +134,13 @@ public class UserService {
     for (String validatedField : validatedFields) { // 입력된 필드들 변경감지 사용하여 업데이트
       switch (validatedField) {
         case "email":
-          if (userRepository.checkUserEmail(request.getEmail())) {
+          if (userRepository.existsByEmail(request.getEmail())) {
             throw new EmailDuplicatedException();
           }
           findUser.changeEmail(request.getEmail());
           break;
         case "nickname":
-          if (userRepository.checkUserNickname(request.getEmail())) {
+          if (userRepository.existsByNickname(request.getNickname())) {
             throw new NicknameDuplicatedException();
           }
           findUser.changeNickname(request.getNickname());

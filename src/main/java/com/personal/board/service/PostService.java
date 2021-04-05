@@ -41,7 +41,7 @@ public class PostService {
     Board findBoard = boardService.checkBoard(boardId);
 
     Long userId = SecurityUtil.getCurrentUserId().get();
-    Optional<User> userById = userRepository.findUserById(userId);
+    Optional<User> userById = userRepository.findById(userId);
     userById.orElseThrow(UserNotFoundException::new);
 
     Long parentId = request.getParentId();
