@@ -54,15 +54,15 @@ public class JwtFilter extends GenericFilterBean {
 
   private String resolveToken(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
-    String bearerToken = null;
+    String token = null;
     if (cookies != null) {
-      bearerToken = Arrays.stream(cookies)
+      token = Arrays.stream(cookies)
           .filter(cookie -> cookie.getName().equals("token"))
           .findFirst()
           .map(Cookie::getValue)
           .orElse(null);
     }
-    return bearerToken;
+    return token;
   }
 
 }

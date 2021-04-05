@@ -6,6 +6,7 @@ import com.personal.board.exception.BadArgumentException;
 import com.personal.board.jwt.TokenProvider;
 import com.personal.board.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +32,9 @@ public class AuthController {
 
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
+  @Value("${jwt.token-validity-in-seconds}")
+  private int cookieAge;
+
   @PostMapping("/sign-in")
   public ResponseEntity<TokenResponse> signIn(@RequestBody @Valid SignInRequest signInRequest, HttpServletResponse response) {
 
@@ -48,6 +52,7 @@ public class AuthController {
 
       Cookie token = new Cookie("token", jwt);
       token.setHttpOnly(true);
+      token.setMaxAge(cookieAge);
       token.setPath("/api/v1");
       response.addCookie(token);
 
