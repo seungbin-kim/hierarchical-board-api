@@ -24,10 +24,7 @@ public class BoardRepository {
 
   public Optional<Board> findBoardById(final Long boardId) {
     Board board = em.find(Board.class, boardId);
-    if (board == null) {
-      return Optional.empty();
-    }
-    return Optional.of(board);
+    return Optional.ofNullable(board);
   }
 
 

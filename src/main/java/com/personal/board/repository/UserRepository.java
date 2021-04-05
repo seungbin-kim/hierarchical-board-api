@@ -29,10 +29,7 @@ public class UserRepository {
 
   public Optional<User> findUserById(final Long userId) {
     User user = em.find(User.class, userId);
-    if (user == null) {
-      return Optional.empty();
-    }
-    return Optional.of(user);
+    return Optional.ofNullable(user);
   }
 
   public Optional<User> findUserWithAuthoritiesByEmail(String email) {
