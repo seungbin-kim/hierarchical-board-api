@@ -24,7 +24,7 @@ public class BoardService {
 
 
   public BoardResponseWithCreatedAt addBoard(final BoardRequest request) {
-    if (boardRepository.findBoardByName(request.getName()).isPresent()) {
+    if (boardRepository.findByName(request.getName()).isPresent()) {
       throw new NameDuplicatedException();
     }
     Board board = new Board(request.getName());
@@ -35,7 +35,7 @@ public class BoardService {
 
   @Transactional(readOnly = true)
   public List<BoardResponseWithDate> getAllBoard() {
-    return boardRepository.findAllBoard()
+    return boardRepository.findAll()
         .stream()
         .map(BoardResponseWithDate::new)
         .collect(Collectors.toList());
@@ -44,7 +44,7 @@ public class BoardService {
 
   @Transactional(readOnly = true)
   public BoardResponseWithDate getBoard(final Long boardId) {
-    Optional<Board> boardById = boardRepository.findBoardById(boardId);
+    Optional<Board> boardById = boardRepository.findById(boardId);
     boardById.orElseThrow(BoardNotFoundException::new);
 
     return new BoardResponseWithDate(boardById.get());
@@ -52,7 +52,7 @@ public class BoardService {
 
 
   public Board checkBoard(final Long boardId) {
-    Optional<Board> boardById = boardRepository.findBoardById(boardId);
+    Optional<Board> boardById = boardRepository.findById(boardId);
     boardById.orElseThrow(BoardNotFoundException::new);
     return boardById.get();
   }
