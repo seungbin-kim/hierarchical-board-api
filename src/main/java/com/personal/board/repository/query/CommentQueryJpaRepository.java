@@ -1,5 +1,6 @@
 package com.personal.board.repository.query;
 
+import com.personal.board.dto.query.CommentIdAndPostIdQueryDto;
 import com.personal.board.dto.query.CommentQueryDto;
 import com.personal.board.dto.response.PageQueryDto;
 import org.springframework.stereotype.Repository;
@@ -89,7 +90,7 @@ public class CommentQueryJpaRepository {
 
   public List<CommentIdAndPostIdQueryDto> findCommentIdByPostId(final List<Long> postIds) {
     return em.createQuery(
-        "SELECT new com.personal.board.repository.query.CommentIdAndPostIdQueryDto(c.id, c.post.id)" +
+        "SELECT new com.personal.board.dto.query.CommentIdAndPostIdQueryDto(c.id, c.post.id)" +
             " FROM Comment c" +
             " WHERE c.post.id IN :postIds", CommentIdAndPostIdQueryDto.class)
         .setParameter("postIds", postIds)

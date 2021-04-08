@@ -1,5 +1,6 @@
 package com.personal.board.repository.query;
 
+import com.personal.board.dto.query.CommentIdAndPostIdQueryDto;
 import com.personal.board.dto.query.PostQueryDto;
 import com.personal.board.dto.response.PageQueryDto;
 import lombok.RequiredArgsConstructor;

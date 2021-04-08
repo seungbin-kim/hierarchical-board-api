@@ -1,4 +1,4 @@
-package com.personal.board.repository.query;
+package com.personal.board.dto.query;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

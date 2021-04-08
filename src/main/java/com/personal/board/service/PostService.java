@@ -10,7 +10,7 @@ import com.personal.board.exception.*;
 import com.personal.board.repository.PostJpaRepository;
 import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
-import com.personal.board.repository.query.CommentIdAndPostIdQueryDto;
+import com.personal.board.dto.query.CommentIdAndPostIdQueryDto;
 import com.personal.board.repository.query.CommentQueryJpaRepository;
 import com.personal.board.dto.query.PostQueryDto;
 import com.personal.board.util.PatchUtil;
