@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -53,7 +52,7 @@ public class AuthController {
       Cookie token = new Cookie("token", jwt);
       token.setHttpOnly(true);
       token.setMaxAge(cookieAge);
-      token.setPath("/api/v1");
+      token.setPath("/");
       response.addCookie(token);
 
       return ResponseEntity
@@ -69,7 +68,7 @@ public class AuthController {
   public void logOut(HttpServletRequest request, HttpServletResponse response) {
     Cookie token = new Cookie("token", null);
     token.setHttpOnly(true);
-    token.setPath("/api/v1");
+    token.setPath("/");
     token.setMaxAge(0);
     response.addCookie(token);
   }
