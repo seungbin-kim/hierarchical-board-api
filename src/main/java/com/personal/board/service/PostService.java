@@ -11,7 +11,7 @@ import com.personal.board.repository.PostJpaRepository;
 import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
 import com.personal.board.repository.query.CommentIdAndPostIdQueryDto;
-import com.personal.board.repository.query.CommentQueryRepository;
+import com.personal.board.repository.query.CommentQueryJpaRepository;
 import com.personal.board.repository.query.PostQueryDto;
 import com.personal.board.util.PatchUtil;
 import com.personal.board.util.SecurityUtil;
@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -39,7 +38,7 @@ public class PostService {
 
   private final PostJpaRepository postJpaRepository;
 
-  private final CommentQueryRepository commentQueryRepository;
+  private final CommentQueryJpaRepository commentQueryJpaRepository;
 
   private final BoardService boardService;
 
@@ -85,10 +84,10 @@ public class PostService {
     Page<PostQueryDto> originalPage = postRepository.findAllOriginal(boardId, pageable);
     List<PostQueryDto> parentListForLoop = originalPage.getContent();
     while (!parentListForLoop.isEmpty()) {
-      List<Long> parentIds = extractParentId(parentListForLoop);
+      List<Long> parentIds = extractParentIds(parentListForLoop);
 
       List<PostQueryDto> children = postRepository.findAllChildren(boardId, parentIds, pageable);
-      Map<Long, List<PostQueryDto>> childrenPostMap = mapByParentID(children);
+      Map<Long, List<PostQueryDto>> childrenPostMap = mapByParentId(children);
 
       Map<Long, Set<Long>> commentIdMap = getCommentIdMapByPostId(parentIds);
 
@@ -111,7 +110,7 @@ public class PostService {
 
 
   private Map<Long, Set<Long>> getCommentIdMapByPostId(List<Long> parentIds) {
-    List<CommentIdAndPostIdQueryDto> commentCountByPostId = commentQueryRepository.findCommentIdByPostId(parentIds);
+    List<CommentIdAndPostIdQueryDto> commentCountByPostId = commentQueryJpaRepository.findCommentIdByPostId(parentIds);
     return commentCountByPostId.stream()
         .collect(groupingBy(CommentIdAndPostIdQueryDto::getPostId,
             mapping(CommentIdAndPostIdQueryDto::getCommentId,
@@ -119,16 +118,16 @@ public class PostService {
   }
 
 
-  private Map<Long, List<PostQueryDto>> mapByParentID(List<PostQueryDto> children) {
+  private Map<Long, List<PostQueryDto>> mapByParentId(List<PostQueryDto> children) {
     return children.stream()
-        .collect(Collectors.groupingBy(PostQueryDto::getParentId));
+        .collect(groupingBy(PostQueryDto::getParentId));
   }
 
 
-  private List<Long> extractParentId(List<PostQueryDto> parentListForLoop) {
+  private List<Long> extractParentIds(List<PostQueryDto> parentListForLoop) {
     return parentListForLoop.stream()
         .map(PostQueryDto::getId)
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
 
