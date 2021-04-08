@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
-public class CommentQueryRepository {
+public class CommentQueryJpaRepository {
 
   @PersistenceContext
   EntityManager em;

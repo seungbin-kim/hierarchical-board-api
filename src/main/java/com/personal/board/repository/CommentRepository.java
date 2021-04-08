@@ -1,56 +1,45 @@
 package com.personal.board.repository;
 
 import com.personal.board.entity.Comment;
-import org.springframework.stereotype.Repository;
+import com.personal.board.repository.query.CommentQueryDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public class CommentRepository {
+public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-  @PersistenceContext
-  private EntityManager em;
+  @Modifying
+  @Query("UPDATE Comment c SET c.user = NULL WHERE c.user.id = :userId")
+  void updateWriterIdToNull(@Param("userId") Long userId);
 
+  Optional<Comment> findByIdAndPostId(Long commentId, Long PostId);
 
-  public Comment save(final Comment comment) {
-    em.persist(comment);
-    return comment;
-  }
+  @Query(
+      value =
+          "SELECT new com.personal.board.repository.query.CommentQueryDto(c.parent.id, c.id, c.user.nickname, c.content, c.createdAt, c.deleted)" +
+              " FROM Comment c LEFT OUTER JOIN c.user u" +
+              " WHERE c.post.id = :postId" +
+              " AND c.parent.id IS NULL" +
+              " ORDER BY c.id ASC",
+      countQuery =
+          "SELECT COUNT(c)" +
+              "FROM Comment c" +
+              " WHERE c.post.id = :postId" +
+              " AND c.parent.id IS NULL")
+  Page<CommentQueryDto> findAllOriginal(@Param("postId") Long postId, Pageable pageable);
 
-
-  public Optional<Comment> findCommentByIdAndPostId(final Long commentId, final Long postId) {
-    try {
-      Comment comment = em.createQuery(
-          "SELECT c" +
-              " FROM Comment c" +
-              " WHERE c.id = :commentId" +
-              " AND c.post.id = :postId", Comment.class)
-          .setParameter("commentId", commentId)
-          .setParameter("postId", postId)
-          .getSingleResult();
-
-      return Optional.of(comment);
-    } catch (Exception exception) {
-      return Optional.empty();
-    }
-  }
-
-
-  public void deleteComment(final Comment comment) {
-    em.remove(comment);
-  }
-
-
-  public void setWriterIdToNull(final Long userId) {
-    em.createQuery(
-        "UPDATE Comment c" +
-            " SET c.user = NULL" +
-            " WHERE c.user.id = :userId")
-        .setParameter("userId", userId)
-        .executeUpdate();
-  }
+  @Query(
+      "SELECT new com.personal.board.repository.query.CommentQueryDto(c.parent.id, c.id, c.user.nickname, c.content, c.createdAt, c.deleted)" +
+          " FROM Comment c LEFT OUTER JOIN c.user u" +
+          " WHERE c.post.id = :postId" +
+          " AND c.parent.id IN :parentIds" +
+          " ORDER BY c.id ASC")
+  List<CommentQueryDto> findAllChildren(@Param("postId") Long postId, @Param("parentIds") List<Long> parentIds);
 
 }

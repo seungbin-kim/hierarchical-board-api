@@ -71,7 +71,7 @@ public class UserService {
     if (userById.isEmpty()) {
       throw new UserNotFoundException();
     }
-    commentRepository.setWriterIdToNull(userId);
+    commentRepository.updateWriterIdToNull(userId);
     postRepository.updateWriterIdToNull(userId);
     userRepository.delete(userById.get());
   }

@@ -2,7 +2,6 @@ package com.personal.board.service;
 
 import com.personal.board.dto.request.CommentRequest;
 import com.personal.board.dto.request.CommentUpdateRequest;
-import com.personal.board.dto.response.PageQueryDto;
 import com.personal.board.repository.query.CommentQueryDto;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
 import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
@@ -12,14 +11,20 @@ import com.personal.board.entity.User;
 import com.personal.board.exception.*;
 import com.personal.board.repository.CommentRepository;
 import com.personal.board.repository.UserRepository;
-import com.personal.board.repository.query.CommentQueryRepository;
 import com.personal.board.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @Service
 @Transactional
@@ -29,8 +34,6 @@ public class CommentService {
   private final UserRepository userRepository;
 
   private final CommentRepository commentRepository;
-
-  private final CommentQueryRepository commentQueryRepository;
 
   private final PostService postService;
 
@@ -60,10 +63,41 @@ public class CommentService {
 
 
   @Transactional(readOnly = true)
-  public PageQueryDto<CommentQueryDto> getPageableComment(final Long postId, final int size, final int page) {
+  public Page<CommentQueryDto> getPageableComment(final Long postId, final Pageable pageable) {
     postService.checkPost(postId, null);
 
-    return commentQueryRepository.findPageableCommentByDto(postId, size, page);
+    Page<CommentQueryDto> originalPage = commentRepository.findAllOriginal(postId, pageable);
+    List<CommentQueryDto> parentListForLoop = originalPage.getContent();
+    while (!parentListForLoop.isEmpty()) {
+      List<Long> parentIds = extractParentIds(parentListForLoop);
+
+      List<CommentQueryDto> children = commentRepository.findAllChildren(postId, parentIds);
+      Map<Long, List<CommentQueryDto>> childrenCommentMap = mapByParentId(children);
+
+      setReply(parentListForLoop, childrenCommentMap);
+
+      parentListForLoop = children;
+    }
+
+    return originalPage;
+  }
+
+
+  private void setReply(List<CommentQueryDto> parentListForLoop, Map<Long, List<CommentQueryDto>> childrenCommentMap) {
+    parentListForLoop.forEach(c -> c.setReply(childrenCommentMap.get(c.getId())));
+  }
+
+
+  private Map<Long, List<CommentQueryDto>> mapByParentId(List<CommentQueryDto> children) {
+    return children.stream()
+        .collect(Collectors.groupingBy(CommentQueryDto::getParentId));
+  }
+
+
+  private List<Long> extractParentIds(List<CommentQueryDto> parentListForLoop) {
+    return parentListForLoop.stream()
+        .map(CommentQueryDto::getId)
+        .collect(toList());
   }
 
 
@@ -86,7 +120,7 @@ public class CommentService {
     checkWriter(targetComment);
 
     if (targetComment.getChildren().isEmpty()) {
-      commentRepository.deleteComment(getDeletableAncestorComment(targetComment));
+      commentRepository.delete(getDeletableAncestorComment(targetComment));
     } else {
       targetComment.changeDeletionStatus();
     }
@@ -103,7 +137,7 @@ public class CommentService {
 
 
   private Comment checkComment(final Long commentId, final Long postId) {
-    Optional<Comment> commentById = commentRepository.findCommentByIdAndPostId(commentId, postId);
+    Optional<Comment> commentById = commentRepository.findByIdAndPostId(commentId, postId);
     commentById.orElseThrow(CommentNotFoundException::new);
 
     Comment findComment = commentById.get();

@@ -17,7 +17,7 @@ public class PostQueryJpaRepository {
   @PersistenceContext
   EntityManager em;
 
-  private final CommentQueryRepository commentQueryRepository;
+  private final CommentQueryJpaRepository commentQueryJpaRepository;
 
 
   public PageQueryDto<PostQueryDto> findPageablePostByDto(final Long boardId, final int size, final int page) {
@@ -41,7 +41,7 @@ public class PostQueryJpaRepository {
       Map<Long, List<PostQueryDto>> childrenPostMap = children.stream()
           .collect(groupingBy(PostQueryDto::getParentId));
 
-      List<CommentIdAndPostIdQueryDto> commentCountByPostId = commentQueryRepository.findCommentIdByPostId(parentIds);
+      List<CommentIdAndPostIdQueryDto> commentCountByPostId = commentQueryJpaRepository.findCommentIdByPostId(parentIds);
       Map<Long, Set<Long>> commentIdMap = commentCountByPostId.stream()
           .collect(groupingBy(CommentIdAndPostIdQueryDto::getPostId,
               mapping(CommentIdAndPostIdQueryDto::getCommentId,
