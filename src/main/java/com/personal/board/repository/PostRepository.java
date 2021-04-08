@@ -18,11 +18,17 @@ public interface PostRepository extends JpaRepository<Post, Long> {
   void updateWriterIdToNull(@Param("userId") Long userId);
 
   @Query(
-      "SELECT new com.personal.board.repository.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
-          " FROM Post p LEFT OUTER JOIN p.user u" +
-          " WHERE p.board.id = :boardId" +
-          " AND p.parent.id IS NULL" +
-          " ORDER BY p.id DESC")
+      value =
+          "SELECT new com.personal.board.repository.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
+              " FROM Post p LEFT OUTER JOIN p.user u" +
+              " WHERE p.board.id = :boardId" +
+              " AND p.parent.id IS NULL" +
+              " ORDER BY p.id DESC",
+      countQuery =
+          "SELECT COUNT(p)" +
+              " FROM Post p" +
+              " WHERE p.board.id = :boardId" +
+              " AND p.parent.id IS NULL")
   Page<PostQueryDto> findAllOriginal(@Param("boardId") Long boardId, Pageable pageable);
 
   @Query(
