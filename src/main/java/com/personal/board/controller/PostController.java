@@ -8,6 +8,10 @@ import com.personal.board.exception.ReflectIllegalAccessException;
 import com.personal.board.repository.query.PostQueryDto;
 import com.personal.board.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -40,14 +44,23 @@ public class PostController {
         .body(postResponse);
   }
 
-  @GetMapping("/boards/{boardId}/posts")
-  public ResponseEntity<PageQueryDto<PostQueryDto>> getPageablePost(
-      @PathVariable final Long boardId,
-      @RequestParam(defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
-      @RequestParam(defaultValue = "0") @Min(value = 0, message = "page must be at least 0.") final int page) {
+//  @GetMapping("/boards/{boardId}/posts")
+//  public ResponseEntity<PageQueryDto<PostQueryDto>> getPageablePost(
+//      @PathVariable final Long boardId,
+//      @RequestParam(defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
+//      @RequestParam(defaultValue = "0") @Min(value = 0, message = "page must be at least 0.") final int page) {
+//
+//    return ResponseEntity
+//        .ok(postService.getPageablePost(boardId, size, page));
+//  }
 
-    return ResponseEntity
-        .ok(postService.getPageablePost(boardId, size, page));
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping("/boards/{boardId}/posts")
+  public Page<PostQueryDto> getPageablePost(
+      @PathVariable final Long boardId,
+      @PageableDefault(size = 5) Pageable pageable) {
+
+    return postService.getPageablePost(boardId, pageable);
   }
 
   @GetMapping("/boards/{boardId}/posts/{postId}")

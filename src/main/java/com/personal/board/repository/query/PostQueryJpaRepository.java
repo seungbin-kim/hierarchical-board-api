@@ -6,14 +6,13 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
+
+import static java.util.stream.Collectors.*;
 
 @Repository
 @RequiredArgsConstructor
-public class PostQueryRepository {
+public class PostQueryJpaRepository {
 
   @PersistenceContext
   EntityManager em;
@@ -36,20 +35,22 @@ public class PostQueryRepository {
     while (!parentListForLoop.isEmpty()) {
       List<Long> parentIds = parentListForLoop.stream()
           .map(PostQueryDto::getId)
-          .collect(Collectors.toList());
+          .collect(toList());
 
       List<PostQueryDto> children = getChildPostDtos(boardId, parentIds);
       Map<Long, List<PostQueryDto>> childrenPostMap = children.stream()
-          .collect(Collectors.groupingBy(PostQueryDto::getParentId));
+          .collect(groupingBy(PostQueryDto::getParentId));
 
       List<CommentIdAndPostIdQueryDto> commentCountByPostId = commentQueryRepository.findCommentIdByPostId(parentIds);
-      Map<Long, List<CommentIdAndPostIdQueryDto>> commentIdMap = commentCountByPostId.stream()
-          .collect(Collectors.groupingBy(CommentIdAndPostIdQueryDto::getPostId));
+      Map<Long, Set<Long>> commentIdMap = commentCountByPostId.stream()
+          .collect(groupingBy(CommentIdAndPostIdQueryDto::getPostId,
+              mapping(CommentIdAndPostIdQueryDto::getCommentId,
+                  toSet())));
 
       parentListForLoop.forEach(p -> {
         p.setReply(childrenPostMap.get(p.getId()));
-        Optional<List<CommentIdAndPostIdQueryDto>> optionalComments = Optional.ofNullable(commentIdMap.get(p.getId()));
-        optionalComments.ifPresent(c -> p.setCommentCount(c.size()));
+        Optional<Set<Long>> optionalCommentIdSet = Optional.ofNullable(commentIdMap.get(p.getId()));
+        optionalCommentIdSet.ifPresent(s -> p.setCommentCount(s.size()));
       });
 
       parentListForLoop = children;

@@ -1,7 +1,6 @@
 package com.personal.board.controller;
 
 import com.personal.board.dto.request.UserUpdateRequest;
-import com.personal.board.dto.response.PageQueryDto;
 import com.personal.board.dto.request.SignUpRequest;
 import com.personal.board.dto.response.user.UserResponseWithCreatedAt;
 import com.personal.board.dto.response.user.UserResponseWithDate;
@@ -22,7 +21,6 @@ import org.springframework.web.util.UriTemplate;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 
 @RestController
 @RequiredArgsConstructor

@@ -2,26 +2,31 @@ package com.personal.board.service;
 
 import com.personal.board.dto.request.PostRequest;
 import com.personal.board.dto.request.PostUpdateRequest;
-import com.personal.board.dto.response.PageQueryDto;
 import com.personal.board.dto.response.post.*;
 import com.personal.board.entity.Board;
 import com.personal.board.entity.Post;
 import com.personal.board.entity.User;
 import com.personal.board.exception.*;
+import com.personal.board.repository.PostJpaRepository;
 import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
+import com.personal.board.repository.query.CommentIdAndPostIdQueryDto;
+import com.personal.board.repository.query.CommentQueryRepository;
 import com.personal.board.repository.query.PostQueryDto;
-import com.personal.board.repository.query.PostQueryRepository;
 import com.personal.board.util.PatchUtil;
 import com.personal.board.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @Service
 @Transactional
@@ -32,7 +37,9 @@ public class PostService {
 
   private final PostRepository postRepository;
 
-  private final PostQueryRepository postQueryRepository;
+  private final PostJpaRepository postJpaRepository;
+
+  private final CommentQueryRepository commentQueryRepository;
 
   private final BoardService boardService;
 
@@ -63,11 +70,65 @@ public class PostService {
   }
 
 
+//  @Transactional(readOnly = true)
+//  public PageQueryDto<PostQueryDto> getPageablePost(final Long boardId, final int size, final int page) {
+//    boardService.checkBoard(boardId);
+//
+//    return postQueryRepository.findPageablePostByDto(boardId, size, page);
+//  }
+
+
   @Transactional(readOnly = true)
-  public PageQueryDto<PostQueryDto> getPageablePost(final Long boardId, final int size, final int page) {
+  public Page<PostQueryDto> getPageablePost(final Long boardId, final Pageable pageable) {
     boardService.checkBoard(boardId);
 
-    return postQueryRepository.findPageablePostByDto(boardId, size, page);
+    Page<PostQueryDto> originalPage = postRepository.findAllOriginal(boardId, pageable);
+    List<PostQueryDto> parentListForLoop = originalPage.getContent();
+    while (!parentListForLoop.isEmpty()) {
+      List<Long> parentIds = extractParentId(parentListForLoop);
+
+      List<PostQueryDto> children = postRepository.findAllChildren(boardId, parentIds, pageable);
+      Map<Long, List<PostQueryDto>> childrenPostMap = mapByParentID(children);
+
+      Map<Long, Set<Long>> commentIdMap = getCommentIdMapByPostId(parentIds);
+
+      setReplyAndCommentCount(parentListForLoop, childrenPostMap, commentIdMap);
+
+      parentListForLoop = children;
+    }
+
+    return originalPage;
+  }
+
+
+  private void setReplyAndCommentCount(List<PostQueryDto> parentListForLoop, Map<Long, List<PostQueryDto>> childrenPostMap, Map<Long, Set<Long>> commentIdMap) {
+    parentListForLoop.forEach(p -> {
+      p.setReply(childrenPostMap.get(p.getId()));
+      Optional<Set<Long>> optionalCommentIdSet = Optional.ofNullable(commentIdMap.get(p.getId()));
+      optionalCommentIdSet.ifPresent(s -> p.setCommentCount(s.size()));
+    });
+  }
+
+
+  private Map<Long, Set<Long>> getCommentIdMapByPostId(List<Long> parentIds) {
+    List<CommentIdAndPostIdQueryDto> commentCountByPostId = commentQueryRepository.findCommentIdByPostId(parentIds);
+    return commentCountByPostId.stream()
+        .collect(groupingBy(CommentIdAndPostIdQueryDto::getPostId,
+            mapping(CommentIdAndPostIdQueryDto::getCommentId,
+                toSet())));
+  }
+
+
+  private Map<Long, List<PostQueryDto>> mapByParentID(List<PostQueryDto> children) {
+    return children.stream()
+        .collect(Collectors.groupingBy(PostQueryDto::getParentId));
+  }
+
+
+  private List<Long> extractParentId(List<PostQueryDto> parentListForLoop) {
+    return parentListForLoop.stream()
+        .map(PostQueryDto::getId)
+        .collect(Collectors.toList());
   }
 
 
@@ -101,7 +162,7 @@ public class PostService {
     checkWriter(targetPost);
 
     if (targetPost.getChildren().isEmpty()) {
-      postRepository.deletePost(getDeletableAncestorPost(targetPost));
+      postRepository.delete(getDeletableAncestorPost(targetPost));
     } else {
       targetPost.changeDeletionStatus();
     }
@@ -118,7 +179,7 @@ public class PostService {
 
 
   public Post checkPost(final Long postId, final Long boardId) {
-    Optional<Post> post = postRepository.findPostByIdAndBoardId(postId, boardId);
+    Optional<Post> post = postJpaRepository.findPostByIdAndBoardId(postId, boardId);
     post.orElseThrow(PostNotFoundException::new);
 
     Post findPost = post.get();

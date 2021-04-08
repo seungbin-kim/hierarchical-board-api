@@ -72,7 +72,7 @@ public class UserService {
       throw new UserNotFoundException();
     }
     commentRepository.setWriterIdToNull(userId);
-    postRepository.setWriterIdToNull(userId);
+    postRepository.updateWriterIdToNull(userId);
     userRepository.delete(userById.get());
   }
 

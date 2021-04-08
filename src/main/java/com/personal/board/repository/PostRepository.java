@@ -1,60 +1,36 @@
 package com.personal.board.repository;
 
 import com.personal.board.entity.Post;
-import org.springframework.stereotype.Repository;
+import com.personal.board.repository.query.PostQueryDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.util.Optional;
+import java.util.List;
 
-@Repository
-public class PostRepository {
+public interface PostRepository extends JpaRepository<Post, Long> {
 
-  @PersistenceContext
-  private EntityManager em;
+  @Modifying
+  @Query("UPDATE Post p SET p.user = NULL WHERE p.user.id = :userId")
+  void updateWriterIdToNull(@Param("userId") Long userId);
 
+  @Query(
+      "SELECT new com.personal.board.repository.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
+          " FROM Post p LEFT OUTER JOIN p.user u" +
+          " WHERE p.board.id = :boardId" +
+          " AND p.parent.id IS NULL" +
+          " ORDER BY p.id DESC")
+  Page<PostQueryDto> findAllOriginal(@Param("boardId") Long boardId, Pageable pageable);
 
-  public Post save(final Post post) {
-    em.persist(post);
-    return post;
-  }
-
-
-  public Optional<Post> findPostByIdAndBoardId(final Long postId, final Long boardId) {
-    String query = "SELECT p FROM Post p WHERE p.id = :postId";
-
-    Post post;
-    try {
-      if (boardId != null) {
-        query += " AND p.board.id = :boardId";
-        post = em.createQuery(query, Post.class)
-            .setParameter("postId", postId)
-            .setParameter("boardId", boardId)
-            .getSingleResult();
-      } else {
-        post = em.createQuery(query, Post.class)
-            .setParameter("postId", postId)
-            .getSingleResult();
-      }
-      return Optional.of(post);
-    } catch (Exception exception) {
-      return Optional.empty();
-    }
-  }
-
-
-  public void deletePost(final Post post) {
-    em.remove(post);
-  }
-
-
-  public void setWriterIdToNull(final Long userId) {
-    em.createQuery(
-        "UPDATE Post p" +
-            " SET p.user = NULL" +
-            " WHERE p.user.id = :userId")
-        .setParameter("userId", userId)
-        .executeUpdate();
-  }
+  @Query(
+      "SELECT new com.personal.board.repository.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
+          " FROM Post p LEFT OUTER JOIN p.user u" +
+          " WHERE p.board.id = :boardId" +
+          " AND p.parent.id IN :parentIds" +
+          " ORDER BY p.id ASC")
+  List<PostQueryDto> findAllChildren(@Param("boardId") Long boardId, @Param("parentIds") List<Long> parentIds, Pageable pageable);
 
 }
