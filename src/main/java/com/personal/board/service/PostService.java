@@ -36,8 +36,6 @@ public class PostService {
 
   private final PostRepository postRepository;
 
-  private final PostJpaRepository postJpaRepository;
-
   private final CommentQueryJpaRepository commentQueryJpaRepository;
 
   private final BoardService boardService;
@@ -178,7 +176,7 @@ public class PostService {
 
 
   public Post checkPost(final Long postId, final Long boardId) {
-    Optional<Post> post = postJpaRepository.findPostByIdAndBoardId(postId, boardId);
+    Optional<Post> post = postRepository.findPostByIdAndBoardId(postId, boardId);
     post.orElseThrow(PostNotFoundException::new);
 
     Post findPost = post.get();
