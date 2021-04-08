@@ -3,6 +3,7 @@ package com.personal.board.repository;
 import com.personal.board.entity.Authority;
 import com.personal.board.entity.User;
 import com.personal.board.enumeration.Role;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,13 +26,33 @@ class UserRepositoryTest {
   @Autowired
   UserRepository userRepository;
 
+  @BeforeEach
+  void before() {
+    User user1 = User.createUser(
+        "a@a.a",
+        "nick",
+        "name1",
+        LocalDate.now(),
+        "123",
+        new Authority(Role.ROLE_USER));
+    User user2 = User.createUser(
+        "b@b.b",
+        "kick",
+        "name2",
+        LocalDate.now(),
+        "123",
+        new Authority(Role.ROLE_USER));
+    userRepository.save(user1);
+    userRepository.save(user2);
+  }
+
   @Test
   void save() throws Exception {
     //given
     User user = User.createUser(
-        "a@a.a",
-        "nick",
-        "name",
+        "c@c.c",
+        "cccc",
+        "namec",
         LocalDate.now(),
         "123",
         new Authority(Role.ROLE_USER));
@@ -46,17 +67,9 @@ class UserRepositoryTest {
   @Test
   void existsByEmailSuccess() throws Exception {
     //given
-    User user = User.createUser(
-        "a@a.a",
-        "nick",
-        "name",
-        LocalDate.now(),
-        "123",
-        new Authority(Role.ROLE_USER));
-    User savedUser = userRepository.save(user);
+    boolean existsByEmail = userRepository.existsByEmail("a@a.a");
 
     //when
-    boolean existsByEmail = userRepository.existsByEmail("a@a.a");
 
     //then
     assertThat(existsByEmail).isTrue();
@@ -65,17 +78,9 @@ class UserRepositoryTest {
   @Test
   void existsByEmailFail() throws Exception {
     //given
-    User user = User.createUser(
-        "a@a.a",
-        "nick",
-        "name",
-        LocalDate.now(),
-        "123",
-        new Authority(Role.ROLE_USER));
-    User savedUser = userRepository.save(user);
+    boolean existsByEmail = userRepository.existsByEmail("b.@b.b");
 
     //when
-    boolean existsByEmail = userRepository.existsByEmail("b.@b.b");
 
     //then
     assertThat(existsByEmail).isFalse();
@@ -84,17 +89,9 @@ class UserRepositoryTest {
   @Test
   void existsByNicknameSuccess() throws Exception {
     //given
-    User user = User.createUser(
-        "a@a.a",
-        "nick",
-        "name",
-        LocalDate.now(),
-        "123",
-        new Authority(Role.ROLE_USER));
-    User savedUser = userRepository.save(user);
+    boolean existsByNickname = userRepository.existsByNickname("nick");
 
     //when
-    boolean existsByNickname = userRepository.existsByNickname("nick");
 
     //then
     assertThat(existsByNickname).isTrue();
@@ -103,17 +100,9 @@ class UserRepositoryTest {
   @Test
   void existsByNicknameFail() throws Exception {
     //given
-    User user = User.createUser(
-        "a@a.a",
-        "nick",
-        "name",
-        LocalDate.now(),
-        "123",
-        new Authority(Role.ROLE_USER));
-    User savedUser = userRepository.save(user);
+    boolean existsByNickname = userRepository.existsByNickname("kim");
 
     //when
-    boolean existsByNickname = userRepository.existsByNickname("kim");
 
     //then
     assertThat(existsByNickname).isFalse();
@@ -122,66 +111,34 @@ class UserRepositoryTest {
   @Test
   void findById() throws Exception {
     //given
-    User user = User.createUser(
-        "a@a.a",
-        "nick",
-        "name",
-        LocalDate.now(),
-        "123",
-        new Authority(Role.ROLE_USER));
-    User savedUser = userRepository.save(user);
+    Optional<User> userOptional = userRepository.findById(0L);
 
     //when
-    Optional<User> userOptional = userRepository.findById(savedUser.getId());
     User findUser = userOptional.get();
 
     //then
-    assertThat(findUser).isEqualTo(savedUser);
+    assertThat(findUser.getId()).isEqualTo(0L);
   }
 
   @Test
   void delete() throws Exception {
     //given
-    User user = User.createUser(
-        "a@a.a",
-        "nick",
-        "name",
-        LocalDate.now(),
-        "123",
-        new Authority(Role.ROLE_USER));
-    User savedUser = userRepository.save(user);
-    long savedUserId = savedUser.getId();
+    Optional<User> userOptional = userRepository.findById(0L);
 
     //when
-    userRepository.delete(savedUser);
-    Optional<User> userOptional = userRepository.findById(savedUserId);
+    userRepository.delete(userOptional.get());
+    Optional<User> userOptional2 = userRepository.findById(0L);
 
     //then
-    assertThrows(NoSuchElementException.class, userOptional::get);
+    assertThrows(NoSuchElementException.class, userOptional2::get);
   }
 
   @Test
   void findAll() throws Exception {
     //given
-    User user1 = User.createUser(
-        "a@a.a",
-        "nick",
-        "name1",
-        LocalDate.now(),
-        "123",
-        new Authority(Role.ROLE_USER));
-    User user2 = User.createUser(
-        "b@b.b",
-        "kick",
-        "name2",
-        LocalDate.now(),
-        "123",
-        new Authority(Role.ROLE_USER));
-    User savedUser1 = userRepository.save(user1);
-    User savedUser2 = userRepository.save(user2);
+    List<User> userList = userRepository.findAll();
 
     //when
-    List<User> userList = userRepository.findAll();
 
     //then
     assertThat(userList.size()).isEqualTo(3); // 관리자계정 생성 DDL 자동실행되므로 +1
@@ -190,23 +147,6 @@ class UserRepositoryTest {
   @Test
   void findAllPage() throws Exception {
     //given
-    User user1 = User.createUser(
-        "a@a.a",
-        "nick",
-        "name1",
-        LocalDate.now(),
-        "123",
-        new Authority(Role.ROLE_USER));
-    User user2 = User.createUser(
-        "b@b.b",
-        "kick",
-        "name2",
-        LocalDate.now(),
-        "123",
-        new Authority(Role.ROLE_USER));
-    User savedUser1 = userRepository.save(user1);
-    User savedUser2 = userRepository.save(user2);
-
     PageRequest pageRequest = PageRequest.of(0, 1);
 
     //when
