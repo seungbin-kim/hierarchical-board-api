@@ -1,4 +1,4 @@
-package com.personal.board.repository.query;
+package com.personal.board.dto.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

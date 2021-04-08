@@ -1,7 +1,7 @@
 package com.personal.board.repository;
 
 import com.personal.board.entity.Post;
-import com.personal.board.repository.query.PostQueryDto;
+import com.personal.board.dto.query.PostQueryDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,7 +19,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
   @Query(
       value =
-          "SELECT new com.personal.board.repository.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
+          "SELECT new com.personal.board.dto.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
               " FROM Post p LEFT OUTER JOIN p.user u" +
               " WHERE p.board.id = :boardId" +
               " AND p.parent.id IS NULL" +
@@ -32,7 +32,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
   Page<PostQueryDto> findAllOriginal(@Param("boardId") Long boardId, Pageable pageable);
 
   @Query(
-      "SELECT new com.personal.board.repository.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
+      "SELECT new com.personal.board.dto.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
           " FROM Post p LEFT OUTER JOIN p.user u" +
           " WHERE p.board.id = :boardId" +
           " AND p.parent.id IN :parentIds" +

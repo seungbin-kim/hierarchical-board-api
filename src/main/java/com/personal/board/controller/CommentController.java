@@ -2,7 +2,7 @@ package com.personal.board.controller;
 
 import com.personal.board.dto.request.CommentRequest;
 import com.personal.board.dto.request.CommentUpdateRequest;
-import com.personal.board.repository.query.CommentQueryDto;
+import com.personal.board.dto.query.CommentQueryDto;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
 import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
 import com.personal.board.service.CommentService;

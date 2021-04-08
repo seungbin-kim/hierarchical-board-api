@@ -2,10 +2,9 @@ package com.personal.board.controller;
 
 import com.personal.board.dto.request.PostRequest;
 import com.personal.board.dto.request.PostUpdateRequest;
-import com.personal.board.dto.response.PageQueryDto;
 import com.personal.board.dto.response.post.*;
 import com.personal.board.exception.ReflectIllegalAccessException;
-import com.personal.board.repository.query.PostQueryDto;
+import com.personal.board.dto.query.PostQueryDto;
 import com.personal.board.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriTemplate;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 
 @Validated
 @RestController

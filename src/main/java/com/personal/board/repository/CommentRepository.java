@@ -1,7 +1,7 @@
 package com.personal.board.repository;
 
 import com.personal.board.entity.Comment;
-import com.personal.board.repository.query.CommentQueryDto;
+import com.personal.board.dto.query.CommentQueryDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,7 +22,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
   @Query(
       value =
-          "SELECT new com.personal.board.repository.query.CommentQueryDto(c.parent.id, c.id, c.user.nickname, c.content, c.createdAt, c.deleted)" +
+          "SELECT new com.personal.board.dto.query.CommentQueryDto(c.parent.id, c.id, c.user.nickname, c.content, c.createdAt, c.deleted)" +
               " FROM Comment c LEFT OUTER JOIN c.user u" +
               " WHERE c.post.id = :postId" +
               " AND c.parent.id IS NULL" +
@@ -35,7 +35,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
   Page<CommentQueryDto> findAllOriginal(@Param("postId") Long postId, Pageable pageable);
 
   @Query(
-      "SELECT new com.personal.board.repository.query.CommentQueryDto(c.parent.id, c.id, c.user.nickname, c.content, c.createdAt, c.deleted)" +
+      "SELECT new com.personal.board.dto.query.CommentQueryDto(c.parent.id, c.id, c.user.nickname, c.content, c.createdAt, c.deleted)" +
           " FROM Comment c LEFT OUTER JOIN c.user u" +
           " WHERE c.post.id = :postId" +
           " AND c.parent.id IN :parentIds" +

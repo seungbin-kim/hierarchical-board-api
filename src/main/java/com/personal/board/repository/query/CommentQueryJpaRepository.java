@@ -1,5 +1,6 @@
 package com.personal.board.repository.query;
 
+import com.personal.board.dto.query.CommentQueryDto;
 import com.personal.board.dto.response.PageQueryDto;
 import org.springframework.stereotype.Repository;
 
@@ -61,7 +62,7 @@ public class CommentQueryJpaRepository {
 
   private List<CommentQueryDto> getChildCommentDtos(Long postId, List<Long> parentIds) {
     return em.createQuery(
-        "SELECT new com.personal.board.repository.query.CommentQueryDto(c.parent.id, c.id, c.user.nickname, c.content, c.createdAt, c.deleted)" +
+        "SELECT new com.personal.board.dto.query.CommentQueryDto(c.parent.id, c.id, c.user.nickname, c.content, c.createdAt, c.deleted)" +
             " FROM Comment c LEFT OUTER JOIN c.user u" +
             " WHERE c.post.id = :postId" +
             " AND c.parent.id IN :parentIds" +
@@ -74,7 +75,7 @@ public class CommentQueryJpaRepository {
 
   private List<CommentQueryDto> getParentCommentDtos(final Long postId, final int size, final int page) {
     return em.createQuery(
-        "SELECT new com.personal.board.repository.query.CommentQueryDto(c.parent.id, c.id, c.user.nickname, c.content, c.createdAt, c.deleted)" +
+        "SELECT new com.personal.board.dto.query.CommentQueryDto(c.parent.id, c.id, c.user.nickname, c.content, c.createdAt, c.deleted)" +
             " FROM Comment c LEFT OUTER JOIN c.user u" +
             " WHERE c.post.id = :postId" +
             " AND c.parent.id IS NULL" +

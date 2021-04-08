@@ -12,7 +12,7 @@ import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
 import com.personal.board.repository.query.CommentIdAndPostIdQueryDto;
 import com.personal.board.repository.query.CommentQueryJpaRepository;
-import com.personal.board.repository.query.PostQueryDto;
+import com.personal.board.dto.query.PostQueryDto;
 import com.personal.board.util.PatchUtil;
 import com.personal.board.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;

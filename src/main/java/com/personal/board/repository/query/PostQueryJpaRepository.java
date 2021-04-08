@@ -1,5 +1,6 @@
 package com.personal.board.repository.query;
 
+import com.personal.board.dto.query.PostQueryDto;
 import com.personal.board.dto.response.PageQueryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -74,7 +75,7 @@ public class PostQueryJpaRepository {
 
   private List<PostQueryDto> getChildPostDtos(final Long boardId, final List<Long> parentIds) {
     return em.createQuery(
-        "SELECT new com.personal.board.repository.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
+        "SELECT new com.personal.board.dto.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
             " FROM Post p LEFT OUTER JOIN p.user u" +
             " WHERE p.board.id = :boardId" +
             " AND p.parent.id IN :parentIds" +
@@ -87,7 +88,7 @@ public class PostQueryJpaRepository {
 
   private List<PostQueryDto> getParentPostDtos(final Long boardId, final int size, final int page) {
     return em.createQuery(
-        "SELECT new com.personal.board.repository.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
+        "SELECT new com.personal.board.dto.query.PostQueryDto(p.parent.id, p.id, p.title, u.nickname, p.createdAt, p.deleted)" +
             " FROM Post p LEFT OUTER JOIN p.user u" +
             " WHERE p.board.id = :boardId" +
             " AND p.parent.id IS NULL" +
