@@ -6,6 +6,6 @@ import java.util.Optional;
 
 public interface PostRepositoryCustom {
 
-  Optional<Post> findPostByIdAndBoardId(final Long postId, final Long boardId);
+  Optional<Post> findPostByIdAndBoardId(Long postId, Long boardId);
 
 }

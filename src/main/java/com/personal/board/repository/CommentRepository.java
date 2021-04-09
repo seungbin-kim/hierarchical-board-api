@@ -1,5 +1,6 @@
 package com.personal.board.repository;
 
+import com.personal.board.dto.query.CommentIdAndPostIdQueryDto;
 import com.personal.board.entity.Comment;
 import com.personal.board.dto.query.CommentQueryDto;
 import org.springframework.data.domain.Page;
@@ -18,7 +19,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
   @Query("UPDATE Comment c SET c.user = NULL WHERE c.user.id = :userId")
   void updateWriterIdToNull(@Param("userId") Long userId);
 
+
   Optional<Comment> findByIdAndPostId(Long commentId, Long PostId);
+
 
   @Query(
       value =
@@ -34,6 +37,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
               " AND c.parent.id IS NULL")
   Page<CommentQueryDto> findAllOriginal(@Param("postId") Long postId, Pageable pageable);
 
+
   @Query(
       "SELECT new com.personal.board.dto.query.CommentQueryDto(c.parent.id, c.id, c.user.nickname, c.content, c.createdAt, c.deleted)" +
           " FROM Comment c LEFT OUTER JOIN c.user u" +
@@ -41,5 +45,12 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
           " AND c.parent.id IN :parentIds" +
           " ORDER BY c.id ASC")
   List<CommentQueryDto> findAllChildren(@Param("postId") Long postId, @Param("parentIds") List<Long> parentIds);
+
+
+  @Query(
+      "SELECT new com.personal.board.dto.query.CommentIdAndPostIdQueryDto(c.id, c.post.id)" +
+          " FROM Comment c" +
+          " WHERE c.post.id IN :postIds")
+  List<CommentIdAndPostIdQueryDto> findCommentIdByPostId(@Param("postIds") List<Long> postIds);
 
 }

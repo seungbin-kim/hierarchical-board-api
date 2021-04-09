@@ -7,11 +7,10 @@ import com.personal.board.entity.Board;
 import com.personal.board.entity.Post;
 import com.personal.board.entity.User;
 import com.personal.board.exception.*;
-import com.personal.board.repository.PostJpaRepository;
+import com.personal.board.repository.CommentRepository;
 import com.personal.board.repository.PostRepository;
 import com.personal.board.repository.UserRepository;
 import com.personal.board.dto.query.CommentIdAndPostIdQueryDto;
-import com.personal.board.repository.query.CommentQueryJpaRepository;
 import com.personal.board.dto.query.PostQueryDto;
 import com.personal.board.util.PatchUtil;
 import com.personal.board.util.SecurityUtil;
@@ -36,7 +35,7 @@ public class PostService {
 
   private final PostRepository postRepository;
 
-  private final CommentQueryJpaRepository commentQueryJpaRepository;
+  private final CommentRepository commentRepository;
 
   private final BoardService boardService;
 
@@ -98,7 +97,7 @@ public class PostService {
   }
 
 
-  private void setReplyAndCommentCount(List<PostQueryDto> parentListForLoop, Map<Long, List<PostQueryDto>> childrenPostMap, Map<Long, Set<Long>> commentIdMap) {
+  private void setReplyAndCommentCount(final List<PostQueryDto> parentListForLoop, final Map<Long, List<PostQueryDto>> childrenPostMap, Map<Long, Set<Long>> commentIdMap) {
     parentListForLoop.forEach(p -> {
       p.setReply(childrenPostMap.get(p.getId()));
       Optional<Set<Long>> optionalCommentIdSet = Optional.ofNullable(commentIdMap.get(p.getId()));
@@ -107,8 +106,8 @@ public class PostService {
   }
 
 
-  private Map<Long, Set<Long>> getCommentIdMapByPostId(List<Long> parentIds) {
-    List<CommentIdAndPostIdQueryDto> commentCountByPostId = commentQueryJpaRepository.findCommentIdByPostId(parentIds);
+  private Map<Long, Set<Long>> getCommentIdMapByPostId(final List<Long> parentIds) {
+    List<CommentIdAndPostIdQueryDto> commentCountByPostId = commentRepository.findCommentIdByPostId(parentIds);
     return commentCountByPostId.stream()
         .collect(groupingBy(CommentIdAndPostIdQueryDto::getPostId,
             mapping(CommentIdAndPostIdQueryDto::getCommentId,
@@ -116,13 +115,13 @@ public class PostService {
   }
 
 
-  private Map<Long, List<PostQueryDto>> mapByParentId(List<PostQueryDto> children) {
+  private Map<Long, List<PostQueryDto>> mapByParentId(final List<PostQueryDto> children) {
     return children.stream()
         .collect(groupingBy(PostQueryDto::getParentId));
   }
 
 
-  private List<Long> extractParentIds(List<PostQueryDto> parentListForLoop) {
+  private List<Long> extractParentIds(final List<PostQueryDto> parentListForLoop) {
     return parentListForLoop.stream()
         .map(PostQueryDto::getId)
         .collect(toList());

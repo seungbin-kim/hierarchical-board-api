@@ -1,23 +1,23 @@
-package com.personal.board.repository.query;
-
-import com.personal.board.dto.query.CommentIdAndPostIdQueryDto;
-import com.personal.board.dto.query.CommentQueryDto;
-import com.personal.board.dto.response.PageQueryDto;
-import org.springframework.stereotype.Repository;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-@Repository
-public class CommentQueryJpaRepository {
-
-  @PersistenceContext
-  EntityManager em;
-
-
+//package com.personal.board.repository.query;
+//
+//import com.personal.board.dto.query.CommentIdAndPostIdQueryDto;
+//import com.personal.board.dto.query.CommentQueryDto;
+//import com.personal.board.dto.response.PageQueryDto;
+//import org.springframework.stereotype.Repository;
+//
+//import javax.persistence.EntityManager;
+//import javax.persistence.PersistenceContext;
+//import java.util.List;
+//import java.util.Map;
+//import java.util.stream.Collectors;
+//
+//@Repository
+//public class CommentQueryJpaRepository {
+//
+//  @PersistenceContext
+//  EntityManager em;
+//
+//
 //  public PageQueryDto<CommentQueryDto> findPageableCommentByDto(final Long postId, final int size, final int page) {
 //    List<CommentQueryDto> parentList = getParentCommentDtos(postId, size, page);
 //
@@ -86,15 +86,15 @@ public class CommentQueryJpaRepository {
 //        .setMaxResults(size)
 //        .getResultList();
 //  }
-
-
-  public List<CommentIdAndPostIdQueryDto> findCommentIdByPostId(final List<Long> postIds) {
-    return em.createQuery(
-        "SELECT new com.personal.board.dto.query.CommentIdAndPostIdQueryDto(c.id, c.post.id)" +
-            " FROM Comment c" +
-            " WHERE c.post.id IN :postIds", CommentIdAndPostIdQueryDto.class)
-        .setParameter("postIds", postIds)
-        .getResultList();
-  }
-
-}
+//
+//
+//  public List<CommentIdAndPostIdQueryDto> findCommentIdByPostId(final List<Long> postIds) {
+//    return em.createQuery(
+//        "SELECT new com.personal.board.dto.query.CommentIdAndPostIdQueryDto(c.id, c.post.id)" +
+//            " FROM Comment c" +
+//            " WHERE c.post.id IN :postIds", CommentIdAndPostIdQueryDto.class)
+//        .setParameter("postIds", postIds)
+//        .getResultList();
+//  }
+//
+//}

@@ -26,7 +26,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         .where(post.id.eq(postId),
                boardIdEq(boardId)
         )
-        .fetchOne();
+        .fetchFirst();
     return Optional.ofNullable(findPost);
   }
 
