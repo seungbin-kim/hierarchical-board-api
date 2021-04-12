@@ -30,10 +30,10 @@ public class PostController {
 
   private final PostService postService;
 
+
   @PostMapping("/boards/{boardId}/posts")
-  public ResponseEntity<PostResponseWithContentAndCreatedAt> addPost(
-      @RequestBody @Valid final PostRequest request,
-      @PathVariable final Long boardId) {
+  public ResponseEntity<PostResponseWithContentAndCreatedAt> addPost(@RequestBody @Valid final PostRequest request,
+                                                                     @PathVariable final Long boardId) {
 
     PostResponseWithContentAndCreatedAt postResponse = postService.addPost(request, boardId);
     return ResponseEntity
@@ -42,39 +42,29 @@ public class PostController {
         .body(postResponse);
   }
 
-//  @GetMapping("/boards/{boardId}/posts")
-//  public ResponseEntity<PageQueryDto<PostQueryDto>> getPageablePost(
-//      @PathVariable final Long boardId,
-//      @RequestParam(defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
-//      @RequestParam(defaultValue = "0") @Min(value = 0, message = "page must be at least 0.") final int page) {
-//
-//    return ResponseEntity
-//        .ok(postService.getPageablePost(boardId, size, page));
-//  }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/boards/{boardId}/posts")
-  public Page<PostQueryDto> getPageablePost(
-      @PathVariable final Long boardId,
-      @PageableDefault(size = 5) Pageable pageable) {
+  public Page<PostQueryDto> getPageablePost(@PathVariable final Long boardId,
+                                            @PageableDefault(size = 5) final Pageable pageable) {
 
-    return postService.getPageablePost(boardId, pageable);
+    return postService.getPageablePosts(boardId, pageable);
   }
 
+
   @GetMapping("/boards/{boardId}/posts/{postId}")
-  public ResponseEntity<PostResponseWithContentAndDate> getPost(
-      @PathVariable final Long boardId,
-      @PathVariable final Long postId) {
+  public ResponseEntity<PostResponseWithContentAndDate> getPost(@PathVariable final Long boardId,
+                                                                @PathVariable final Long postId) {
 
     return ResponseEntity
         .ok(postService.getPost(boardId, postId));
   }
 
+
   @PatchMapping("/boards/{boardId}/posts/{postId}")
-  public ResponseEntity<PostResponseWithContentAndModifiedAt> patchPost(
-      @RequestBody final PostUpdateRequest request,
-      @PathVariable final Long boardId,
-      @PathVariable final Long postId) {
+  public ResponseEntity<PostResponseWithContentAndModifiedAt> patchPost(@RequestBody final PostUpdateRequest request,
+                                                                        @PathVariable final Long boardId,
+                                                                        @PathVariable final Long postId) {
 
     try {
       return ResponseEntity
@@ -84,10 +74,10 @@ public class PostController {
     }
   }
 
+
   @DeleteMapping("/boards/{boardId}/posts/{postId}")
-  public ResponseEntity<?> deletePost(
-      @PathVariable final Long boardId,
-      @PathVariable final Long postId) {
+  public ResponseEntity<?> deletePost(@PathVariable final Long boardId,
+                                      @PathVariable final Long postId) {
 
     postService.deletePost(boardId, postId);
     return ResponseEntity

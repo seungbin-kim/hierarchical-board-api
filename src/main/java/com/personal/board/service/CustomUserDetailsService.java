@@ -21,18 +21,19 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Override
   @Transactional(readOnly = true)
-  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
+
     return userRepository.findByEmailWithAuthorities(email)
         .map(this::createUser)
         .orElseThrow(() -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다."));
   }
 
-  private org.springframework.security.core.userdetails.User createUser(User user) {
+  private org.springframework.security.core.userdetails.User createUser(final User user) {
+
     List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
         .map(authority -> new SimpleGrantedAuthority(authority.getAuthorityName().toString()))
         .collect(Collectors.toList());
-    return
-        new org.springframework.security.core.userdetails.User(
+    return new org.springframework.security.core.userdetails.User(
             String.valueOf(user.getId()), user.getPassword(), grantedAuthorities);
   }
 

@@ -29,13 +29,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private final HandlerExceptionResolver handlerExceptionResolver;
 
+
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 
+
   @Override
-  protected void configure(HttpSecurity http) throws Exception {
+  protected void configure(final HttpSecurity http) throws Exception {
     http
         .csrf().disable()
 
@@ -49,6 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         .and()
         .authorizeRequests()
+        .antMatchers("/auth/**").permitAll()
         .antMatchers(HttpMethod.POST, "/sign-in").permitAll()
         .antMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
         .antMatchers(HttpMethod.GET, "/api/v1/boards").permitAll()

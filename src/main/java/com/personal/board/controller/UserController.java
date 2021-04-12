@@ -28,9 +28,11 @@ import javax.validation.Valid;
 public class UserController {
 
   private static final String USERS = "/api/v1/users";
+
   private static final String USER = USERS + "/{id}";
 
   private final UserService userService;
+
 
   @PostMapping("/users")
   public ResponseEntity<UserResponseWithCreatedAt> signUp(@RequestBody @Valid final SignUpRequest signUpRequest) {
@@ -45,28 +47,20 @@ public class UserController {
         .body(userResponse);
   }
 
-//  @GetMapping("/users")
-//  public ResponseEntity<PageQueryDto<UserResponseWithDate>> getPageableUsers(
-//      @RequestParam(defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
-//      @RequestParam(defaultValue = "0") @Min(value = 0, message = "page must be at least 0.") final int page) {
-//
-//    return ResponseEntity
-//        .ok(userService.getPageableUsers(size, page));
-//  }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/users")
-  public Page<UserResponseWithDate> getPageableUsers(@PageableDefault(size = 5, sort = "id") Pageable pageable) {
+  public Page<UserResponseWithDate> getPageableUsers(@PageableDefault(size = 5, sort = "id") final Pageable pageable) {
 
     return userService.getPageableUsers(pageable);
   }
 
-  @PatchMapping("/users/{id}")
-  public ResponseEntity<UserResponseWithModifiedAt> patchUser(
-      @RequestBody @Valid final UserUpdateRequest request,
-      @PathVariable final Long id) {
 
-    SecurityUtil.checkAdminAndUserAuthentication(id);
+  @PatchMapping("/users/{id}")
+  public ResponseEntity<UserResponseWithModifiedAt> patchUser(@RequestBody @Valid final UserUpdateRequest request,
+                                                              @PathVariable final Long id) {
+
+    SecurityUtil.checkAdminAndSameUser(id);
 
     try {
       return ResponseEntity
@@ -76,30 +70,33 @@ public class UserController {
     }
   }
 
+
   @GetMapping("/users/{id}")
   public ResponseEntity<UserResponseWithDate> getUser(@PathVariable final Long id) {
 
-    SecurityUtil.checkAdminAndUserAuthentication(id);
+    SecurityUtil.checkAdminAndSameUser(id);
 
     return ResponseEntity
         .ok(userService.getUser(id));
   }
 
+
   @DeleteMapping("/users/{id}")
-  public ResponseEntity<?> deleteUser(@PathVariable final Long id, final HttpServletResponse response) {
+  public ResponseEntity<?> deleteUser(@PathVariable final Long id,
+                                      final HttpServletResponse response) {
 
-    SecurityUtil.checkAdminAndUserAuthentication(id);
+    SecurityUtil.checkAdminAndSameUser(id);
 
-    Cookie token = new Cookie("token", null);
-    token.setHttpOnly(true);
-    token.setPath("/api/v1");
-    response.addCookie(token);
+    if (SecurityUtil.isAdmin()) {
+      Cookie token = new Cookie("token", null);
+      token.setHttpOnly(true);
+      token.setPath("/");
+      response.addCookie(token);
+    }
 
     userService.deleteUser(id);
 
-    return ResponseEntity
-        .noContent()
-        .build();
+    return ResponseEntity.noContent().build();
   }
 
 }

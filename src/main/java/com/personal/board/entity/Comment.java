@@ -50,7 +50,11 @@ public class Comment extends BaseEntity {
   private boolean deleted;
 
 
-  public static Comment createComment(final Post post, final User user, final String content, final Comment parent) {
+  public static Comment createComment(final Post post,
+                                      final User user,
+                                      final String content,
+                                      final Comment parent) {
+
     Comment comment = new Comment();
     comment.setPost(post);
     comment.setUser(user);
@@ -61,6 +65,7 @@ public class Comment extends BaseEntity {
 
 
   public void updateComment(final String content) {
+
     if (content != null) {
       if (StringUtils.isBlank(content)) {
         throw new BadArgumentException("content is blank.");
@@ -71,23 +76,24 @@ public class Comment extends BaseEntity {
   }
 
 
-  private void setPost(Post post) {
+  private void setPost(final Post post) {
     this.post = post;
   }
 
-  private void setUser(User user) {
+  private void setUser(final User user) {
     this.user = user;
   }
 
-  private void changeContent(String content) {
+  private void changeContent(final String content) {
     this.content = content;
   }
 
-  public void changeParent(Comment parent) {
+  public void changeParent(final Comment parent) {
     this.parent = parent;
   }
 
   public void changeDeletionStatus() {
+
     this.deleted = true;
     this.changeContent("지워진 댓글");
   }

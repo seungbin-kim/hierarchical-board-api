@@ -33,7 +33,8 @@ public class PostQueryDto {
     this.commentCount = count;
   }
 
-  public void setReply(List<PostQueryDto> reply) {
+  public void setReply(final List<PostQueryDto> reply) {
+
     if (reply == null) {
       this.reply = new ArrayList<>();
       return;

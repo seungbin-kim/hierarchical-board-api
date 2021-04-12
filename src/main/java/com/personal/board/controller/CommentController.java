@@ -28,10 +28,10 @@ public class CommentController {
 
   private final CommentService commentService;
 
+
   @PostMapping("/posts/{postId}/comments")
-  public ResponseEntity<CommentResponseWithCreatedAt> addComment(
-      @RequestBody @Valid final CommentRequest request,
-      @PathVariable final Long postId) {
+  public ResponseEntity<CommentResponseWithCreatedAt> addComment(@RequestBody @Valid final CommentRequest request,
+                                                                 @PathVariable final Long postId) {
 
     CommentResponseWithCreatedAt commentResponse = commentService.addComment(request, postId);
     return ResponseEntity
@@ -40,40 +40,30 @@ public class CommentController {
         .body(commentResponse);
   }
 
-//  @GetMapping("/posts/{postId}/comments")
-//  public ResponseEntity<PageQueryDto<CommentQueryDto>> getPageableComment(
-//      @PathVariable final Long postId,
-//      @RequestParam(defaultValue = "5") @Min(value = 1, message = "size must be at least 1.") final int size,
-//      @RequestParam(defaultValue = "0") @Min(value = 0, message = "page must be at least 0.") final int page) {
-//
-//    return ResponseEntity
-//        .ok(commentService.getPageableComment(postId, size, page));
-//  }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/posts/{postId}/comments")
-  public Page<CommentQueryDto> getPageableComment(
-      @PathVariable final Long postId,
-      @PageableDefault(size = 5) Pageable pageable) {
+  public Page<CommentQueryDto> getPageableComment(@PathVariable final Long postId,
+                                                  @PageableDefault(size = 5) final Pageable pageable) {
 
     return commentService.getPageableComment(postId, pageable);
   }
 
+
   @PatchMapping("/posts/{postId}/comments/{commentId}")
-  public ResponseEntity<CommentResponseWithModifiedAt> patchComment(
-      @RequestBody final CommentUpdateRequest request,
-      @PathVariable final Long postId,
-      @PathVariable final Long commentId) {
+  public ResponseEntity<CommentResponseWithModifiedAt> patchComment(@RequestBody final CommentUpdateRequest request,
+                                                                    @PathVariable final Long postId,
+                                                                    @PathVariable final Long commentId) {
 
     return ResponseEntity
         .ok(commentService.updateComment(request, postId, commentId));
   }
 
+
   @DeleteMapping("/posts/{postId}/comments/{commentId}")
-  public ResponseEntity<?> deleteComment(
-      @PathVariable final Long postId,
-      @PathVariable final Long commentId) {
-    
+  public ResponseEntity<?> deleteComment(@PathVariable final Long postId,
+                                         @PathVariable final Long commentId) {
+
     commentService.deleteComment(postId, commentId);
     return ResponseEntity
         .noContent()

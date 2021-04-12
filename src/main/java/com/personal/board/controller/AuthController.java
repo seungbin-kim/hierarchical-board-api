@@ -3,23 +3,15 @@ package com.personal.board.controller;
 import com.personal.board.dto.request.SignInRequest;
 import com.personal.board.dto.response.TokenResponse;
 import com.personal.board.exception.BadArgumentException;
-import com.personal.board.jwt.TokenProvider;
+import com.personal.board.service.AuthService;
 import com.personal.board.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -27,45 +19,29 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class AuthController {
 
-  private final TokenProvider tokenProvider;
+  private final AuthService authService;
 
-  private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
-  @Value("${jwt.token-validity-in-seconds}")
-  private int cookieAge;
 
   @PostMapping("/sign-in")
-  public ResponseEntity<TokenResponse> signIn(@RequestBody @Valid SignInRequest signInRequest, HttpServletResponse response) {
+  public ResponseEntity<TokenResponse> signIn(@RequestBody @Valid final SignInRequest signInRequest,
+                                              final HttpServletResponse response) {
 
     if (!SecurityUtil.getAuthentication().getName().equals("anonymousUser")) {
       throw new BadArgumentException("이미 로그인 되어 있네요?");
     }
 
-    UsernamePasswordAuthenticationToken authenticationToken =
-        new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword());
+    Cookie token = authService.logIn(signInRequest);
+    response.addCookie(token);
 
-    try {
-      Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-      SecurityContextHolder.getContext().setAuthentication(authentication);
-      String jwt = tokenProvider.createToken(authentication);
-
-      Cookie token = new Cookie("token", jwt);
-      token.setHttpOnly(true);
-      token.setMaxAge(cookieAge);
-      token.setPath("/");
-      response.addCookie(token);
-
-      return ResponseEntity
-          .ok()
-          .body(new TokenResponse(jwt));
-    } catch (BadCredentialsException exception) {
-      throw new BadArgumentException("email or password is incorrect.");
-    }
-
+    return ResponseEntity
+        .ok()
+        .body(new TokenResponse(token.getValue()));
   }
 
+
   @PostMapping("/log-out")
-  public void logOut(HttpServletRequest request, HttpServletResponse response) {
+  public void logOut(final HttpServletResponse response) {
+
     Cookie token = new Cookie("token", null);
     token.setHttpOnly(true);
     token.setPath("/");

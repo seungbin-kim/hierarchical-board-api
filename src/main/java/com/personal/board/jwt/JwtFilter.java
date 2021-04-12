@@ -28,10 +28,11 @@ public class JwtFilter extends GenericFilterBean {
 
   private final HandlerExceptionResolver handlerExceptionResolver;
 
+
   @Override
-  public void doFilter(ServletRequest request,
-                       ServletResponse response,
-                       FilterChain chain) throws IOException, ServletException {
+  public void doFilter(final ServletRequest request,
+                       final ServletResponse response,
+                       final FilterChain chain) throws IOException, ServletException {
 
     HttpServletRequest httpServletRequest = (HttpServletRequest) request;
     String jwt = resolveToken(httpServletRequest);
@@ -52,7 +53,9 @@ public class JwtFilter extends GenericFilterBean {
 
   }
 
-  private String resolveToken(HttpServletRequest request) {
+
+  private String resolveToken(final HttpServletRequest request) {
+
     Cookie[] cookies = request.getCookies();
     String token = null;
     if (cookies != null) {

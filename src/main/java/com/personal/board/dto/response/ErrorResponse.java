@@ -20,6 +20,7 @@ public class ErrorResponse {
     private final String message;
 
     public Error(final String type, final String message) {
+
       this.type = type;
       this.message = message;
     }

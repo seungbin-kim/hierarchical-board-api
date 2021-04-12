@@ -49,13 +49,12 @@ public class User extends BaseEntity {
       inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
   private Set<Authority> authorities = new HashSet<>();
 
-  public static User createUser(
-      final String email,
-      final String nickname,
-      final String name,
-      final LocalDate birthday,
-      final String password,
-      final Authority authority) {
+  public static User createUser(final String email,
+                                final String nickname,
+                                final String name,
+                                final LocalDate birthday,
+                                final String password,
+                                final Authority authority) {
 
     User user = new User();
     user.changeEmail(email);

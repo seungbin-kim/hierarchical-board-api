@@ -20,18 +20,20 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
 
   @Override
-  public Optional<Post> findPostByIdAndBoardId(final Long postId, final Long boardId) {
+  public Optional<Post> findPostByIdAndBoardId(final Long postId,
+                                               final Long boardId) {
+
     Post findPost = queryFactory
         .selectFrom(post)
         .where(post.id.eq(postId),
-               boardIdEq(boardId)
+            boardIdEq(boardId)
         )
         .fetchFirst();
     return Optional.ofNullable(findPost);
   }
 
 
-  private Predicate boardIdEq(Long boardId) {
+  private Predicate boardIdEq(final Long boardId) {
     return (boardId != null) ? post.board.id.eq(boardId) : null;
   }
 

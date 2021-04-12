@@ -15,10 +15,12 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler({AccessDeniedException.class, AuthenticationException.class, JwtException.class})
   public ResponseEntity<ErrorResponse> authenticationExceptionHandler() {
+
     return ResponseEntity
         .status(HttpStatus.FORBIDDEN)
         .body(makeErrorResponse(ErrorType.FORBIDDEN, "Authentication error."));
   }
+
 
   static ErrorResponse makeErrorResponse(final ErrorType errorType, final String message) {
     return new ErrorResponse(errorType, message);

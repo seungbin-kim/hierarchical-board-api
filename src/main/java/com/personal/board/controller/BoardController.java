@@ -25,6 +25,7 @@ public class BoardController {
 
   private final BoardService boardService;
 
+
   @PostMapping("/boards")
   public ResponseEntity<BoardResponseWithCreatedAt> addBoard(@RequestBody @Valid final BoardRequest request) {
 
@@ -38,12 +39,14 @@ public class BoardController {
         .body(boardResponse);
   }
 
+
   @GetMapping("/boards")
   public ResponseEntity<ListResponse<BoardResponseWithDate>> getAllBoard() {
 
     return ResponseEntity
         .ok(new ListResponse<>(boardService.getAllBoard()));
   }
+
 
   @GetMapping("/boards/{boardId}")
   public ResponseEntity<BoardResponseWithDate> getBoard(@PathVariable final Long boardId) {

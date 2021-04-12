@@ -55,7 +55,12 @@ public class Post extends BaseEntity {
   private boolean deleted;
 
 
-  public static Post createPost(final Board board, final User user, final String title, final String content, final Post parent) {
+  public static Post createPost(final Board board,
+                                final User user,
+                                final String title,
+                                final String content,
+                                final Post parent) {
+
     Post post = new Post();
     post.setBoard(board);
     post.setUser(user);
@@ -66,7 +71,11 @@ public class Post extends BaseEntity {
   }
 
 
-  public void updatePost(final ArrayList<String> validatedFields, final String title, final String content) {
+  public void updatePost(
+      final ArrayList<String> validatedFields,
+      final String title,
+      final String content) {
+
     for (String validatedField : validatedFields) { // 입력이 확인된 필드를 변경감지로 데이터 변경
       switch (validatedField) {
         case "title":
@@ -81,7 +90,7 @@ public class Post extends BaseEntity {
   }
 
 
-  private void setBoard(Board board) {
+  private void setBoard(final Board board) {
     this.board = board;
   }
 
@@ -89,19 +98,20 @@ public class Post extends BaseEntity {
     this.user = user;
   }
 
-  private void changeTitle(String title) {
+  private void changeTitle(final String title) {
     this.title = title;
   }
 
-  private void changeContent(String content) {
+  private void changeContent(final String content) {
     this.content = content;
   }
 
-  public void changeParent(Post parent) {
+  public void changeParent(final Post parent) {
     this.parent = parent;
   }
 
   public void changeDeletionStatus() {
+
     this.deleted = true;
     this.changeTitle("지워진 게시글");
     this.changeContent("지워진 게시글");

@@ -27,7 +27,8 @@ public class CommentQueryDto {
 
   private List<CommentQueryDto> reply;
 
-  public void setReply(List<CommentQueryDto> reply) {
+  public void setReply(final List<CommentQueryDto> reply) {
+
     if (reply == null) {
       this.reply = new ArrayList<>();
       return;

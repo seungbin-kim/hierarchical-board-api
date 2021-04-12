@@ -14,10 +14,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   boolean existsByEmail(String email);
 
+
   boolean existsByNickname(String nickname);
+
 
   @Query("SELECT u FROM User u JOIN FETCH u.authorities WHERE u.email = :email")
   Optional<User> findByEmailWithAuthorities(@Param("email") String email);
+
 
   @NonNull
   Page<User> findAll(@NonNull Pageable pageable);

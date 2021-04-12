@@ -10,7 +10,7 @@ public class CommentResponseWithCreatedAt extends CommentResponse {
 
   private LocalDateTime createdAt;
 
-  public CommentResponseWithCreatedAt(Comment comment) {
+  public CommentResponseWithCreatedAt(final Comment comment) {
     super(comment);
     this.createdAt = comment.getCreatedAt();
   }
