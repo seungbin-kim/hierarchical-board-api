@@ -18,6 +18,7 @@ public class SecurityUtil {
 
   /**
    * 회원의 id 반환
+   *
    * @return SecurityContext 의 회원 id 반환
    */
   public static Optional<Long> getCurrentUserId() {
@@ -41,6 +42,7 @@ public class SecurityUtil {
 
   /**
    * 로그인 한 회원이 관리자인지 검사
+   *
    * @return 관리자라면 true, 아니라면 false
    */
   public static boolean isAdmin() {
@@ -53,6 +55,7 @@ public class SecurityUtil {
 
   /**
    * SecurityContext 의 Authentication 반환
+   *
    * @return Authentication 반환
    */
   public static Authentication getAuthentication() {
@@ -62,6 +65,7 @@ public class SecurityUtil {
 
   /**
    * 관리자 또는 로그인된 회원과 같은지 검사
+   *
    * @param id 검사할 회원 id
    */
   public static void checkAdminAndSameUser(final Long id) {
@@ -76,6 +80,7 @@ public class SecurityUtil {
 
   /**
    * 로그인된 회원과 같은지 검사
+   *
    * @param id 검사할 회원 id
    * @return 로그인한 회원과 같다면 true, 아니라면 false
    */

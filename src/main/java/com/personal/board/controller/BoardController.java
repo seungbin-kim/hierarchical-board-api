@@ -28,6 +28,7 @@ public class BoardController {
 
   /**
    * 게시판 등록
+   *
    * @param request 등록 요청정보
    * @return 등록된 게시판 정보
    */
@@ -47,6 +48,7 @@ public class BoardController {
 
   /**
    * 게시판 목록 조회
+   *
    * @return 등록된 게시판 목록
    */
   @GetMapping("/boards")
@@ -59,6 +61,7 @@ public class BoardController {
 
   /**
    * 게시판 단건조회
+   *
    * @param boardId 조회할 게시판 id
    * @return 게시판 정보
    */

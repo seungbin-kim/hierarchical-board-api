@@ -26,6 +26,12 @@ public class AuthService {
   private int cookieAge;
 
 
+  /**
+   * 로그인 처리
+   *
+   * @param signInRequest 로그인 정보
+   * @return JWT 쿠키 설정
+   */
   public Cookie logIn(final SignInRequest signInRequest) {
 
     UsernamePasswordAuthenticationToken authenticationToken =

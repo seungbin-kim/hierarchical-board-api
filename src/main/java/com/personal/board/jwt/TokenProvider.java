@@ -54,6 +54,7 @@ public class TokenProvider {
 
   /**
    * JWT 토큰 생성
+   *
    * @param authentication 인증정보
    * @return 유저의 id 와 권한이 담긴 JWT 토큰
    */
@@ -77,6 +78,7 @@ public class TokenProvider {
 
   /**
    * 토큰에서 인증정보 추출
+   *
    * @param token JWT 토큰
    * @return 인증정보
    */
@@ -102,6 +104,7 @@ public class TokenProvider {
 
   /**
    * 토큰 검사
+   *
    * @param token JWT 토큰
    * @return 유효할 시 return 반환, 아니라면 JwtException 발생
    */

@@ -36,6 +36,7 @@ public class UserController {
 
   /**
    * 회원가입
+   *
    * @param signUpRequest 회원가입 정보
    * @return 등록한 정보
    */
@@ -55,6 +56,7 @@ public class UserController {
 
   /**
    * 유저목록 페이징 조회
+   *
    * @param pageable 페이징 정보
    * @return 페이징된 유저목록
    */
@@ -68,6 +70,7 @@ public class UserController {
 
   /**
    * 유저정보 수정
+   *
    * @param request 수정정보
    * @param id      유저 id
    * @return 수정된 유저정보
@@ -89,6 +92,7 @@ public class UserController {
 
   /**
    * 유저 단건조회
+   *
    * @param id 유저 id
    * @return 유저정보
    */
@@ -104,6 +108,7 @@ public class UserController {
 
   /**
    * 유저 삭제
+   *
    * @param id       유저 id
    * @param response 응답
    * @return 상태코드 204

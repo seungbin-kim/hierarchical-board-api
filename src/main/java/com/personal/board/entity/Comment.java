@@ -55,6 +55,7 @@ public class Comment extends BaseEntity {
 
   /**
    * 생성 메서드
+   *
    * @param post    게시글 엔티티
    * @param user    유저 엔티티
    * @param content 내용
@@ -77,6 +78,7 @@ public class Comment extends BaseEntity {
 
   /**
    * 내용수정 메서드
+   *
    * @param content 수정할 내용
    */
   public void updateComment(final String content) {

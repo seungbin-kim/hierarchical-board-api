@@ -15,6 +15,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
   /**
    * 유저 탈퇴시 게시글과의 참조관계를 지우기위한 업데이트 쿼리
+   *
    * @param userId 유저 id
    */
   @Modifying
@@ -24,6 +25,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
   /**
    * 게시글 페이징조회(원글만 조회)
+   *
    * @param boardId  게시판 id
    * @param pageable 페이징 정보
    * @return 조회된 게시글(원글) DTO 페이지
@@ -45,6 +47,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
   /**
    * 부모글의 답글 조회
+   *
    * @param boardId   게시판 id
    * @param parentIds 부모글의 id 목록 (부모글들은 모두 같은계층)
    * @return 부모글들의 답글 목록

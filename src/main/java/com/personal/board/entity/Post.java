@@ -56,6 +56,7 @@ public class Post extends BaseEntity {
 
   /**
    * 생성메서드
+   *
    * @param board   게시판 엔티티
    * @param user    유저 엔티티
    * @param title   글 제목
@@ -81,6 +82,7 @@ public class Post extends BaseEntity {
 
   /**
    * 게시글 수정
+   *
    * @param validatedFields 입력된 필드들
    * @param title           글 제목
    * @param content         글 내용

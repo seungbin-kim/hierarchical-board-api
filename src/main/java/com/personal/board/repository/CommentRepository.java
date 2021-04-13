@@ -25,6 +25,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
   /**
    * 댓글 페이징조회 (원 댓글만 조회)
+   *
    * @param postId   게시글 id
    * @param pageable 페이징 정보
    * @return 조회된 댓글(원글) DTO 페이지
@@ -46,6 +47,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
   /**
    * 부모 댓글의 답 댓글 조회
+   *
    * @param postId    게시글 id
    * @param parentIds 부모 댓글 id 목록 (부모글들은 모두 같은계층)
    * @return 부모글들의 답 댓글 목록
@@ -61,6 +63,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
   /**
    * 게시글들의 댓글 id 조회(각 계층의 게시글들의 댓글수 확인용)
+   *
    * @param postIds 게시글 id 목록 (게시글은 모두 같은계층)
    * @return 조회된 목록
    */

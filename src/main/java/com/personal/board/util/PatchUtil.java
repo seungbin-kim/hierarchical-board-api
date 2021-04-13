@@ -12,6 +12,7 @@ public class PatchUtil {
 
   /**
    * 업데이트 요청에서 유효한 필드목록 반환
+   *
    * @param request 업데이트 정보
    * @return 유효한 필드목록
    * @throws IllegalAccessException 필드 접근 불가시 발생

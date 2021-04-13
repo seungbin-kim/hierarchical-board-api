@@ -55,6 +55,7 @@ public class User extends BaseEntity {
 
   /**
    * 생성 메서드
+   *
    * @param email     이메일
    * @param nickname  닉네임
    * @param name      이름

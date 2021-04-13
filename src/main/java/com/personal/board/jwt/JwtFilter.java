@@ -31,6 +31,7 @@ public class JwtFilter extends GenericFilterBean {
 
   /**
    * JWT 인증필터
+   *
    * @param request  요청정보
    * @param response 응답
    * @param chain    필터체인
@@ -62,6 +63,12 @@ public class JwtFilter extends GenericFilterBean {
   }
 
 
+  /**
+   * 요청에서 토큰꺼내기
+   *
+   * @param request
+   * @return
+   */
   private String resolveToken(final HttpServletRequest request) {
 
     Cookie[] cookies = request.getCookies();

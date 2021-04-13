@@ -14,6 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   /**
    * email 존재확인
+   *
    * @param email 이메일
    * @return 존재시 true, 아니라면 false
    */
@@ -22,6 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   /**
    * 닉네임 존재확인
+   *
    * @param nickname 닉네임
    * @return 존재시 true, 아니라면 false
    */
@@ -30,6 +32,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   /**
    * 유저 정보와 권한정보 같이조회
+   *
    * @param email 이메일
    * @return 조회된 유저
    */
@@ -39,6 +42,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   /**
    * 유저목록 페이징조회
+   *
    * @param pageable 페이징 정보
    * @return 페이징된 유저목록
    */

@@ -33,6 +33,7 @@ public class PostController {
 
   /**
    * 게시글 등록
+   *
    * @param request 등록 요청정보
    * @param boardId 등록할 게시판 id
    * @return 등록된 게시글 정보
@@ -51,6 +52,7 @@ public class PostController {
 
   /**
    * 게시글 페이징 조회
+   *
    * @param boardId  조회할 게시판 id
    * @param pageable 페이징 정보
    * @return 페이징된 게시글 목록
@@ -66,6 +68,7 @@ public class PostController {
 
   /**
    * 게시글 단건조회
+   *
    * @param boardId 게시판 id
    * @param postId  게시글 id
    * @return 게시글 정보
@@ -81,6 +84,7 @@ public class PostController {
 
   /**
    * 게시글 수정
+   *
    * @param request 수정 정보
    * @param boardId 게시판 id
    * @param postId  게시글 id
@@ -102,6 +106,7 @@ public class PostController {
 
   /**
    * 게시글 삭제
+   *
    * @param boardId 게시판 id
    * @param postId  게시글 id
    * @return 상태코드 204

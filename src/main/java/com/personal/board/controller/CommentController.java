@@ -31,6 +31,7 @@ public class CommentController {
 
   /**
    * 댓글 추가
+   *
    * @param request 댓글 정보
    * @param postId  등록할 게시글 id
    * @return 등록한 댓글정보
@@ -49,6 +50,7 @@ public class CommentController {
 
   /**
    * 댓글 페이징 조회
+   *
    * @param postId   댓글 조회할 게시글 id
    * @param pageable 페이징 정보
    * @return 페이징된 댓글 목록
@@ -64,6 +66,7 @@ public class CommentController {
 
   /**
    * 댓글 수정
+   *
    * @param request   수정 정보
    * @param postId    게시글 id
    * @param commentId 댓글 id
@@ -81,6 +84,7 @@ public class CommentController {
 
   /**
    * 댓글 삭제
+   *
    * @param postId    댓글이 등록된 게시글 id
    * @param commentId 댓글 id
    * @return 상태코드 204
