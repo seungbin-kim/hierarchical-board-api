@@ -19,6 +19,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
   }
 
 
+  /**
+   * 게시글 id로 게시글찾기 또는 게시판 id와 게시글 id로 게시글 찾기
+   * @param postId  게시글 id
+   * @param boardId 게시판 id. null 가능
+   * @return 조회한 게시글
+   */
   @Override
   public Optional<Post> findPostByIdAndBoardId(final Long postId,
                                                final Long boardId) {

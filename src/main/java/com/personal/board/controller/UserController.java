@@ -34,6 +34,11 @@ public class UserController {
   private final UserService userService;
 
 
+  /**
+   * 회원가입
+   * @param signUpRequest 회원가입 정보
+   * @return 등록한 정보
+   */
   @PostMapping("/users")
   public ResponseEntity<UserResponseWithCreatedAt> signUp(@RequestBody @Valid final SignUpRequest signUpRequest) {
 
@@ -48,6 +53,11 @@ public class UserController {
   }
 
 
+  /**
+   * 유저목록 페이징 조회
+   * @param pageable 페이징 정보
+   * @return 페이징된 유저목록
+   */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/users")
   public Page<UserResponseWithDate> getPageableUsers(@PageableDefault(size = 5, sort = "id") final Pageable pageable) {
@@ -56,6 +66,12 @@ public class UserController {
   }
 
 
+  /**
+   * 유저정보 수정
+   * @param request 수정정보
+   * @param id      유저 id
+   * @return 수정된 유저정보
+   */
   @PatchMapping("/users/{id}")
   public ResponseEntity<UserResponseWithModifiedAt> patchUser(@RequestBody @Valid final UserUpdateRequest request,
                                                               @PathVariable final Long id) {
@@ -71,6 +87,11 @@ public class UserController {
   }
 
 
+  /**
+   * 유저 단건조회
+   * @param id 유저 id
+   * @return 유저정보
+   */
   @GetMapping("/users/{id}")
   public ResponseEntity<UserResponseWithDate> getUser(@PathVariable final Long id) {
 
@@ -81,6 +102,12 @@ public class UserController {
   }
 
 
+  /**
+   * 유저 삭제
+   * @param id       유저 id
+   * @param response 응답
+   * @return 상태코드 204
+   */
   @DeleteMapping("/users/{id}")
   public ResponseEntity<?> deleteUser(@PathVariable final Long id,
                                       final HttpServletResponse response) {

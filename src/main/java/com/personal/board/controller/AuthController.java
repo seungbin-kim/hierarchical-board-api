@@ -21,6 +21,12 @@ public class AuthController {
 
   private final AuthService authService;
 
+  /**
+   * 로그인
+   * @param signInRequest 로그인 요청정보
+   * @param response      응답
+   * @return JWT 토큰
+   */
 
   @PostMapping("/sign-in")
   public ResponseEntity<TokenResponse> signIn(@RequestBody @Valid final SignInRequest signInRequest,
@@ -39,6 +45,10 @@ public class AuthController {
   }
 
 
+  /**
+   * 로그아웃
+   * @param response 응답. 쿠키 내 JWT 토큰삭제
+   */
   @PostMapping("/log-out")
   public void logOut(final HttpServletResponse response) {
 

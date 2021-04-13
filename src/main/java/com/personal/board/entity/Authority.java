@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+/**
+ * 권한정보
+ */
 @Entity
 @Getter
 @AllArgsConstructor

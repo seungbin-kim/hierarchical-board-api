@@ -9,10 +9,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@NamedEntityGraph(
-    name = "Post.user",
-    attributeNodes = @NamedAttributeNode("user"))
-
+/**
+ * 게시글 엔티티
+ */
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -55,6 +54,15 @@ public class Post extends BaseEntity {
   private boolean deleted;
 
 
+  /**
+   * 생성메서드
+   * @param board   게시판 엔티티
+   * @param user    유저 엔티티
+   * @param title   글 제목
+   * @param content 글 내용
+   * @param parent  원글
+   * @return 생성된 게시글 엔티티
+   */
   public static Post createPost(final Board board,
                                 final User user,
                                 final String title,
@@ -71,12 +79,18 @@ public class Post extends BaseEntity {
   }
 
 
+  /**
+   * 게시글 수정
+   * @param validatedFields 입력된 필드들
+   * @param title           글 제목
+   * @param content         글 내용
+   */
   public void updatePost(
       final ArrayList<String> validatedFields,
       final String title,
       final String content) {
 
-    for (String validatedField : validatedFields) { // 입력이 확인된 필드를 변경감지로 데이터 변경
+    for (String validatedField : validatedFields) {
       switch (validatedField) {
         case "title":
           this.changeTitle(title);
@@ -86,7 +100,7 @@ public class Post extends BaseEntity {
           break;
       }
     }
-    this.setModifiedAt(LocalDateTime.now()); // 수정시간
+    this.setModifiedAt(LocalDateTime.now());
   }
 
 
@@ -110,6 +124,9 @@ public class Post extends BaseEntity {
     this.parent = parent;
   }
 
+  /**
+   * 삭제시 상태변경
+   */
   public void changeDeletionStatus() {
 
     this.deleted = true;

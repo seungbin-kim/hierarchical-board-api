@@ -29,6 +29,14 @@ public class JwtFilter extends GenericFilterBean {
   private final HandlerExceptionResolver handlerExceptionResolver;
 
 
+  /**
+   * JWT 인증필터
+   * @param request  요청정보
+   * @param response 응답
+   * @param chain    필터체인
+   * @throws IOException
+   * @throws ServletException
+   */
   @Override
   public void doFilter(final ServletRequest request,
                        final ServletResponse response,

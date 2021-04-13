@@ -9,6 +9,9 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * 유저 엔티티
+ */
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -49,6 +52,17 @@ public class User extends BaseEntity {
       inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
   private Set<Authority> authorities = new HashSet<>();
 
+
+  /**
+   * 생성 메서드
+   * @param email     이메일
+   * @param nickname  닉네임
+   * @param name      이름
+   * @param birthday  생일
+   * @param password  비밀번호
+   * @param authority 권한
+   * @return 생성된 유저 엔티티
+   */
   public static User createUser(final String email,
                                 final String nickname,
                                 final String name,
@@ -65,6 +79,7 @@ public class User extends BaseEntity {
     user.authorities.add(authority);
     return user;
   }
+
 
   public void changeEmail(final String email) {
     this.email = email;

@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 댓글 엔티티
+ */
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -50,6 +53,14 @@ public class Comment extends BaseEntity {
   private boolean deleted;
 
 
+  /**
+   * 생성 메서드
+   * @param post    게시글 엔티티
+   * @param user    유저 엔티티
+   * @param content 내용
+   * @param parent  원글
+   * @return 생성된 엔티티
+   */
   public static Comment createComment(final Post post,
                                       final User user,
                                       final String content,
@@ -64,6 +75,10 @@ public class Comment extends BaseEntity {
   }
 
 
+  /**
+   * 내용수정 메서드
+   * @param content 수정할 내용
+   */
   public void updateComment(final String content) {
 
     if (content != null) {
@@ -92,6 +107,9 @@ public class Comment extends BaseEntity {
     this.parent = parent;
   }
 
+  /**
+   * 삭제시 상태변경 메서드
+   */
   public void changeDeletionStatus() {
 
     this.deleted = true;

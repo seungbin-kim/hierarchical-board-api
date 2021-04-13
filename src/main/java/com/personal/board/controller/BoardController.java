@@ -26,6 +26,11 @@ public class BoardController {
   private final BoardService boardService;
 
 
+  /**
+   * 게시판 등록
+   * @param request 등록 요청정보
+   * @return 등록된 게시판 정보
+   */
   @PostMapping("/boards")
   public ResponseEntity<BoardResponseWithCreatedAt> addBoard(@RequestBody @Valid final BoardRequest request) {
 
@@ -40,6 +45,10 @@ public class BoardController {
   }
 
 
+  /**
+   * 게시판 목록 조회
+   * @return 등록된 게시판 목록
+   */
   @GetMapping("/boards")
   public ResponseEntity<ListResponse<BoardResponseWithDate>> getAllBoard() {
 
@@ -48,6 +57,11 @@ public class BoardController {
   }
 
 
+  /**
+   * 게시판 단건조회
+   * @param boardId 조회할 게시판 id
+   * @return 게시판 정보
+   */
   @GetMapping("/boards/{boardId}")
   public ResponseEntity<BoardResponseWithDate> getBoard(@PathVariable final Long boardId) {
 

@@ -15,6 +15,9 @@ public class JwtSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurity
   private final HandlerExceptionResolver handlerExceptionResolver;
 
 
+  /**
+   * JWT 필터 등록
+   */
   @Override
   public void configure(final HttpSecurity http) throws Exception {
 
