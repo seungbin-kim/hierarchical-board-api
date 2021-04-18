@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.personal.board.dto.request.SignUpRequest;
+import com.personal.board.dto.request.UserUpdateRequest;
 import com.personal.board.dto.response.user.UserResponseWithCreatedAt;
 import com.personal.board.dto.response.user.UserResponseWithDate;
+import com.personal.board.dto.response.user.UserResponseWithModifiedAt;
 import com.personal.board.entity.Authority;
 import com.personal.board.entity.User;
 import com.personal.board.enumeration.Role;
@@ -58,17 +60,17 @@ class UserControllerUnitTest {
   @MockBean
   private JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
+  String email = "test@test.com";
+  String name = "testName";
+  String nickname = "testNickname";
+  LocalDate birthday = LocalDate.parse("1997-05-28");
+  String password = "1234";
+  Authority authority = new Authority(Role.ROLE_USER);
+
   @Test
   @DisplayName("회원가입")
   void signUp() throws Exception {
     //given
-    String email = "test@test.com";
-    String name = "testName";
-    String nickname = "testNickname";
-    LocalDate birthday = LocalDate.parse("1997-05-28");
-    String password = "1234";
-    Authority authority = new Authority(Role.ROLE_USER);
-
     SignUpRequest signUpRequest = new SignUpRequest();
     signUpRequest.setEmail(email);
     signUpRequest.setName(name);
@@ -81,8 +83,10 @@ class UserControllerUnitTest {
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .writeValueAsString(signUpRequest);
 
+    Long id = 1L;
+
     User user = User.createUser(email, nickname, name, birthday, password, authority);
-    ReflectionTestUtils.setField(user, "id", 1L);
+    ReflectionTestUtils.setField(user, "id", id);
 
     UserResponseWithCreatedAt userResponseWithCreatedAt = new UserResponseWithCreatedAt(user);
     when(userService.signUp(signUpRequest))
@@ -97,6 +101,7 @@ class UserControllerUnitTest {
     // then
     resultActions
         .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.id").value(id))
         .andExpect(jsonPath("$.email").value(email))
         .andDo(print());
   }
@@ -143,6 +148,86 @@ class UserControllerUnitTest {
       list.add(user);
     }
     return list;
+  }
+
+  @Test
+  @DisplayName("유저정보수정")
+  @WithMockUser(username = "1")
+  void patchUser() throws Exception {
+    //given
+    UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
+    userUpdateRequest.setEmail("change@a.b");
+    userUpdateRequest.setName("changeName");
+    userUpdateRequest.setNickname("changeNickname");
+    userUpdateRequest.setPassword(password);
+
+    String content = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .writeValueAsString(userUpdateRequest);
+
+    Long id = 1L;
+
+    User user = User.createUser("change@a.b", "changeNickname", "changeName", birthday, password, authority);
+    ReflectionTestUtils.setField(user, "id", id);
+
+    UserResponseWithModifiedAt userResponseWithModifiedAt = new UserResponseWithModifiedAt(user);
+    when(userService.updateUser(userUpdateRequest, id))
+        .thenReturn(userResponseWithModifiedAt);
+
+    //when
+    ResultActions resultActions = mockMvc.perform(patch("/api/v1/users/{id}", id)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(content)
+        .accept(MediaType.APPLICATION_JSON));
+
+    //then
+    resultActions
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(1L))
+        .andExpect(jsonPath("$.email").value("change@a.b"))
+        .andDo(print());
+  }
+  
+  @Test
+  @DisplayName("유저단건조회")
+  @WithMockUser(username = "1")
+  void getUser() throws Exception {
+    //given
+    Long id = 1L;
+    User user = User.createUser(email, nickname, name, birthday, password, authority);
+    ReflectionTestUtils.setField(user, "id", id);
+
+    UserResponseWithDate userResponseWithDate = new UserResponseWithDate(user);
+    when(userService.getUser(id))
+        .thenReturn(userResponseWithDate);
+
+    //when
+    ResultActions resultActions = mockMvc.perform(get("/api/v1/users/{id}", id)
+        .accept(MediaType.APPLICATION_JSON));
+
+    //then
+    resultActions
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(id))
+        .andExpect(jsonPath("$.email").value(email))
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("유저삭제")
+  @WithMockUser(username = "1")
+  void deleteUser() throws Exception {
+    //given
+    Long id = 1L;
+
+    //when
+    ResultActions resultActions = mockMvc.perform(delete("/api/v1/users/{id}", id));
+
+    //then
+    resultActions
+        .andExpect(status().isNoContent())
+        .andDo(print());
   }
 
 }
