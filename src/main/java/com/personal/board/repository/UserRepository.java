@@ -39,14 +39,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
   @Query("SELECT u FROM User u JOIN FETCH u.authorities WHERE u.email = :email")
   Optional<User> findByEmailWithAuthorities(@Param("email") String email);
 
-
-  /**
-   * 유저목록 페이징조회
-   *
-   * @param pageable 페이징 정보
-   * @return 페이징된 유저목록
-   */
-  @NonNull
-  Page<User> findAll(@NonNull Pageable pageable);
-
 }
