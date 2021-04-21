@@ -151,7 +151,13 @@ class UserControllerIntegrationTest {
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .writeValueAsString(userUpdateRequest);
 
-    User user = User.createUser(email, nickname, name, birthday, passwordEncoder.encode(password), authority);
+    User user = User.createUser(
+        email,
+        nickname,
+        name,
+        birthday,
+        passwordEncoder.encode(password),
+        authority);
     userRepository.save(user);
 
     Long id = 1L;
