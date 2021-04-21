@@ -1,5 +1,6 @@
 package com.personal.board.dto.request;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 public class UserUpdateRequest {
 
   @Email(message = "not in email format.")
