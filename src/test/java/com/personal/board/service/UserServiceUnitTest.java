@@ -110,7 +110,7 @@ class UserServiceUnitTest {
     doNothing()
         .when(commentRepository).updateWriterIdToNull(id);
     doNothing()
-        .when(postRepository).updateWriterIdToNull(id);
+        .when(userRepository).updateWriterIdToNull(id);
     doNothing()
         .when(userRepository).delete(user);
 
@@ -119,7 +119,7 @@ class UserServiceUnitTest {
 
     //then
     verify(commentRepository, times(1)).updateWriterIdToNull(id);
-    verify(postRepository, times(1)).updateWriterIdToNull(id);
+    verify(userRepository, times(1)).updateWriterIdToNull(id);
     verify(userRepository, times(1)).delete(user);
   }
 
