@@ -68,7 +68,7 @@ public class UserService {
     User user = findUser(userId);
 
     commentRepository.updateWriterIdToNull(userId);
-    postRepository.updateWriterIdToNull(userId);
+    userRepository.updateWriterIdToNull(userId);
 
     userRepository.delete(user);
   }

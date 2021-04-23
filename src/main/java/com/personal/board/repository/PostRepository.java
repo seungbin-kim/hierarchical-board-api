@@ -14,16 +14,6 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
 
   /**
-   * 유저 탈퇴시 게시글과의 참조관계를 지우기위한 업데이트 쿼리
-   *
-   * @param userId 유저 id
-   */
-  @Modifying
-  @Query("UPDATE Post p SET p.user = NULL WHERE p.user.id = :userId")
-  void updateWriterIdToNull(@Param("userId") Long userId);
-
-
-  /**
    * 게시글 페이징조회(원글만 조회)
    *
    * @param boardId  게시판 id
