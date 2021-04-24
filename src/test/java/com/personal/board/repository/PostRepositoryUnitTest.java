@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
@@ -130,8 +131,7 @@ class PostRepositoryUnitTest {
     }
     return list;
   }
-
-
+  
   private List<Post> createPostList(int number, User user, Board board) {
     List<Post> list = new ArrayList<>();
     for (int i = 0; i < number; i++) {
@@ -145,6 +145,35 @@ class PostRepositoryUnitTest {
       list.add(post);
     }
     return list;
+  }
+  
+  @Test
+  @DisplayName("게시글찾기")
+  void findPostByIdAndBoardId() throws Exception {
+    //given
+    int number = 10;
+    Board board = new Board("testBoard");
+    boardRepository.save(board);
+
+    User user = User.createUser(
+        email,
+        nickname,
+        name,
+        birthday,
+        password,
+        authority
+    );
+    userRepository.save(user);
+
+    List<Post> postList = createPostList(number, user, board);
+    postRepository.saveAll(postList);
+
+    //when
+    Optional<Post> post1 = postRepository.findPostByIdAndBoardId(1L, board.getId());
+    Optional<Post> post2 = postRepository.findPostByIdAndBoardId(1L, null);
+
+    //then
+    assertThat(post1.get()).isEqualTo(post2.get());
   }
 
 }
