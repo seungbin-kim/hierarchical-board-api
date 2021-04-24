@@ -35,6 +35,7 @@ public class CommentService {
 
   private final UserService userService;
 
+  private final SecurityUtil securityUtil;
 
   /**
    * 댓글 등록
@@ -49,7 +50,7 @@ public class CommentService {
 
     Post post = postService.findPost(postId, null);
 
-    Long userId = SecurityUtil.getCurrentUserId().get();
+    Long userId = securityUtil.getCurrentUserId().get();
     User user = userService.findUser(userId);
 
     Comment comment = createComment(request, post, user);
@@ -70,7 +71,7 @@ public class CommentService {
 
     postService.findPost(postId, null);
     Comment targetComment = findComment(commentId, postId);
-    SecurityUtil.checkAdminAndSameUser(targetComment.getUser().getId());
+    securityUtil.checkAdminAndSameUser(targetComment.getUser().getId());
 
     checkAndDeleteComment(targetComment);
   }
@@ -107,7 +108,7 @@ public class CommentService {
     postService.findPost(postId, null);
 
     Comment findComment = findComment(commentId, postId);
-    SecurityUtil.checkAdminAndSameUser(findComment.getUser().getId());
+    securityUtil.checkAdminAndSameUser(findComment.getUser().getId());
 
     findComment.updateComment(request.getContent());
 

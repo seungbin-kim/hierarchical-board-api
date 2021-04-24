@@ -25,6 +25,8 @@ public class BoardController {
 
   private final BoardService boardService;
 
+  private final SecurityUtil securityUtil;
+
 
   /**
    * 게시판 등록
@@ -35,7 +37,7 @@ public class BoardController {
   @PostMapping("/boards")
   public ResponseEntity<BoardResponseWithCreatedAt> addBoard(@RequestBody @Valid final BoardRequest request) {
 
-    if (!SecurityUtil.isAdmin()) {
+    if (!securityUtil.isAdmin()) {
       throw new AccessDeniedException("관리자가 아님");
     }
 

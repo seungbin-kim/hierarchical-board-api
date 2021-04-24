@@ -38,6 +38,7 @@ public class PostService {
 
   private final PatchUtil patchUtil;
 
+  private final SecurityUtil securityUtil;
 
   /**
    * 게시글 등록
@@ -52,7 +53,7 @@ public class PostService {
 
     Board board = boardService.findBoard(boardId);
 
-    Long userId = SecurityUtil.getCurrentUserId().get();
+    Long userId = securityUtil.getCurrentUserId().get();
     User user = userService.findUser(userId);
 
     Post post = createPost(request, board, user);
@@ -74,7 +75,7 @@ public class PostService {
     boardService.findBoard(boardId);
 
     Post targetPost = findPost(postId, boardId);
-    SecurityUtil.checkAdminAndSameUser(targetPost.getUser().getId());
+    securityUtil.checkAdminAndSameUser(targetPost.getUser().getId());
 
     checkAndDeletePost(targetPost);
   }
@@ -128,7 +129,7 @@ public class PostService {
     boardService.findBoard(boardId);
 
     Post findPost = findPost(postId, boardId);
-    SecurityUtil.checkAdminAndSameUser(findPost.getUser().getId());
+    securityUtil.checkAdminAndSameUser(findPost.getUser().getId());
 
     ArrayList<String> validatedFields = patchUtil.getValidatedFields(request);
     findPost.updatePost(validatedFields, request.getTitle(), request.getContent());

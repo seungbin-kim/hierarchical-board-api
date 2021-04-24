@@ -8,9 +8,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+@Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SecurityUtil {
 
@@ -21,7 +23,7 @@ public class SecurityUtil {
    *
    * @return SecurityContext 의 회원 id 반환
    */
-  public static Optional<Long> getCurrentUserId() {
+  public Optional<Long> getCurrentUserId() {
 
     final Authentication authentication = getAuthentication();
     if (authentication == null) {
@@ -45,7 +47,7 @@ public class SecurityUtil {
    *
    * @return 관리자라면 true, 아니라면 false
    */
-  public static boolean isAdmin() {
+  public boolean isAdmin() {
 
     return getAuthentication().getAuthorities().stream()
         .map(Object::toString)
@@ -58,7 +60,7 @@ public class SecurityUtil {
    *
    * @return Authentication 반환
    */
-  public static Authentication getAuthentication() {
+  public Authentication getAuthentication() {
     return SecurityContextHolder.getContext().getAuthentication();
   }
 
@@ -68,7 +70,7 @@ public class SecurityUtil {
    *
    * @param id 검사할 회원 id
    */
-  public static void checkAdminAndSameUser(final Long id) {
+  public void checkAdminAndSameUser(final Long id) {
 
     if (!isAdmin()) {
       if (!isSameUser(id)) {
@@ -84,7 +86,7 @@ public class SecurityUtil {
    * @param id 검사할 회원 id
    * @return 로그인한 회원과 같다면 true, 아니라면 false
    */
-  private static boolean isSameUser(final Long id) {
+  private boolean isSameUser(final Long id) {
 
     Long currentUserId = getCurrentUserId().get();
     return id.equals(currentUserId);

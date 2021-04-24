@@ -33,6 +33,8 @@ public class UserController {
 
   private final UserService userService;
 
+  private final SecurityUtil securityUtil;
+
 
   /**
    * 회원가입
@@ -43,7 +45,7 @@ public class UserController {
   @PostMapping("/users")
   public ResponseEntity<UserResponseWithCreatedAt> signUp(@RequestBody @Valid final SignUpRequest signUpRequest) {
 
-    if (!SecurityUtil.getAuthentication().getName().equals("anonymousUser")) {
+    if (!securityUtil.getAuthentication().getName().equals("anonymousUser")) {
       throw new BadArgumentException("이미 로그인 되어 있네요?");
     }
 
@@ -79,7 +81,7 @@ public class UserController {
   public ResponseEntity<UserResponseWithModifiedAt> patchUser(@RequestBody @Valid final UserUpdateRequest request,
                                                               @PathVariable final Long id) {
 
-    SecurityUtil.checkAdminAndSameUser(id);
+    securityUtil.checkAdminAndSameUser(id);
 
     try {
       return ResponseEntity
@@ -99,7 +101,7 @@ public class UserController {
   @GetMapping("/users/{id}")
   public ResponseEntity<UserResponseWithDate> getUser(@PathVariable final Long id) {
 
-    SecurityUtil.checkAdminAndSameUser(id);
+    securityUtil.checkAdminAndSameUser(id);
 
     return ResponseEntity
         .ok(userService.getUser(id));
@@ -117,9 +119,9 @@ public class UserController {
   public ResponseEntity<?> deleteUser(@PathVariable final Long id,
                                       final HttpServletResponse response) {
 
-    SecurityUtil.checkAdminAndSameUser(id);
+    securityUtil.checkAdminAndSameUser(id);
 
-    if (SecurityUtil.isAdmin()) {
+    if (securityUtil.isAdmin()) {
       Cookie token = new Cookie("token", null);
       token.setHttpOnly(true);
       token.setPath("/");

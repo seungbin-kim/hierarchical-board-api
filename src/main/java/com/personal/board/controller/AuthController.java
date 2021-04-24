@@ -21,6 +21,8 @@ public class AuthController {
 
   private final AuthService authService;
 
+  private final SecurityUtil securityUtil;
+
   /**
    * 로그인
    *
@@ -33,7 +35,7 @@ public class AuthController {
   public ResponseEntity<TokenResponse> signIn(@RequestBody @Valid final SignInRequest signInRequest,
                                               final HttpServletResponse response) {
 
-    if (!SecurityUtil.getAuthentication().getName().equals("anonymousUser")) {
+    if (!securityUtil.getAuthentication().getName().equals("anonymousUser")) {
       throw new BadArgumentException("이미 로그인 되어 있네요?");
     }
 
