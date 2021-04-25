@@ -67,9 +67,10 @@ public class PostService {
    *
    * @param boardId 삭제할 게시글이 속한 게시판 id
    * @param postId  삭제할 게시글 id
+   * @return 서비스 수행 후 true 리턴
    */
   @Transactional
-  public void deletePost(final Long boardId,
+  public boolean deletePost(final Long boardId,
                          final Long postId) {
 
     boardService.findBoard(boardId);
@@ -78,6 +79,7 @@ public class PostService {
     securityUtil.checkAdminAndSameUser(targetPost.getUser().getId());
 
     checkAndDeletePost(targetPost);
+    return true;
   }
 
 

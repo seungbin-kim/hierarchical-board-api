@@ -23,6 +23,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -87,8 +88,41 @@ class PostServiceUnitTest {
     PostResponseWithContentAndCreatedAt response = postService.addPost(postRequest, board.getId());
 
     //then
-    Assertions.assertThat(response.getTitle()).isEqualTo("testTitle");
-    Assertions.assertThat(response.getContent()).isEqualTo("testContent");
+    assertThat(response.getTitle()).isEqualTo("testTitle");
+    assertThat(response.getContent()).isEqualTo("testContent");
+  }
+
+  @Test
+  @DisplayName("게시글삭제")
+  void deletePost() throws Exception {
+    //given
+    Board board = new Board("testBoard");
+    User user = User.createUser(
+        "email",
+        "nickname",
+        "name",
+        LocalDate.now(),
+        "password",
+        new Authority(Role.ROLE_USER));
+    Long postId = 1L;
+    Long boardId = 1L;
+    when(postRepository.findPostByIdAndBoardId(postId, boardId))
+        .thenReturn(Optional.of(
+            Post.createPost(
+                board,
+                user,
+                "testTitle",
+                "testContent",
+                null
+            )));
+
+    //when
+    boolean bool = postService.deletePost(postId, boardId);
+
+    //then
+    verify(boardService, times(1)).findBoard(boardId);
+    verify(securityUtil, times(1)).checkAdminAndSameUser(any());
+    assertThat(bool).isTrue();
   }
 
 }
