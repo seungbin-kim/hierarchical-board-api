@@ -2,8 +2,10 @@ package com.personal.board.service;
 
 import com.personal.board.dto.query.PostQueryDto;
 import com.personal.board.dto.request.PostRequest;
+import com.personal.board.dto.request.PostUpdateRequest;
 import com.personal.board.dto.response.post.PostResponseWithContentAndCreatedAt;
 import com.personal.board.dto.response.post.PostResponseWithContentAndDate;
+import com.personal.board.dto.response.post.PostResponseWithContentAndModifiedAt;
 import com.personal.board.entity.Authority;
 import com.personal.board.entity.Board;
 import com.personal.board.entity.Post;
@@ -27,6 +29,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -212,6 +215,45 @@ class PostServiceUnitTest {
       list.add(dto);
     }
     return list;
+  }
+
+  @Test
+  @DisplayName("게시글업데이트")
+  void updatePost() throws Exception {
+    //given
+    String updateTitle = "abc";
+    PostUpdateRequest postUpdateRequest = new PostUpdateRequest();
+    postUpdateRequest.setTitle(updateTitle);
+
+    Long postId = 1L;
+    Long boardId = 1L;
+    Board board = new Board("testBoard");
+    User user = User.createUser(
+        "email",
+        "nickname",
+        "name",
+        LocalDate.now(),
+        "password",
+        new Authority(Role.ROLE_USER));
+    Post post = Post.createPost(
+        board,
+        user,
+        "testTitle",
+        "testContent",
+        null
+    );
+    ReflectionTestUtils.setField(post, "id", postId);
+    when(postRepository.findPostByIdAndBoardId(postId, boardId))
+        .thenReturn(Optional.of(post));
+    when(patchUtil.getValidatedFields(postUpdateRequest))
+        .thenReturn(new ArrayList<>(Arrays.asList("title")));
+
+    //when
+    PostResponseWithContentAndModifiedAt response = postService.updatePost(postUpdateRequest, boardId, postId);
+
+    //then
+    assertThat(response.getId()).isEqualTo(postId);
+    assertThat(response.getTitle()).isEqualTo(updateTitle);
   }
 
 }
