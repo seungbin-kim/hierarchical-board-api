@@ -15,6 +15,7 @@ import com.personal.board.jwt.JwtAccessDeniedHandler;
 import com.personal.board.jwt.JwtAuthenticationEntryPoint;
 import com.personal.board.jwt.TokenProvider;
 import com.personal.board.service.UserService;
+import com.personal.board.util.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +27,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -33,6 +36,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +54,9 @@ class UserControllerUnitTest {
 
   @MockBean
   private UserService userService;
+
+  @MockBean
+  private SecurityUtil securityUtil;
 
   @MockBean
   private TokenProvider tokenProvider;
@@ -84,13 +91,50 @@ class UserControllerUnitTest {
         .writeValueAsString(signUpRequest);
 
     Long id = 1L;
-
     User user = User.createUser(email, nickname, name, birthday, password, authority);
     ReflectionTestUtils.setField(user, "id", id);
 
     UserResponseWithCreatedAt userResponseWithCreatedAt = new UserResponseWithCreatedAt(user);
     when(userService.signUp(signUpRequest))
         .thenReturn(userResponseWithCreatedAt);
+    when(securityUtil.getAuthentication())
+        .thenReturn(new Authentication() {
+          @Override
+          public Collection<? extends GrantedAuthority> getAuthorities() {
+            return null;
+          }
+
+          @Override
+          public Object getCredentials() {
+            return null;
+          }
+
+          @Override
+          public Object getDetails() {
+            return null;
+          }
+
+          @Override
+          public Object getPrincipal() {
+            return null;
+          }
+
+          @Override
+          public boolean isAuthenticated() {
+            return false;
+          }
+
+          @Override
+          public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+
+          }
+
+          @Override
+          public String getName() {
+            return "anonymousUser";
+          }
+        });
+    doNothing().when(securityUtil).checkAdminAndSameUser(any());
 
     //when
     ResultActions resultActions = mockMvc.perform(post("/api/v1/users")
@@ -188,7 +232,7 @@ class UserControllerUnitTest {
         .andExpect(jsonPath("$.email").value("change@a.b"))
         .andDo(print());
   }
-  
+
   @Test
   @DisplayName("유저단건조회")
   @WithMockUser(username = "1")
