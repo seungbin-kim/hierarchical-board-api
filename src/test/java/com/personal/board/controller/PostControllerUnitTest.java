@@ -3,7 +3,10 @@ package com.personal.board.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personal.board.dto.query.PostQueryDto;
 import com.personal.board.dto.request.PostRequest;
+import com.personal.board.dto.request.PostUpdateRequest;
 import com.personal.board.dto.response.post.PostResponseWithContentAndCreatedAt;
+import com.personal.board.dto.response.post.PostResponseWithContentAndDate;
+import com.personal.board.dto.response.post.PostResponseWithContentAndModifiedAt;
 import com.personal.board.entity.Authority;
 import com.personal.board.entity.Board;
 import com.personal.board.entity.Post;
@@ -173,6 +176,100 @@ class PostControllerUnitTest {
       list.add(dto);
     }
     return list;
+  }
+  
+  @Test
+  @DisplayName("게시글단건조회")
+  void getPost() throws Exception {
+    //given
+    Long boardId = 1L;
+    Board board = new Board("test");
+    ReflectionTestUtils.setField(board, "id", boardId);
+
+    Long postId = 1L;
+    Post post = Post.createPost(
+        board,
+        user,
+        postTitle,
+        postContent,
+        null
+    );
+    ReflectionTestUtils.setField(post, "id", postId);
+
+    when(postService.getPost(boardId, postId))
+        .thenReturn(new PostResponseWithContentAndDate(post));
+    
+    //when
+    ResultActions perform = mockMvc.perform(get("/api/v1/boards/{boardId}/posts/{postId}", boardId, postId)
+        .accept(MediaType.APPLICATION_JSON));
+
+    //then
+    perform
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(postId))
+        .andExpect(jsonPath("$.title").value(postTitle))
+        .andExpect(jsonPath("$.content").value(postContent))
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("게시글수정")
+  @WithMockUser
+  void patchPost() throws Exception {
+    //given
+    String changeTitle = "changeTitle";
+    PostUpdateRequest request = new PostUpdateRequest();
+    request.setTitle(changeTitle);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    String content = objectMapper.writeValueAsString(request);
+
+    Long boardId = 1L;
+    Board board = new Board("test");
+    ReflectionTestUtils.setField(board, "id", boardId);
+
+    Long postId = 1L;
+    Post post = Post.createPost(
+        board,
+        user,
+        changeTitle,
+        postContent,
+        null
+    );
+    ReflectionTestUtils.setField(post, "id", postId);
+
+    when(postService.updatePost(request, boardId, postId))
+        .thenReturn(new PostResponseWithContentAndModifiedAt(post));
+
+    //when
+    ResultActions perform = mockMvc.perform(patch("/api/v1/boards/{boardId}/posts/{postId}", boardId, postId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(content)
+        .accept(MediaType.APPLICATION_JSON));
+
+    //then
+    perform
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(postId))
+        .andExpect(jsonPath("$.title").value(changeTitle))
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("게시글삭제")
+  @WithMockUser
+  void deletePost() throws Exception {
+    //given
+    Long boardId = 1L;
+    Long postId = 1L;
+
+    //when
+    ResultActions perform = mockMvc.perform(delete("/api/v1/boards/{boardId}/posts/{postId}", boardId, postId));
+
+    //then
+    perform
+        .andExpect(status().isNoContent())
+        .andDo(print());
   }
 
 }
