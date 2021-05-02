@@ -58,8 +58,6 @@ class BoardControllerIntegrationTest {
     String content = new ObjectMapper()
         .writeValueAsString(boardRequest);
 
-    Board board = new Board(boardName);
-
     //when
     ResultActions perform = mockMvc.perform(post("/api/v1/boards")
         .contentType(MediaType.APPLICATION_JSON)
