@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personal.board.dto.request.BoardRequest;
 import com.personal.board.entity.Board;
 import com.personal.board.repository.BoardRepository;
-import com.personal.board.service.BoardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +59,6 @@ class BoardControllerIntegrationTest {
         .writeValueAsString(boardRequest);
 
     Board board = new Board(boardName);
-    ReflectionTestUtils.setField(board, "id", 1L);
 
     //when
     ResultActions perform = mockMvc.perform(post("/api/v1/boards")
@@ -99,7 +96,6 @@ class BoardControllerIntegrationTest {
     List<Board> list = new ArrayList<>();
     for (int i = 1; i <= number; i++) {
       Board board = new Board("testBoard" + i);
-      ReflectionTestUtils.setField(board, "id", (long) i);
       list.add(board);
     }
     return list;
