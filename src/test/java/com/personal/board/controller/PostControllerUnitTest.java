@@ -143,15 +143,17 @@ class PostControllerUnitTest {
         .thenReturn(response);
 
     //when
-    ResultActions perform = mockMvc.perform(get("/api/v1/boards/{boardId}/posts?page=0&size=5", boardId)
+    ResultActions perform = mockMvc.perform(get("/api/v1/boards/{boardId}/posts", boardId)
+        .queryParam("page", String.valueOf(page))
+        .queryParam("size", String.valueOf(pageSize))
         .accept(MediaType.APPLICATION_JSON));
 
     //then
     perform
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content", Matchers.hasSize(pageSize)))
-        .andExpect(jsonPath("$.content.[0].id").value(1))
-        .andExpect(jsonPath("$.content.[1].id").value(2))
+        .andExpect(jsonPath("$.content.[0].id").value(number))
+        .andExpect(jsonPath("$.content.[1].id").value(number - 1))
         .andExpect(jsonPath("$.totalElements").value(number))
         .andExpect(jsonPath("$.totalPages").value(1))
         .andDo(print());
@@ -159,7 +161,7 @@ class PostControllerUnitTest {
 
   private List<PostQueryDto> createPostQueryDto(int number, boolean isChildren) {
     List<PostQueryDto> list = new ArrayList<>();
-    for (int i = 1; i <= number; i++) {
+    for (int i = number; i >= 1; i--) {
       Long parentId = null;
       long id = i;
       if (isChildren) {
