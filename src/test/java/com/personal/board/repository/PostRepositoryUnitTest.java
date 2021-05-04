@@ -73,10 +73,11 @@ class PostRepositoryUnitTest {
     List<Post> postList = createPostList(number, user, board);
     postRepository.saveAll(postList);
 
-    List<Post> replyList = createReplyList(3, postList, user, board);
+    int numberOfReply = 3;
+    List<Post> replyList = createReplyList(numberOfReply, postList, user, board);
     postRepository.saveAll(replyList);
 
-    List<Post> replyListDeep = createReplyList(3, replyList, user, board);
+    List<Post> replyListDeep = createReplyList(numberOfReply, replyList, user, board);
     postRepository.saveAll(replyListDeep);
 
     int requestSize = 5;
