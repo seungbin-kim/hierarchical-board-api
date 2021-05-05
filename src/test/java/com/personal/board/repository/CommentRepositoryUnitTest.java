@@ -16,6 +16,7 @@ import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -122,6 +123,50 @@ class CommentRepositoryUnitTest {
       list.add(comment);
     }
     return list;
+  }
+
+  @Test
+  void findAllChildren() throws Exception {
+    //given
+    int number = 10;
+    Board board = new Board("testBoard");
+    boardRepository.save(board);
+
+    User user = User.createUser(
+        email,
+        nickname,
+        name,
+        birthday,
+        password,
+        authority
+    );
+    userRepository.save(user);
+
+    Post post = Post.createPost(
+        board,
+        user,
+        "title",
+        "content",
+        null
+    );
+    postRepository.save(post);
+
+    List<Comment> commentList = createCommentList(number, post, user);
+    commentRepository.saveAll(commentList);
+
+    int numberOfReply = 3;
+    List<Comment> replyList = createReplyList(numberOfReply, commentList, post, user);
+    commentRepository.saveAll(replyList);
+
+    List<Long> parentIds = commentList.stream()
+        .map(Comment::getId)
+        .collect(Collectors.toList());
+
+    //when
+    List<CommentQueryDto> children = commentRepository.findAllChildren(post.getId(), parentIds);
+
+    //then
+    assertThat(children.size()).isEqualTo(number * numberOfReply);
   }
 
 }
