@@ -36,7 +36,6 @@ class CommentRepositoryUnitTest {
   @Autowired
   UserRepository userRepository;
 
-
   @Autowired
   EntityManager em;
 
@@ -126,6 +125,7 @@ class CommentRepositoryUnitTest {
   }
 
   @Test
+  @DisplayName("자식댓글조회")
   void findAllChildren() throws Exception {
     //given
     int number = 10;
