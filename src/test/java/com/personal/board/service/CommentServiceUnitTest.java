@@ -107,4 +107,55 @@ class CommentServiceUnitTest {
     assertThat(commentResponseWithCreatedAt.getContent()).isEqualTo(content);
   }
 
+  @Test
+  @DisplayName("댓글삭제")
+  void deleteComment() throws Exception {
+    //given
+    Long postId = 1L;
+    Long commentId = 1L;
+    Long boardId = 1L;
+    Long userId = 1L;
+
+    Board board = new Board("testBoard");
+    ReflectionTestUtils.setField(board, "id", boardId);
+
+    User user = User.createUser(
+        email,
+        nickname,
+        name,
+        birthday,
+        password,
+        authority
+    );
+    ReflectionTestUtils.setField(user, "id", userId);
+
+    Post post = Post.createPost(
+        board,
+        user,
+        "testTitle",
+        "testContent",
+        null
+    );
+    ReflectionTestUtils.setField(post, "id", postId);
+
+    String content = "test";
+    Comment comment = Comment.createComment(
+        post,
+        user,
+        content,
+        null
+    );
+    ReflectionTestUtils.setField(comment, "id", commentId);
+
+    when(commentRepository.findByIdAndPostId(commentId, postId))
+        .thenReturn(Optional.of(comment));
+
+    //when
+    commentService.deleteComment(postId, commentId);
+
+    //then
+    verify(postService, times(1)).findPost(postId, null);
+    verify(securityUtil, times(1)).checkAdminAndSameUser(any());
+  }
+
 }
