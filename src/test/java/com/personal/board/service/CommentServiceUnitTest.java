@@ -1,5 +1,6 @@
 package com.personal.board.service;
 
+import com.personal.board.dto.query.CommentQueryDto;
 import com.personal.board.dto.request.CommentRequest;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
 import com.personal.board.entity.*;
@@ -12,9 +13,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -156,6 +163,54 @@ class CommentServiceUnitTest {
     //then
     verify(postService, times(1)).findPost(postId, null);
     verify(securityUtil, times(1)).checkAdminAndSameUser(any());
+  }
+
+  @Test
+  @DisplayName("댓글페이지조회")
+  void getPageableComment() throws Exception {
+    //given
+    int page = 0;
+    int pageSize = 10;
+    int number = 5;
+    Long postId = 1L;
+    PageRequest pageRequest = PageRequest.of(page, pageSize);
+
+    List<CommentQueryDto> parents = createCommentQueryDto(number, false);
+    List<CommentQueryDto> children = createCommentQueryDto(number, true);
+    PageImpl<CommentQueryDto> pageImpl = new PageImpl<>(parents, pageRequest, number);
+    when(commentRepository.findAllOriginal(postId, pageRequest))
+        .thenReturn(pageImpl);
+    when(commentRepository.findAllChildren(any(), any()))
+        .thenReturn(children)
+        .thenReturn(new ArrayList<>());
+
+    //when
+    Page<CommentQueryDto> dtoPage = commentService.getPageableComment(postId, pageRequest);
+
+    //then
+    assertThat(dtoPage.getTotalElements()).isEqualTo(number);
+    assertThat(dtoPage.getContent().size()).isEqualTo(number);
+  }
+
+  private List<CommentQueryDto> createCommentQueryDto(int number, boolean isChildren) {
+    List<CommentQueryDto> list = new ArrayList<>();
+    for (int i = 1; i <= number; i++) {
+      Long parentId = null;
+      long id = i;
+      if (isChildren) {
+        parentId = (long) i;
+        id = (i + number);
+      }
+      CommentQueryDto dto = new CommentQueryDto(
+          parentId,
+          id,
+          "nickname" + i,
+          "content" + i,
+          LocalDateTime.now(),
+          false);
+      list.add(dto);
+    }
+    return list;
   }
 
 }
