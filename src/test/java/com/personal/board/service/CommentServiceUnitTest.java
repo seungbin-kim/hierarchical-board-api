@@ -2,7 +2,9 @@ package com.personal.board.service;
 
 import com.personal.board.dto.query.CommentQueryDto;
 import com.personal.board.dto.request.CommentRequest;
+import com.personal.board.dto.request.CommentUpdateRequest;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
+import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
 import com.personal.board.entity.*;
 import com.personal.board.enumeration.Role;
 import com.personal.board.repository.CommentRepository;
@@ -211,6 +213,61 @@ class CommentServiceUnitTest {
       list.add(dto);
     }
     return list;
+  }
+  
+  @Test
+  @DisplayName("댓글업데이트")
+  void updateComment() throws Exception {
+    //given
+    Long commentId = 1L;
+    Long postId = 1L;
+    Long boardId = 1L;
+    Long userId = 1L;
+
+    String update = "updateContent";
+    CommentUpdateRequest request = new CommentUpdateRequest();
+    request.setContent(update);
+
+    Board board = new Board("testBoard");
+    ReflectionTestUtils.setField(board, "id", boardId);
+
+    User user = User.createUser(
+        email,
+        nickname,
+        name,
+        birthday,
+        password,
+        authority
+    );
+    ReflectionTestUtils.setField(user, "id", userId);
+
+    Post post = Post.createPost(
+        board,
+        user,
+        "testTitle",
+        "testContent",
+        null
+    );
+    ReflectionTestUtils.setField(post, "id", postId);
+
+    String content = "test";
+    Comment comment = Comment.createComment(
+        post,
+        user,
+        content,
+        null
+    );
+    ReflectionTestUtils.setField(comment, "id", commentId);
+
+    when(commentRepository.findByIdAndPostId(commentId, postId))
+        .thenReturn(Optional.of(comment));
+    
+    //when
+    CommentResponseWithModifiedAt response = commentService.updateComment(request, postId, commentId);
+
+    //then
+    assertThat(response.getId()).isEqualTo(commentId);
+    assertThat(response.getContent()).isEqualTo(update);
   }
 
 }
