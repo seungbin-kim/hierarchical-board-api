@@ -3,7 +3,9 @@ package com.personal.board.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personal.board.dto.query.CommentQueryDto;
 import com.personal.board.dto.request.CommentRequest;
+import com.personal.board.dto.request.CommentUpdateRequest;
 import com.personal.board.dto.response.comment.CommentResponseWithCreatedAt;
+import com.personal.board.dto.response.comment.CommentResponseWithModifiedAt;
 import com.personal.board.entity.*;
 import com.personal.board.enumeration.Role;
 import com.personal.board.jwt.JwtAccessDeniedHandler;
@@ -212,6 +214,70 @@ class CommentControllerUnitTest {
       list.add(dto);
     }
     return list;
+  }
+  
+  @Test
+  @DisplayName("댓글수정")
+  @WithMockUser("1")
+  void patchComment() throws Exception {
+    //given
+    Long postId = 1L;
+    Long userId = 1L;
+    Long boardId = 1L;
+    Long commentId = 1L;
+
+    String updateContent = "update";
+    CommentUpdateRequest request = new CommentUpdateRequest();
+    request.setContent(updateContent);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    String requestContent = objectMapper.writeValueAsString(request);
+
+    Board board = new Board("testBoard");
+    ReflectionTestUtils.setField(board, "id", boardId);
+
+    User user = User.createUser(
+        email,
+        nickname,
+        name,
+        birthday,
+        password,
+        authority
+    );
+    ReflectionTestUtils.setField(user, "id", userId);
+
+    Post post = Post.createPost(
+        board,
+        user,
+        "testTitle",
+        "testContent",
+        null
+    );
+    ReflectionTestUtils.setField(post, "id", postId);
+
+    Comment comment = Comment.createComment(
+        post,
+        user,
+        requestContent,
+        null
+    );
+    ReflectionTestUtils.setField(comment, "id", commentId);
+
+    when(commentService.updateComment(request, postId, commentId))
+        .thenReturn(new CommentResponseWithModifiedAt(comment));
+
+    //when
+    ResultActions perform = mockMvc.perform(patch("/api/v1/posts/{postId}/comments/{commentId}", postId, commentId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(requestContent)
+        .accept(MediaType.APPLICATION_JSON));
+
+    //then
+    perform
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(commentId))
+        .andExpect(jsonPath("$.content").value(requestContent))
+        .andDo(print());
   }
 
 }
