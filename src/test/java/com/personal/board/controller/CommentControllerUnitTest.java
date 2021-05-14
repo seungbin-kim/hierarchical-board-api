@@ -279,5 +279,22 @@ class CommentControllerUnitTest {
         .andExpect(jsonPath("$.content").value(requestContent))
         .andDo(print());
   }
+  
+  @Test
+  @DisplayName("댓글 삭제")
+  @WithMockUser("1")
+  void deleteComment() throws Exception {
+    //given
+    Long postId = 1L;
+    Long commentId = 1L;
+    
+    //when
+    ResultActions perform = mockMvc.perform(delete("/api/v1/posts/{postId}/comments/{commentId}", postId, commentId));
+
+    //then
+    perform
+        .andExpect(status().isNoContent())
+        .andDo(print());
+  }
 
 }
