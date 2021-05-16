@@ -188,8 +188,8 @@ class CommentControllerUnitTest {
     perform
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content", Matchers.hasSize(number)))
-        .andExpect(jsonPath("$.content.[0].id").value(number))
-        .andExpect(jsonPath("$.content.[1].id").value(number - 1))
+        .andExpect(jsonPath("$.content.[0].id").value(1L))
+        .andExpect(jsonPath("$.content.[1].id").value(2L))
         .andExpect(jsonPath("$.totalElements").value(number))
         .andExpect(jsonPath("$.totalPages").value(1))
         .andDo(print());
@@ -197,7 +197,7 @@ class CommentControllerUnitTest {
 
   private List<CommentQueryDto> createCommentQueryDto(int number, boolean isChildren) {
     List<CommentQueryDto> list = new ArrayList<>();
-    for (int i = number; i >= 1; i--) {
+    for (int i = 1; i <= number; i++) {
       Long parentId = null;
       long id = i;
       if (isChildren) {
@@ -258,7 +258,7 @@ class CommentControllerUnitTest {
     Comment comment = Comment.createComment(
         post,
         user,
-        requestContent,
+        updateContent,
         null
     );
     ReflectionTestUtils.setField(comment, "id", commentId);
@@ -276,12 +276,12 @@ class CommentControllerUnitTest {
     perform
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(commentId))
-        .andExpect(jsonPath("$.content").value(requestContent))
+        .andExpect(jsonPath("$.content").value(updateContent))
         .andDo(print());
   }
   
   @Test
-  @DisplayName("댓글 삭제")
+  @DisplayName("댓글삭제")
   @WithMockUser("1")
   void deleteComment() throws Exception {
     //given

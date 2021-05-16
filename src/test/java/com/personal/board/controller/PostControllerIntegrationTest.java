@@ -57,6 +57,7 @@ class PostControllerIntegrationTest {
 
   @BeforeEach
   public void init() {
+    em.createNativeQuery("ALTER SEQUENCE board_seq RESTART WITH 1").executeUpdate();
     em.createNativeQuery("ALTER SEQUENCE post_seq RESTART WITH 1").executeUpdate();
     em.createNativeQuery("ALTER SEQUENCE user_seq RESTART WITH 1").executeUpdate();
   }
@@ -80,7 +81,7 @@ class PostControllerIntegrationTest {
   );
 
   @Test
-  @DisplayName("게시글 등록")
+  @DisplayName("게시글등록")
   @WithMockUser("1")
   void addPost() throws Exception {
     //given
@@ -132,7 +133,7 @@ class PostControllerIntegrationTest {
     postRepository.saveAll(childrenPostList);
 
     //when
-    ResultActions perform = mockMvc.perform(get("/api/v1/boards/{boardId}/posts?page=0&size=5", boardId)
+    ResultActions perform = mockMvc.perform(get("/api/v1/boards/{boardId}/posts", boardId)
         .queryParam("page", String.valueOf(page))
         .queryParam("size", String.valueOf(pageSize))
         .accept(MediaType.APPLICATION_JSON));
