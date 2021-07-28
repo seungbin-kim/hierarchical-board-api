@@ -1,0 +1,12 @@
+version: "3"
+services:
+    database:
+        image: postgres:latest
+        container_name: postgres-board
+        restart: always
+        ports:
+            - 15432:5432
+        environment:
+            POSTGRES_USER: scott
+            POSTGRES_PASSWORD: tiger
+            POSTGRES_DB: board
