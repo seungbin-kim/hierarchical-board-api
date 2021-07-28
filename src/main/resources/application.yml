@@ -2,7 +2,7 @@ spring:
   profiles:
     active: local
   datasource:
-    url: jdbc:postgresql://localhost:5432/scott
+    url: jdbc:postgresql://localhost:15432/board
     username: scott
     password: tiger
     driver-class-name: org.postgresql.Driver
@@ -27,6 +27,6 @@ logging.level:
   org.hibernate.SQL: debug
 
 jwt:
-#  header: Authorization
-  secret:
+  #  header: Authorization
+  secret: c2V1bmdiaW4ta2ltLXNwcmluZy1ib290LWhpZXJhcmNoaWNhbC1ib2FyZC1hcGk==
   token-validity-in-seconds: 180
