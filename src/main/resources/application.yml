@@ -28,5 +28,5 @@ logging.level:
 
 jwt:
   #  header: Authorization
-  secret: c2V1bmdiaW4ta2ltLXNwcmluZy1ib290LWhpZXJhcmNoaWNhbC1ib2FyZC1hcGk==
+  secret: c2V1bmdiaW4ta2ltLXNwcmluZy1ib290LWhpZXJhcmNoaWNhbC1ib2FyZC1hcGktc2VydmVyLWp3dC1zZWNyZXQ=
   token-validity-in-seconds: 180
