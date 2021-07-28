@@ -39,7 +39,6 @@ public class AuthService {
 
     try {
       Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-      SecurityContextHolder.getContext().setAuthentication(authentication);
       String jwt = tokenProvider.createToken(authentication);
 
       Cookie token = new Cookie("token", jwt);
